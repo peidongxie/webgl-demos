@@ -134,4 +134,64 @@ const glFunctionArgToString = <
     : String(argValue);
 };
 
-export { init, mightBeEnum, glEnumToString, glFunctionArgToString };
+const logErrorMsg = <FuncName extends WebGLRenderingContextFuncName>(
+  errValue: number,
+  funcName: FuncName,
+  argValues: WebGLRenderingContextArgValues<FuncName>,
+): void => {
+  const argStr = Array.from(argValues)
+    .map((argValue, argIndex) =>
+      glFunctionArgToString(funcName, argIndex, argValue),
+    )
+    .join(', ');
+  window.console?.log?.(
+    `WebGL error ${glEnumToString(errValue)} in ${funcName}(${argStr})`,
+  );
+};
+
+const makeDebugContext = (
+  ctx: WebGLRenderingContext,
+  onError?: <FuncName extends WebGLRenderingContextFuncName>(
+    errValue: number,
+    funcName: FuncName,
+    argValues: WebGLRenderingContextArgValues<FuncName>,
+  ) => void,
+): WebGLRenderingContext => {
+  init(ctx);
+  const handleRuntimeError = onError || logErrorMsg;
+  const errValues: number[] = [];
+  return new Proxy(ctx, {
+    get(target, p) {
+      const original = target[p as keyof WebGLRenderingContext];
+      if (p === 'getError') {
+        return () => errValues.shift() || target.NO_ERROR;
+      } else if (typeof original === 'function') {
+        return <FuncName extends WebGLRenderingContextFuncName>(
+          ...argValues: WebGLRenderingContextArgValues<FuncName>
+        ): ReturnType<WebGLRenderingContext[FuncName]> => {
+          const funcName = p as FuncName;
+          const func = ctx[funcName] as (
+            ...argValues: WebGLRenderingContextArgValues<FuncName>
+          ) => ReturnType<WebGLRenderingContext[FuncName]>;
+          const result = func(...argValues);
+          const errValue = target.getError();
+          if (errValue) {
+            errValues.push(errValue);
+            handleRuntimeError(errValue, funcName, argValues);
+          }
+          return result;
+        };
+      } else {
+        return original;
+      }
+    },
+  });
+};
+
+export {
+  init,
+  mightBeEnum,
+  glEnumToString,
+  glFunctionArgToString,
+  makeDebugContext,
+};
