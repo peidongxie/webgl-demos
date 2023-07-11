@@ -29,4 +29,28 @@ class Vector4 {
   }
 }
 
-export { Vector3, Vector4 };
+const MATRIX4_IDENTITY = new Float32Array([
+  1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
+]);
+
+class Matrix4 {
+  elements: Float32Array;
+
+  constructor(source?: Matrix4) {
+    this.elements = source?.elements.slice() || MATRIX4_IDENTITY.slice();
+  }
+
+  setIdentity(): this {
+    this.elements.set(MATRIX4_IDENTITY);
+    return this;
+  }
+
+  set(matrix: Matrix4): this {
+    if (this.elements !== matrix.elements) {
+      this.elements.set(matrix.elements);
+    }
+    return this;
+  }
+}
+
+export { Matrix4, Vector3, Vector4 };
