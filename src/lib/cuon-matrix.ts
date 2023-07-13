@@ -113,6 +113,55 @@ class Matrix4 {
     }
     return result;
   }
+
+  transpose(): this {
+    const a = this.elements;
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < i; j++) {
+        const tmp = a[i + j * 4];
+        a[i + j * 4] = a[i * 4 + j];
+        a[i * 4 + j] = tmp;
+      }
+    }
+    return this;
+  }
+
+  setInverseOf(other: Matrix4): this {
+    const a = other.elements;
+    const b = new Float32Array(16);
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 4; j++) {
+        const tmp00 = a[(i > 0 ? 0 : 1) * 4 + (j > 0 ? 0 : 1)];
+        const tmp01 = a[(i > 0 ? 0 : 1) * 4 + (j > 1 ? 1 : 2)];
+        const tmp02 = a[(i > 0 ? 0 : 1) * 4 + (j > 2 ? 2 : 3)];
+        const tmp10 = a[(i > 1 ? 1 : 2) * 4 + (j > 0 ? 0 : 1)];
+        const tmp11 = a[(i > 1 ? 1 : 2) * 4 + (j > 1 ? 1 : 2)];
+        const tmp12 = a[(i > 1 ? 1 : 2) * 4 + (j > 2 ? 2 : 3)];
+        const tmp20 = a[(i > 2 ? 2 : 3) * 4 + (j > 0 ? 0 : 1)];
+        const tmp21 = a[(i > 2 ? 2 : 3) * 4 + (j > 1 ? 1 : 2)];
+        const tmp22 = a[(i > 2 ? 2 : 3) * 4 + (j > 2 ? 2 : 3)];
+        b[i + j * 4] =
+          ((i + j) % 2 ? -1 : 1) *
+          (tmp00 * tmp11 * tmp22 +
+            tmp01 * tmp12 * tmp20 +
+            tmp02 * tmp10 * tmp21 -
+            tmp00 * tmp12 * tmp21 -
+            tmp01 * tmp10 * tmp22 -
+            tmp02 * tmp11 * tmp20);
+      }
+    }
+    const rank = a[0] * b[0] + a[4] * b[1] + a[8] * b[2] + a[12] * b[3];
+    if (rank !== 0) {
+      for (let i = 0; i < 16; i++) {
+        this.elements[i] = b[i] / rank;
+      }
+    }
+    return this;
+  }
+
+  invert(): this {
+    return this.setInverseOf(this);
+  }
 }
 
 export { Matrix4, Vector3, Vector4 };
