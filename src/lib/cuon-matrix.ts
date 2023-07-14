@@ -162,6 +162,41 @@ class Matrix4 {
   invert(): this {
     return this.setInverseOf(this);
   }
+
+  setOrtho(
+    left: number,
+    right: number,
+    bottom: number,
+    top: number,
+    near: number,
+    far: number,
+  ): this {
+    if (left === right || bottom === top || near === far) {
+      throw 'null frustum';
+    }
+    this.setIdentity();
+    const a = this.elements;
+    a[0] = 2 / (right - left);
+    a[5] = 2 / (top - bottom);
+    a[10] = -2 / (far - near);
+    a[12] = -(right + left) / (right - left);
+    a[13] = -(top + bottom) / (top - bottom);
+    a[14] = -(far + near) / (far - near);
+    return this;
+  }
+
+  ortho(
+    left: number,
+    right: number,
+    bottom: number,
+    top: number,
+    near: number,
+    far: number,
+  ): this {
+    return this.concat(
+      new Matrix4().setOrtho(left, right, bottom, top, near, far),
+    );
+  }
 }
 
 export { Matrix4, Vector3, Vector4 };
