@@ -197,6 +197,42 @@ class Matrix4 {
       new Matrix4().setOrtho(left, right, bottom, top, near, far),
     );
   }
+
+  setPerspective(
+    fovy: number,
+    aspect: number,
+    near: number,
+    far: number,
+  ): this {
+    if (near === far || aspect === 0) {
+      throw 'null frustum';
+    }
+    if (near <= 0) {
+      throw 'near <= 0';
+    }
+    if (far <= 0) {
+      throw 'far <= 0';
+    }
+    const degree = (Math.PI * fovy) / 360;
+    const tan = Math.tan(degree);
+    if (tan === 0) {
+      throw 'null frustum';
+    }
+    const cot = 1 / tan;
+    this.setIdentity();
+    const a = this.elements;
+    a[0] = cot / aspect;
+    a[5] = cot;
+    a[10] = -(far + near) / (far - near);
+    a[11] = -1;
+    a[14] = -(2 * near * far) / (far - near);
+    a[15] = 0;
+    return this;
+  }
+
+  perspective(fovy: number, aspect: number, near: number, far: number): this {
+    return this.concat(new Matrix4().setPerspective(fovy, aspect, near, far));
+  }
 }
 
 export { Matrix4, Vector3, Vector4 };
