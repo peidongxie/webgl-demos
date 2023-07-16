@@ -233,6 +233,25 @@ class Matrix4 {
   perspective(fovy: number, aspect: number, near: number, far: number): this {
     return this.concat(new Matrix4().setPerspective(fovy, aspect, near, far));
   }
+
+  setScale(x: number, y: number, z: number): this {
+    this.setIdentity();
+    const a = this.elements;
+    a[0] = x;
+    a[5] = y;
+    a[10] = z;
+    return this;
+  }
+
+  scale(x: number, y: number, z: number): this {
+    const a = this.elements;
+    for (let i = 0; i < 4; i++) {
+      a[i] *= x;
+      a[i + 4] *= y;
+      a[i + 8] *= z;
+    }
+    return this;
+  }
 }
 
 export { Matrix4, Vector3, Vector4 };
