@@ -252,6 +252,23 @@ class Matrix4 {
     }
     return this;
   }
+
+  setTranslate(x: number, y: number, z: number): this {
+    this.setIdentity();
+    const a = this.elements;
+    a[12] = x;
+    a[13] = y;
+    a[14] = z;
+    return this;
+  }
+
+  translate(x: number, y: number, z: number): this {
+    const a = this.elements;
+    for (let i = 0; i < 4; i++) {
+      a[i + 12] += a[i] * x + a[i + 4] * y + a[i + 8] * z;
+    }
+    return this;
+  }
 }
 
 export { Matrix4, Vector3, Vector4 };
