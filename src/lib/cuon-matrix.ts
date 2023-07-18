@@ -269,6 +269,57 @@ class Matrix4 {
     }
     return this;
   }
+
+  setRotate(angle: number, x: number, y: number, z: number): this {
+    this.setIdentity();
+    const degree = (Math.PI * angle) / 180;
+    const a = this.elements;
+    const sin = Math.sin(degree);
+    const cos = Math.cos(degree);
+    if (x !== 0 && y === 0 && z === 0) {
+      a[5] = cos;
+      a[6] = x < 0 ? -sin : sin;
+      a[9] = x < 0 ? sin : -sin;
+      a[10] = cos;
+    } else if (x === 0 && y !== 0 && z === 0) {
+      a[0] = cos;
+      a[2] = y < 0 ? sin : -sin;
+      a[8] = y < 0 ? -sin : sin;
+      a[10] = cos;
+    } else if (x === 0 && y === 0 && z !== 0) {
+      a[0] = cos;
+      a[4] = z < 0 ? sin : -sin;
+      a[1] = z < 0 ? -sin : sin;
+      a[5] = cos;
+    } else if (x !== 0 || y !== 0 || z !== 0) {
+      const squareSum = x * x + y * y + z * z;
+      const xx = (x * x) / squareSum;
+      const yy = (y * y) / squareSum;
+      const zz = (z * z) / squareSum;
+      const xy = (x * y) / squareSum;
+      const yz = (y * z) / squareSum;
+      const zx = (z * x) / squareSum;
+      const tmp = 1 - cos;
+      const magnitude = Math.sqrt(squareSum);
+      const xSin = (x * sin) / magnitude;
+      const ySin = (y * sin) / magnitude;
+      const zSin = (z * sin) / magnitude;
+      a[0] = xx * tmp + cos;
+      a[1] = xy * tmp + zSin;
+      a[2] = zx * tmp - ySin;
+      a[4] = xy * tmp - zSin;
+      a[5] = yy * tmp + cos;
+      a[6] = yz * tmp + xSin;
+      a[8] = zx * tmp + ySin;
+      a[9] = yz * tmp - xSin;
+      a[10] = zz * tmp + cos;
+    }
+    return this;
+  }
+
+  rotate(angle: number, x: number, y: number, z: number): this {
+    return this.concat(new Matrix4().setRotate(angle, x, y, z));
+  }
 }
 
 export { Matrix4, Vector3, Vector4 };
