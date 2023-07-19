@@ -320,6 +320,87 @@ class Matrix4 {
   rotate(angle: number, x: number, y: number, z: number): this {
     return this.concat(new Matrix4().setRotate(angle, x, y, z));
   }
+
+  setLookAt(
+    eyeX: number,
+    eyeY: number,
+    eyeZ: number,
+    centerX: number,
+    centerY: number,
+    centerZ: number,
+    upX: number,
+    upY: number,
+    upZ: number,
+  ): this {
+    this.setIdentity();
+    const a = this.elements;
+    const a02 = eyeX - centerX;
+    const a12 = eyeY - centerY;
+    const a22 = eyeZ - centerZ;
+    const magnitude2 = Math.sqrt(a02 * a02 + a12 * a12 + a22 * a22);
+    if (magnitude2) {
+      a[2] = a02 / magnitude2;
+      a[6] = a12 / magnitude2;
+      a[10] = a22 / magnitude2;
+    } else {
+      a[2] = 0;
+      a[6] = 0;
+      a[10] = 0;
+    }
+    const a00 = upY * a22 - upZ * a12;
+    const a10 = upZ * a02 - upX * a22;
+    const a20 = upX * a12 - upY * a02;
+    const magnitude0 = Math.sqrt(a00 * a00 + a10 * a10 + a20 * a20);
+    if (magnitude0) {
+      a[0] = a00 / magnitude0;
+      a[4] = a10 / magnitude0;
+      a[8] = a20 / magnitude0;
+    } else {
+      a[0] = 0;
+      a[4] = 0;
+      a[8] = 0;
+    }
+    const a01 = a12 * a20 - a22 * a10;
+    const a11 = a22 * a00 - a02 * a20;
+    const a21 = a02 * a10 - a12 * a00;
+    const magnitude1 = Math.sqrt(a01 * a01 + a11 * a11 + a21 * a21);
+    if (magnitude1) {
+      a[1] = a01 / magnitude1;
+      a[5] = a11 / magnitude1;
+      a[9] = a21 / magnitude1;
+    } else {
+      a[1] = 0;
+      a[5] = 0;
+      a[9] = 0;
+    }
+    return this.translate(-eyeX, -eyeY, -eyeZ);
+  }
+
+  lookAt(
+    eyeX: number,
+    eyeY: number,
+    eyeZ: number,
+    centerX: number,
+    centerY: number,
+    centerZ: number,
+    upX: number,
+    upY: number,
+    upZ: number,
+  ): this {
+    return this.concat(
+      new Matrix4().setLookAt(
+        eyeX,
+        eyeY,
+        eyeZ,
+        centerX,
+        centerY,
+        centerZ,
+        upX,
+        upY,
+        upZ,
+      ),
+    );
+  }
 }
 
 export { Matrix4, Vector3, Vector4 };
