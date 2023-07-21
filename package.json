@@ -27,7 +27,7 @@
   "scripts": {
     "build": "tsc && vite build",
     "dev": "vite",
-    "fix": "eslint src --ext ts,tsx --fix && sort-package-json",
+    "fix": "eslint . --ext ts,tsx --fix && sort-package-json",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "prepare": "husky install",
     "preview": "vite preview"
@@ -55,5 +55,5 @@
     "typescript": "^5.2.2",
     "vite": "^4.4.9"
   },
-  "packageManager": "pnpm@8.6.12"
+  "packageManager": "pnpm@8.7.1"
 }
