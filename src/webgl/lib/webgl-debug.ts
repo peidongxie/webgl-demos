@@ -170,10 +170,11 @@ const makeDebugContext = (
           ...argValues: WebGLRenderingContextArgValues<FuncName>
         ): ReturnType<WebGLRenderingContext[FuncName]> => {
           const funcName = p as FuncName;
-          const func = ctx[funcName] as (
-            ...argValues: WebGLRenderingContextArgValues<FuncName>
-          ) => ReturnType<WebGLRenderingContext[FuncName]>;
-          const result = func(...argValues);
+          const result = (
+            ctx[funcName] as (
+              ...argValues: WebGLRenderingContextArgValues<FuncName>
+            ) => ReturnType<WebGLRenderingContext[FuncName]>
+          )(...argValues);
           const errValue = target.getError();
           if (errValue) {
             errValues.push(errValue);
