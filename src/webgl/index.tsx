@@ -5,6 +5,7 @@ import Demo02 from './demo-02';
 import Demo03 from './demo-03';
 import Demo04 from './demo-04';
 import Demo05 from './demo-05';
+import Demo06 from './demo-06';
 
 interface WebglProps {
   [key: string]: never;
@@ -19,6 +20,7 @@ const Webgl: FC<WebglProps> = () => {
       <Route path={'/demo-03'} element={<Demo03 />} />
       <Route path={'/demo-04'} element={<Demo04 />} />
       <Route path={'/demo-05'} element={<Demo05 />} />
+      <Route path={'/demo-06'} element={<Demo06 />} />
     </Routes>
   );
 };
