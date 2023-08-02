@@ -1,21 +1,10 @@
 import { type FC } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Webgl from './webgl';
+import { Outlet } from 'react-router-dom';
 import './app.css';
+import { type ComponentProps } from './type';
 
-interface AppProps {
-  [key: string]: never;
-}
-
-const App: FC<AppProps> = () => {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path={'/'} element={'Hello, World!'} />
-        <Route path={'/webgl/*'} element={<Webgl />} />
-      </Routes>
-    </BrowserRouter>
-  );
+const App: FC<ComponentProps> = () => {
+  return <Outlet />;
 };
 
 export default App;
