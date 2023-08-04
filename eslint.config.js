@@ -16,14 +16,15 @@ const compat = new FlatCompat({
 });
 
 export default [
+  {
+    ignores: ['dist/*'],
+  },
   ...compat.extends(
     'plugin:@typescript-eslint/recommended',
     'plugin:react-hooks/recommended',
     'plugin:prettier/recommended',
   ),
   {
-    files: ['src/*'],
-    ignores: [],
     languageOptions: {
       globals: {
         ...globals.browser,
