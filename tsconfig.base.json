@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    // Type Checking
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    // Modules
+    "allowImportingTsExtensions": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    // Emit
+    "noEmit": true,
+    // Interop Constraints
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
+    // Language and Environment
+    "jsx": "react-jsx",
+    "lib": ["dom", "dom.iterable", "es2020", "webworker"],
+    "target": "es2020",
+    "useDefineForClassFields": true,
+    // Projects
+    "composite": true,
+  }
+}
