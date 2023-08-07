@@ -1,10 +1,8 @@
 import { type FC } from 'react';
 import { Outlet } from 'react-router-dom';
-interface WebglProps {
-  [key: string]: never;
-}
+import { type ComponentProps } from '../type';
 
-const Webgl: FC<WebglProps> = () => {
+const Webgl: FC<ComponentProps> = () => {
   return <Outlet />;
 };
 
