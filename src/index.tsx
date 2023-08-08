@@ -16,6 +16,7 @@ import WebglDemo05 from './webgl/demo-05';
 import WebglDemo06 from './webgl/demo-06';
 import WebglDemo07 from './webgl/demo-07';
 import WebglDemo08 from './webgl/demo-08';
+import WebglDemo09 from './webgl/demo-09';
 
 const webglChildren: RouteObject[] = [
   {
@@ -79,6 +80,14 @@ const webglChildren: RouteObject[] = [
     element: <WebglDemo08 />,
     loader: (): MatchData => ({
       value: ['08 绘制三角', '/demo-08'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-09',
+    element: <WebglDemo09 />,
+    loader: (): MatchData => ({
+      value: ['09 绘制单独线', '/demo-09'],
       children: [],
     }),
   },
