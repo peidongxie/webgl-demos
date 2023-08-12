@@ -20,6 +20,7 @@ import WebglDemo09 from './webgl/demo-09';
 import WebglDemo10 from './webgl/demo-10';
 import WebglDemo11 from './webgl/demo-11';
 import WebglDemo12 from './webgl/demo-12';
+import WebglDemo13 from './webgl/demo-13';
 
 const webglChildren: RouteObject[] = [
   {
@@ -115,6 +116,14 @@ const webglChildren: RouteObject[] = [
     element: <WebglDemo12 />,
     loader: (): MatchData => ({
       value: ['12 绘制矩形', '/demo-12'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-13',
+    element: <WebglDemo13 />,
+    loader: (): MatchData => ({
+      value: ['13 绘制飘带', '/demo-13'],
       children: [],
     }),
   },
