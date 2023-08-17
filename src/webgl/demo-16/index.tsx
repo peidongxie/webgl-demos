@@ -7,7 +7,7 @@ import VSHADER_SOURCE from './vertex.glsl?raw';
 /**
  * 旋转三角-矩阵
  */
-const Demo15: FC<ComponentProps> = () => {
+const Demo16: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const positionAttributeLocationRef = useRef(-1);
@@ -113,4 +113,4 @@ const Demo15: FC<ComponentProps> = () => {
   );
 };
 
-export default Demo15;
+export default Demo16;

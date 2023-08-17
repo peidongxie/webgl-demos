@@ -17,10 +17,13 @@ const Demo15: FC<ComponentProps> = () => {
   const [vertices] = useState(
     () => new Float32Array([0, 0.5, -0.5, -0.5, 0.5, -0.5]),
   );
-  const [angle] = useState(90);
-  const radian = (Math.PI * angle) / 180;
-  const cos = Math.cos(radian);
-  const sin = Math.sin(radian);
+  const [[cos, sin]] = useState(() => {
+    const angle = 90;
+    const radian = (Math.PI * angle) / 180;
+    const cos = Math.cos(radian);
+    const sin = Math.sin(radian);
+    return [cos, sin] as const;
+  });
 
   useEffect(() => {
     /**
