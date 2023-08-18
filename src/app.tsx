@@ -21,14 +21,14 @@ const App: FC<ComponentProps> = () => {
     const object = {
       category: categoryValue,
       demo: demoValue,
-      next: () => {
-        const index = demoEntries.findIndex((entry) => entry[1] === demoValue);
-        const nextIndex = (index + 1) % demoEntries.length;
-        navigate(demoEntries[nextIndex][1]);
-      },
       previous: () => {
         const index = demoEntries.findIndex((entry) => entry[1] === demoValue);
         const nextIndex = index > 0 ? index - 1 : demoEntries.length - 1;
+        navigate(demoEntries[nextIndex][1]);
+      },
+      next: () => {
+        const index = demoEntries.findIndex((entry) => entry[1] === demoValue);
+        const nextIndex = (index + 1) % demoEntries.length;
         navigate(demoEntries[nextIndex][1]);
       },
     };
@@ -40,8 +40,8 @@ const App: FC<ComponentProps> = () => {
       .add(object, 'demo', Object.fromEntries(demoEntries))
       .onChange((value: string) => navigate(value))
       .name('示例');
-    demoEntries.length && gui.add(object, 'next').name('下一个示例');
     demoEntries.length && gui.add(object, 'previous').name('上一个示例');
+    demoEntries.length && gui.add(object, 'next').name('下一个示例');
     guiRef.current = gui;
     return () => {
       guiRef.current?.destroy();
