@@ -135,7 +135,7 @@ const webglChildren: RouteObject[] = [
     path: 'demo-14',
     element: <WebglDemo14 />,
     loader: (): MatchData => ({
-      value: ['14 移动三角', '/demo-14'],
+      value: ['14 向量平移', '/demo-14'],
       children: [],
     }),
   },
@@ -143,7 +143,7 @@ const webglChildren: RouteObject[] = [
     path: 'demo-15',
     element: <WebglDemo15 />,
     loader: (): MatchData => ({
-      value: ['15 旋转三角', '/demo-15'],
+      value: ['15 向量旋转', '/demo-15'],
       children: [],
     }),
   },
@@ -151,7 +151,7 @@ const webglChildren: RouteObject[] = [
     path: 'demo-16',
     element: <WebglDemo16 />,
     loader: (): MatchData => ({
-      value: ['16 旋转三角-矩阵', '/demo-16'],
+      value: ['16 矩阵旋转', '/demo-16'],
       children: [],
     }),
   },
@@ -159,7 +159,7 @@ const webglChildren: RouteObject[] = [
     path: 'demo-17',
     element: <WebglDemo17 />,
     loader: (): MatchData => ({
-      value: ['17 缩放三角-矩阵', '/demo-17'],
+      value: ['17 矩阵缩放', '/demo-17'],
       children: [],
     }),
   },

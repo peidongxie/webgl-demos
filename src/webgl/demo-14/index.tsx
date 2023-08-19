@@ -5,7 +5,7 @@ import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 移动三角
+ * 向量平移
  */
 const Demo14: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);

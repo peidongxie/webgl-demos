@@ -5,7 +5,7 @@ import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 缩放三角-矩阵
+ * 矩阵缩放
  */
 const Demo17: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);

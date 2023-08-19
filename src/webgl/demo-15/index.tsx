@@ -5,7 +5,7 @@ import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 旋转三角
+ * 向量旋转
  */
 const Demo15: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
