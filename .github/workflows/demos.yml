@@ -1,0 +1,46 @@
+name: demos
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.1.0
+        with:
+          fetch-depth: 0
+      - name: Initialize manager
+        uses: pnpm/action-setup@v2.4.0
+      - name: Setup environment
+        uses: actions/setup-node@v3.8.1
+        with:
+          cache: 'pnpm'
+          node-version: 'lts/*'
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build project
+        run: pnpm run build
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2.0.0
+        with:
+          path: dist
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - id: deployment
+        name: Deploy site
+        uses: actions/deploy-pages@v2.0.4
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+  pages: write
