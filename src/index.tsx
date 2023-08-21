@@ -26,6 +26,7 @@ import WebglDemo15 from './webgl/demo-15';
 import WebglDemo16 from './webgl/demo-16';
 import WebglDemo17 from './webgl/demo-17';
 import WebglDemo18 from './webgl/demo-18';
+import WebglDemo19 from './webgl/demo-19';
 
 const webglChildren: RouteObject[] = [
   {
@@ -169,6 +170,14 @@ const webglChildren: RouteObject[] = [
     element: <WebglDemo18 />,
     loader: (): MatchData => ({
       value: ['18 旋转', '/demo-18'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-19',
+    element: <WebglDemo19 />,
+    loader: (): MatchData => ({
+      value: ['19 先平移再旋转', '/demo-19'],
       children: [],
     }),
   },
