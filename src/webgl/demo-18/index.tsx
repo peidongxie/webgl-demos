@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FC } from 'react';
+import { useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { type ComponentProps } from '../../type';
 import { Matrix4 } from '../lib/cuon-matrix';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
@@ -16,9 +16,12 @@ const Demo18: FC<ComponentProps> = () => {
     null,
   );
   const vertexBufferRef = useRef<WebGLBuffer | null>(null);
-  const [vertices] = useState(
-    () => new Float32Array([0, 0.5, -0.5, -0.5, 0.5, -0.5]),
-  );
+  const [points] = useState<[number, number][]>([
+    [0, 0.5],
+    [-0.5, -0.5],
+    [0.5, -0.5],
+  ]);
+  const vertices = useMemo(() => new Float32Array(points.flat()), [points]);
   const [transformMatrix] = useState(() => {
     const angle = 90;
     const transformMatrix = new Matrix4();
