@@ -22,14 +22,14 @@ const Demo20: FC<ComponentProps> = () => {
     [0.3, -0.3],
   ]);
   const vertices = useMemo(() => new Float32Array(points.flat()), [points]);
-  const [modelMatrix] = useState(() => {
-    const angle = 60;
-    const translation = [0.5, 0, 0];
+  const [angle] = useState(60);
+  const [[translationX, translationY, translationZ]] = useState([0.5, 0, 0]);
+  const modelMatrix = useMemo(() => {
     const modelMatrix = new Matrix4();
-    modelMatrix.setTranslate(translation[0], translation[1], translation[2]);
+    modelMatrix.setTranslate(translationX, translationY, translationZ);
     modelMatrix.rotate(angle, 0, 0, 1);
     return modelMatrix;
-  });
+  }, [angle, translationX, translationY, translationZ]);
 
   useEffect(() => {
     /**

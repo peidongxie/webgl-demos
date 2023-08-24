@@ -21,8 +21,8 @@ const Demo16: FC<ComponentProps> = () => {
     [0.5, -0.5],
   ]);
   const vertices = useMemo(() => new Float32Array(points.flat()), [points]);
-  const [transformMatrix] = useState(() => {
-    const angle = 90;
+  const [angle] = useState(90);
+  const transformMatrix = useMemo(() => {
     const radian = (Math.PI * angle) / 180;
     const cos = Math.cos(radian);
     const sin = Math.sin(radian);
@@ -44,7 +44,7 @@ const Demo16: FC<ComponentProps> = () => {
       0,
       1,
     ]);
-  });
+  }, [angle]);
 
   useEffect(() => {
     /**

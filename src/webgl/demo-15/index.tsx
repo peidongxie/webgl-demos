@@ -20,13 +20,13 @@ const Demo15: FC<ComponentProps> = () => {
     [0.5, -0.5],
   ]);
   const vertices = useMemo(() => new Float32Array(points.flat()), [points]);
-  const [[cos, sin]] = useState(() => {
-    const angle = 90;
+  const [angle] = useState(90);
+  const [cos, sin] = useMemo(() => {
     const radian = (Math.PI * angle) / 180;
     const cos = Math.cos(radian);
     const sin = Math.sin(radian);
     return [cos, sin] as const;
-  });
+  }, [angle]);
 
   useEffect(() => {
     /**

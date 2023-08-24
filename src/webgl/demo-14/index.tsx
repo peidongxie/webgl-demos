@@ -21,7 +21,7 @@ const Demo14: FC<ComponentProps> = () => {
     [0.5, -0.5],
   ]);
   const vertices = useMemo(() => new Float32Array(points.flat()), [points]);
-  const [translation] = useState([0.5, 0.5, 0]);
+  const [[translationX, translationY, translationZ]] = useState([0.5, 0.5, 0]);
 
   useEffect(() => {
     /**
@@ -83,13 +83,13 @@ const Demo14: FC<ComponentProps> = () => {
     gl.enableVertexAttribArray(positionAttributeLocation);
     gl.uniform4f(
       translationUniformLocation,
-      translation[0],
-      translation[1],
-      translation[2],
+      translationX,
+      translationY,
+      translationZ,
       0,
     );
     gl.drawArrays(gl.TRIANGLES, 0, Math.floor(vertices.length / 2));
-  }, [vertices, translation]);
+  }, [vertices, translationX, translationY, translationZ]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>

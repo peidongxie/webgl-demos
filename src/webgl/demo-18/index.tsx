@@ -22,12 +22,12 @@ const Demo18: FC<ComponentProps> = () => {
     [0.5, -0.5],
   ]);
   const vertices = useMemo(() => new Float32Array(points.flat()), [points]);
-  const [transformMatrix] = useState(() => {
-    const angle = 90;
+  const [angle] = useState(90);
+  const transformMatrix = useMemo(() => {
     const transformMatrix = new Matrix4();
     transformMatrix.setRotate(angle, 0, 0, 1);
     return transformMatrix;
-  });
+  }, [angle]);
 
   useEffect(() => {
     /**
