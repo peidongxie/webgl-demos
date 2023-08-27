@@ -10,7 +10,10 @@ const App: FC<ComponentProps> = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const gui = new GUI({ title: '控制面板' });
+    const gui = new GUI({
+      title: '控制面板',
+      container: document.getElementById('gui-app')!,
+    });
     const categoryEntries = (matches[0]?.data as MatchData)?.children || [];
     const categoryValue =
       (matches[1]?.data as MatchData)?.value?.[1] || '请选择';
@@ -49,7 +52,15 @@ const App: FC<ComponentProps> = () => {
     };
   }, [matches, navigate]);
 
-  return <Outlet />;
+  return (
+    <>
+      <Outlet />
+      <div className={'lil-gui autoPlace'}>
+        <div id={'gui-app'} />
+        <div id={'gui-demo'} />
+      </div>
+    </>
+  );
 };
 
 export default App;
