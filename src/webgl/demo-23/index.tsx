@@ -1,3 +1,4 @@
+import { GUI } from 'lil-gui';
 import {
   useCallback,
   useEffect,
@@ -13,9 +14,10 @@ import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 绘制动画
+ * 控制复合动画
  */
-const Demo21: FC<ComponentProps> = () => {
+const Demo23: FC<ComponentProps> = () => {
+  const guiRef = useRef<GUI | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const positionAttributeLocationRef = useRef(-1);
@@ -29,47 +31,72 @@ const Demo21: FC<ComponentProps> = () => {
     [0.5, -0.5],
   ]);
   const vertices = useMemo(() => new Float32Array(points.flat()), [points]);
-  const [timeStart] = useState(() => Date.now());
-  const [[angleStart, angleStep]] = useState([0, 45]);
+  const timeRef = useRef(Date.now());
+  const angleRef = useRef(0);
+  const stepRef = useRef(45);
   const modelMatrixRef = useRef(new Matrix4());
 
   const animate = useCallback(() => {
-    const time = Date.now();
-    const timeSpan = time - timeStart;
-    const angleSpan = (angleStep * timeSpan) / 1000;
-    const angle = angleStart + angleSpan;
-    return angle;
-  }, [timeStart, angleStart, angleStep]);
+    const timeEnd = Date.now();
+    const timeStart = timeRef.current;
+    const timeSpan = timeEnd - timeStart;
+    const angleStart = angleRef.current;
+    const angleSpan = (stepRef.current * timeSpan) / 1000;
+    const angleEnd = angleStart + angleSpan;
+    timeRef.current = timeEnd;
+    angleRef.current = angleEnd;
+  }, []);
 
-  const draw = useCallback(
-    (angle: number) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const gl = glRef.current;
-      if (!gl) return;
-      const modelMatrixUniformLocation = modelMatrixUniformLocationRef.current;
-      if (!modelMatrixUniformLocation) return;
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      /**
-       * 调整模型矩阵，绘制
-       */
-      const modelMatrix = modelMatrixRef.current;
-      modelMatrix.setRotate(angle, 0, 0, 1);
-      gl.uniformMatrix4fv(
-        modelMatrixUniformLocation,
-        false,
-        modelMatrix.elements,
-      );
-      gl.drawArrays(gl.TRIANGLES, 0, Math.floor(vertices.length / 2));
-    },
-    [vertices],
-  );
+  const draw = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const gl = glRef.current;
+    if (!gl) return;
+    const modelMatrixUniformLocation = modelMatrixUniformLocationRef.current;
+    if (!modelMatrixUniformLocation) return;
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    /**
+     * 调整模型矩阵，绘制
+     */
+    const modelMatrix = modelMatrixRef.current;
+    const angle = angleRef.current;
+    modelMatrix.setRotate(angle, 0, 0, 1);
+    modelMatrix.translate(0.35, 0, 0);
+    gl.uniformMatrix4fv(
+      modelMatrixUniformLocation,
+      false,
+      modelMatrix.elements,
+    );
+    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(vertices.length / 2));
+  }, [vertices]);
 
   const tick = useCallback(() => {
-    const angle = animate();
-    draw(angle);
+    animate();
+    draw();
     requestAnimationFrame(tick);
   }, [animate, draw]);
+
+  useEffect(() => {
+    const gui = new GUI({
+      title: '速度控件',
+      container: document.getElementById('gui-demo')!,
+    });
+    const object = {
+      up: () => {
+        stepRef.current += 10;
+      },
+      down: () => {
+        stepRef.current -= 10;
+      },
+    };
+    gui.add(object, 'up').name('UP');
+    gui.add(object, 'down').name('DOWN');
+    guiRef.current = gui;
+    return () => {
+      guiRef.current?.destroy();
+      guiRef.current = null;
+    };
+  }, []);
 
   useEffect(() => {
     /**
@@ -137,4 +164,4 @@ const Demo21: FC<ComponentProps> = () => {
   );
 };
 
-export default Demo21;
+export default Demo23;
