@@ -79,7 +79,7 @@ const Demo23: FC<ComponentProps> = () => {
   useEffect(() => {
     const gui = new GUI({
       title: '速度控件',
-      container: document.getElementById('gui-demo')!,
+      container: document.querySelector<HTMLElement>('#gui-demo')!,
     });
     const object = {
       up: () => {

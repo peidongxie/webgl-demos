@@ -12,7 +12,7 @@ const App: FC<ComponentProps> = () => {
   useEffect(() => {
     const gui = new GUI({
       title: '控制面板',
-      container: document.getElementById('gui-app')!,
+      container: document.querySelector<HTMLElement>('#gui-app')!,
     });
     const categoryEntries = (matches[0]?.data as MatchData)?.children || [];
     const categoryValue =
