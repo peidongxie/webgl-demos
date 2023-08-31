@@ -1,4 +1,3 @@
-import { GUI } from 'lil-gui';
 import {
   useCallback,
   useEffect,
@@ -7,6 +6,7 @@ import {
   useState,
   type FC,
 } from 'react';
+import { useGui, type GuiOptions, type GuiSchema } from '../../lib/gui-utils';
 import { type ComponentProps } from '../../type';
 import { Matrix4 } from '../lib/cuon-matrix';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
@@ -17,7 +17,6 @@ import VSHADER_SOURCE from './vertex.glsl?raw';
  * 控制复合动画
  */
 const Demo23: FC<ComponentProps> = () => {
-  const guiRef = useRef<GUI | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const positionAttributeLocationRef = useRef(-1);
@@ -35,6 +34,31 @@ const Demo23: FC<ComponentProps> = () => {
   const angleRef = useRef(0);
   const stepRef = useRef(45);
   const modelMatrixRef = useRef(new Matrix4());
+  const schemas = useMemo<GuiSchema[]>(() => {
+    return [
+      {
+        type: 'function',
+        name: 'UP',
+        initialValue: () => {
+          stepRef.current += 10;
+        },
+      },
+      {
+        type: 'function',
+        name: 'DOWN',
+        initialValue: () => {
+          stepRef.current -= 10;
+        },
+      },
+    ];
+  }, []);
+  const options = useMemo<GuiOptions>(
+    () => ({
+      container: '#gui-demo',
+      title: '速度控件',
+    }),
+    [],
+  );
 
   const animate = useCallback(() => {
     const timeEnd = Date.now();
@@ -76,27 +100,7 @@ const Demo23: FC<ComponentProps> = () => {
     requestAnimationFrame(tick);
   }, [animate, draw]);
 
-  useEffect(() => {
-    const gui = new GUI({
-      title: '速度控件',
-      container: document.querySelector<HTMLElement>('#gui-demo')!,
-    });
-    const object = {
-      up: () => {
-        stepRef.current += 10;
-      },
-      down: () => {
-        stepRef.current -= 10;
-      },
-    };
-    gui.add(object, 'up').name('UP');
-    gui.add(object, 'down').name('DOWN');
-    guiRef.current = gui;
-    return () => {
-      guiRef.current?.destroy();
-      guiRef.current = null;
-    };
-  }, []);
+  useGui(schemas, options);
 
   useEffect(() => {
     /**
