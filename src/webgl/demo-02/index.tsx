@@ -1,13 +1,14 @@
 import { useEffect, useRef, type FC } from 'react';
+import { getWebGLContext } from '../lib/cuon-utils';
 
-interface Demo01Props {
+interface Demo02Props {
   [key: string]: never;
 }
 
 /**
- * 使用画布
+ * 清空画布
  */
-const Demo01: FC<Demo01Props> = () => {
+const Demo02: FC<Demo02Props> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -21,13 +22,13 @@ const Demo01: FC<Demo01Props> = () => {
     /**
      * 上下文
      */
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const gl = getWebGLContext(canvas);
+    if (!gl) return;
     /**
-     * 绘制
+     * 清空
      */
-    ctx.fillStyle = 'rgba(0, 0, 255, 1)';
-    ctx.fillRect(120, 10, 150, 150);
+    gl.clearColor(0, 0, 0, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT);
   }, []);
 
   return (
@@ -37,4 +38,4 @@ const Demo01: FC<Demo01Props> = () => {
   );
 };
 
-export default Demo01;
+export default Demo02;

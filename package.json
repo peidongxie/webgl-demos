@@ -27,8 +27,8 @@
   "scripts": {
     "build": "tsc && vite build",
     "dev": "vite",
-    "fix": "eslint src --ext ts,tsx --fix && sort-package-json",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "fix": "eslint . --fix && sort-package-json",
+    "lint": "eslint . --max-warnings 0",
     "prepare": "husky install",
     "preview": "vite preview"
   },
@@ -38,6 +38,8 @@
     "react-router-dom": "^6.15.0"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^2.1.2",
+    "@eslint/js": "^8.48.0",
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.5.0",
@@ -48,6 +50,7 @@
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
+    "globals": "^13.21.0",
     "husky": "^8.0.3",
     "lint-staged": "^14.0.1",
     "prettier": "^3.0.3",
@@ -55,5 +58,5 @@
     "typescript": "^5.2.2",
     "vite": "^4.4.9"
   },
-  "packageManager": "pnpm@8.6.12"
+  "packageManager": "pnpm@8.7.1"
 }
