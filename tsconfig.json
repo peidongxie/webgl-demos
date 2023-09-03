@@ -1,4 +1,7 @@
 {
   "extends": ["./tsconfig.base", "./tsconfig.recommend"],
   "include": ["src", "vite.config.ts"],
+  "compilerOptions": {
+    "outDir": "dist"
+  }
 }
