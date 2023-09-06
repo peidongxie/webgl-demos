@@ -34,6 +34,10 @@ import WebglDemo23 from './webgl/demo-23';
 
 const webglChildren: RouteObject[] = [
   {
+    path: '*',
+    element: null,
+  },
+  {
     path: 'demo-01',
     element: <WebglDemo01 />,
     loader: (): MatchData => ({
@@ -220,6 +224,10 @@ const webglChildren: RouteObject[] = [
 ];
 
 const appChildren: RouteObject[] = [
+  {
+    path: '*',
+    element: null,
+  },
   {
     path: 'webgl',
     element: <Webgl />,
