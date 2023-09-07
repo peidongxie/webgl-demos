@@ -24,42 +24,46 @@ const Demo14: FC<ComponentProps> = () => {
   const [[translationX, translationY, translationZ]] = useState([0.5, 0.5, 0]);
 
   useEffect(() => {
-    /**
-     * 画布
-     */
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-    /**
-     * 上下文
-     */
-    const gl = getWebGLContext(canvas);
-    if (!gl || !initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) return;
-    glRef.current = gl;
-    /**
-     * 变量位置
-     */
-    const positionAttributeLocation = gl.getAttribLocation(
-      gl.program,
-      'a_Position',
-    );
-    const translationUniformLocation = gl.getUniformLocation(
-      gl.program,
-      'u_Translation',
-    );
-    positionAttributeLocationRef.current = positionAttributeLocation;
-    translationUniformLocationRef.current = translationUniformLocation;
-    /**
-     * 缓冲区
-     */
-    const vertexBuffer = gl.createBuffer();
-    vertexBufferRef.current = vertexBuffer;
-    /**
-     * 清空
-     */
-    gl.clearColor(0, 0, 0, 1);
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    if (canvasRef.current) {
+      const canvas = canvasRef.current;
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (canvasRef.current && !glRef.current) {
+      const gl = getWebGLContext(canvasRef.current);
+      if (gl && initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
+        /**
+         * 变量位置
+         */
+        const positionAttributeLocation = gl.getAttribLocation(
+          gl.program,
+          'a_Position',
+        );
+        const translationUniformLocation = gl.getUniformLocation(
+          gl.program,
+          'u_Translation',
+        );
+        positionAttributeLocationRef.current = positionAttributeLocation;
+        translationUniformLocationRef.current = translationUniformLocation;
+        /**
+         * 缓冲区
+         */
+        const vertexBuffer = gl.createBuffer();
+        vertexBufferRef.current = vertexBuffer;
+        /**
+         * 清空
+         */
+        gl.clearColor(0, 0, 0, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+      }
+      glRef.current = gl;
+    }
+    return () => {
+      glRef.current = null;
+    };
   }, []);
 
   useEffect(() => {

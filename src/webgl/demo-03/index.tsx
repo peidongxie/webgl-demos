@@ -12,24 +12,28 @@ const Demo03: FC<ComponentProps> = () => {
   const glRef = useRef<WebGLRenderingContext | null>(null);
 
   useEffect(() => {
-    /**
-     * 画布
-     */
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-    /**
-     * 上下文
-     */
-    const gl = getWebGLContext(canvas);
-    if (!gl || !initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) return;
-    glRef.current = gl;
-    /**
-     * 清空
-     */
-    gl.clearColor(0, 0, 0, 1);
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    if (canvasRef.current) {
+      const canvas = canvasRef.current;
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (canvasRef.current && !glRef.current) {
+      const gl = getWebGLContext(canvasRef.current);
+      if (gl && initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
+        /**
+         * 清空
+         */
+        gl.clearColor(0, 0, 0, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+      }
+      glRef.current = gl;
+    }
+    return () => {
+      glRef.current = null;
+    };
   }, []);
 
   useEffect(() => {
