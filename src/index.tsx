@@ -7,6 +7,8 @@ import {
 } from 'react-router-dom';
 import App from './app';
 import { type MatchData } from './type';
+import Mars from './mars';
+import MarsDemo01 from './mars/demo-01';
 import Webgl from './webgl';
 import WebglDemo01 from './webgl/demo-01';
 import WebglDemo02 from './webgl/demo-02';
@@ -223,6 +225,21 @@ const webglChildren: RouteObject[] = [
   },
 ];
 
+const marsChildren: RouteObject[] = [
+  {
+    path: '*',
+    element: null,
+  },
+  {
+    path: 'demo-01',
+    element: <MarsDemo01 />,
+    loader: (): MatchData => ({
+      value: ['01 播放动画', '/demo-01'],
+      children: [],
+    }),
+  },
+];
+
 const appChildren: RouteObject[] = [
   {
     path: '*',
@@ -247,6 +264,23 @@ const appChildren: RouteObject[] = [
         ]),
     }),
     children: webglChildren,
+  },
+  {
+    path: 'mars',
+    element: <Mars />,
+    loader: (args): MatchData => ({
+      value: ['Mars', '/mars'],
+      children: marsChildren
+        .map((child) => child.loader?.(args))
+        .filter<MatchData>((childData): childData is MatchData => {
+          if (!childData) return false;
+          if (!Reflect.has(childData, 'value')) return false;
+          if (!Reflect.has(childData, 'children')) return false;
+          return true;
+        })
+        .map((childData) => [childData.value[0], `/mars${childData.value[1]}`]),
+    }),
+    children: marsChildren,
   },
 ];
 
