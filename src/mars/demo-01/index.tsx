@@ -20,9 +20,16 @@ const Demo01: FC<ComponentProps> = () => {
       const player = new MarsPlayer({ container });
       player
         .loadScene(SCENE_URL)
-        .then((composition) => player.play(composition))
-        .then(() => (container.style.backgroundImage = ''))
-        .catch(() => (container.style.backgroundImage = `url(${IMAGE_URL})`));
+        .then((composition) => {
+          if (playerRef.current === player) {
+            player.play(composition);
+          }
+        })
+        .catch(() => {
+          if (playerRef.current === player) {
+            container.style.backgroundImage = `url(${IMAGE_URL})`;
+          }
+        });
       playerRef.current = player;
     }
     return () => {
