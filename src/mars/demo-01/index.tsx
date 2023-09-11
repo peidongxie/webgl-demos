@@ -18,24 +18,31 @@ const Demo01: FC<ComponentProps> = () => {
     if (containerRef.current && !playerRef.current) {
       const container = containerRef.current;
       const player = new MarsPlayer({ container });
-      player
-        .loadScene(SCENE_URL)
-        .then((composition) => {
-          if (playerRef.current === player) {
-            player.play(composition);
-          }
-        })
-        .catch(() => {
-          if (playerRef.current === player) {
-            container.style.backgroundImage = `url(${IMAGE_URL})`;
-          }
-        });
       playerRef.current = player;
     }
     return () => {
       playerRef.current?.dispose();
       playerRef.current = null;
     };
+  }, []);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const player = playerRef.current;
+    if (!player) return;
+    player
+      .loadScene(SCENE_URL)
+      .then((composition) => {
+        if (playerRef.current === player) {
+          player.play(composition);
+        }
+      })
+      .catch(() => {
+        if (playerRef.current === player) {
+          container.style.backgroundImage = `url(${IMAGE_URL})`;
+        }
+      });
   }, []);
 
   return (
