@@ -31,18 +31,16 @@ const Demo01: FC<ComponentProps> = () => {
     if (!container) return;
     const player = playerRef.current;
     if (!player) return;
-    player
-      .loadScene(SCENE_URL)
-      .then((composition) => {
-        if (playerRef.current === player) {
-          player.play(composition);
-        }
-      })
-      .catch(() => {
-        if (playerRef.current === player) {
-          container.style.backgroundImage = `url(${IMAGE_URL})`;
-        }
-      });
+    (async () => {
+      try {
+        const composition = await player.loadScene(SCENE_URL);
+        if (playerRef.current !== player) return;
+        await player.play(composition);
+      } catch {
+        if (playerRef.current !== player) return;
+        container.style.backgroundImage = `url(${IMAGE_URL})`;
+      }
+    })();
   }, []);
 
   return (
