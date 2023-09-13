@@ -7,6 +7,8 @@ import {
 } from 'react-router-dom';
 import App from './app';
 import { type MatchData } from './type';
+import Galacean from './galacean';
+import GalaceanDemo01 from './galacean/demo-01';
 import Mars from './mars';
 import MarsDemo01 from './mars/demo-01';
 import Webgl from './webgl';
@@ -240,6 +242,21 @@ const marsChildren: RouteObject[] = [
   },
 ];
 
+const galaceanChildren: RouteObject[] = [
+  {
+    path: '*',
+    element: null,
+  },
+  {
+    path: 'demo-01',
+    element: <GalaceanDemo01 />,
+    loader: (): MatchData => ({
+      value: ['01 初始化画布', '/demo-01'],
+      children: [],
+    }),
+  },
+];
+
 const appChildren: RouteObject[] = [
   {
     path: '*',
@@ -281,6 +298,26 @@ const appChildren: RouteObject[] = [
         .map((childData) => [childData.value[0], `/mars${childData.value[1]}`]),
     }),
     children: marsChildren,
+  },
+  {
+    path: 'galacean',
+    element: <Galacean />,
+    loader: (args): MatchData => ({
+      value: ['Galacean', '/galacean'],
+      children: galaceanChildren
+        .map((child) => child.loader?.(args))
+        .filter<MatchData>((childData): childData is MatchData => {
+          if (!childData) return false;
+          if (!Reflect.has(childData, 'value')) return false;
+          if (!Reflect.has(childData, 'children')) return false;
+          return true;
+        })
+        .map((childData) => [
+          childData.value[0],
+          `/galacean${childData.value[1]}`,
+        ]),
+    }),
+    children: galaceanChildren,
   },
 ];
 

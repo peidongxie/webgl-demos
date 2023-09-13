@@ -33,6 +33,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@galacean/engine": "^1.0.4",
     "@galacean/mars-player": "^2.3.6",
     "lil-gui": "^0.18.2",
     "react": "^18.2.0",

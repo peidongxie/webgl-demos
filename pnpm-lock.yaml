@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@galacean/engine':
+    specifier: ^1.0.4
+    version: 1.0.4
   '@galacean/mars-player':
     specifier: ^2.3.6
     version: 2.3.6
@@ -324,6 +327,47 @@ packages:
     resolution: {integrity: sha512-HxjQ8Qn+4SI3/AFv6sOrDB+g6PpUTDwSJiQqOrnneEk8L71161srI9gjzzZvYVbzHiVg/BvcH95+cK/zfIt4pg==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
+
+  /@galacean/engine-core@1.0.4:
+    resolution: {integrity: sha512-ukRqBF++AUmdZ8rQQ0jYClQwResaKAJ87Y+sdrfGztx++nePC8RbH5yav77PIIXJs71CCVpwGjOiw/s+NRWmRw==}
+    dependencies:
+      '@galacean/engine-math': 1.0.4
+    dev: false
+
+  /@galacean/engine-draco@1.0.4:
+    resolution: {integrity: sha512-sK0GidHrt4JZP+7tyD15sRneyM9BzIW4gtZ2HxkCjjPvk/PF2CJ0+GhdnwxVx7No4gzvcCE/CNvLy8eQ8fCP4A==}
+    dependencies:
+      '@galacean/engine-core': 1.0.4
+    dev: false
+
+  /@galacean/engine-loader@1.0.4:
+    resolution: {integrity: sha512-Qt1oc7Gy4pQ0PAN7BieY0w69yA+oi2iwBsa9aKayZDvyGjVpawN2/qS2cKCtW4DvrfjvYZKyrfaLPYt/RJJbuw==}
+    dependencies:
+      '@galacean/engine-core': 1.0.4
+      '@galacean/engine-draco': 1.0.4
+      '@galacean/engine-math': 1.0.4
+      '@galacean/engine-rhi-webgl': 1.0.4
+    dev: false
+
+  /@galacean/engine-math@1.0.4:
+    resolution: {integrity: sha512-skDIDeHq+wY0vVph5PcEHbf9WcHJp67z0GeyfMMIirG8P+4UWxyg09FXGCFT1io+GhKHw3EgDQgdpFdvPDdWfg==}
+    dev: false
+
+  /@galacean/engine-rhi-webgl@1.0.4:
+    resolution: {integrity: sha512-rMb/FCcKVQYH378rmKzcJmeiTjDadO/2LsLOH93nHwXhuribxmkizEdT7sayhiiLg+nAKPwnDoS58+sw6O2Bbg==}
+    dependencies:
+      '@galacean/engine-core': 1.0.4
+      '@galacean/engine-math': 1.0.4
+    dev: false
+
+  /@galacean/engine@1.0.4:
+    resolution: {integrity: sha512-8wFg5FmaKU7IQeUe6WMia2m+zm3/TzKoNOtwbIqEi2QNlG1NxovGWPODI8C6khhnWLbAK6TMf+C5zSZTUH5FqQ==}
+    dependencies:
+      '@galacean/engine-core': 1.0.4
+      '@galacean/engine-loader': 1.0.4
+      '@galacean/engine-math': 1.0.4
+      '@galacean/engine-rhi-webgl': 1.0.4
+    dev: false
 
   /@galacean/mars-core@2.3.6:
     resolution: {integrity: sha512-jI3tlDV/y77jKo+TWtta+Z7AHxXQhDzju11I48fWUA4pu8PvQHmVxoBJGJV78Har1qsSuSVEQ0aW+P0uhqJY1w==}
