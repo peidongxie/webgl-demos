@@ -14,20 +14,22 @@ const Demo01: FC<ComponentProps> = () => {
   const promiseRef = useRef<Promise<WebGLEngine> | null>(null);
 
   useEffect(() => {
-    if (canvasRef.current && !promiseRef.current) {
-      const canvas = canvasRef.current;
-      const promise = WebGLEngine.create({ canvas });
-      promiseRef.current = promise;
-    }
-    return () => {
-      promiseRef.current?.then((engine) => engine.destroy());
-      promiseRef.current = null;
-    };
-  }, []);
-
-  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    const promise = promiseRef.current;
+    if (promise) return;
+    promiseRef.current = WebGLEngine.create({ canvas });
+  }, []);
+
+  useEffect(
+    () => () => {
+      promiseRef.current?.then((engine) => engine.destroy());
+      promiseRef.current = null;
+    },
+    [],
+  );
+
+  useEffect(() => {
     const promise = promiseRef.current;
     if (!promise) return;
     (async () => {
