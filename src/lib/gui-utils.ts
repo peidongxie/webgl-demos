@@ -199,4 +199,4 @@ const useGui = (schemas: GuiSchema[], options: GuiOptions): void => {
   }, [schemas, options]);
 };
 
-export { useGui, type GuiOptions, type GuiSchema };
+export { type GuiOptions, type GuiSchema, useGui };

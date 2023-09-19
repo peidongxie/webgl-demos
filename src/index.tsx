@@ -1,16 +1,17 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
-  RouterProvider,
   createBrowserRouter,
   type RouteObject,
+  RouterProvider,
 } from 'react-router-dom';
+
 import App from './app';
-import { type MatchData } from './type';
 import Galacean from './galacean';
 import GalaceanDemo01 from './galacean/demo-01';
 import Mars from './mars';
 import MarsDemo01 from './mars/demo-01';
+import { type MatchData } from './type';
 import Webgl from './webgl';
 import WebglDemo01 from './webgl/demo-01';
 import WebglDemo02 from './webgl/demo-02';

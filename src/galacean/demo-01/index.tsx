@@ -1,8 +1,12 @@
 import { WebGLEngine } from '@galacean/engine';
-import { useEffect, useRef, type FC } from 'react';
+import { type FC, useEffect, useRef } from 'react';
+
 import { type ComponentProps } from '../../type';
 
 const main = async (engine: WebGLEngine): Promise<void> => {
+  /**
+   * 根据 DOM 元素显示尺寸调整画布尺寸
+   */
   engine.canvas.resizeByClientSize();
 };
 

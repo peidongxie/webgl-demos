@@ -1,12 +1,13 @@
 import {
+  type FC,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-  type FC,
 } from 'react';
-import { useGui, type GuiOptions, type GuiSchema } from '../../lib/gui-utils';
+
+import { type GuiOptions, type GuiSchema, useGui } from '../../lib/gui-utils';
 import { type ComponentProps } from '../../type';
 import { Matrix4 } from '../lib/cuon-matrix';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';

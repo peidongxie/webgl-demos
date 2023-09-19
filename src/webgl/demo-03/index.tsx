@@ -1,4 +1,5 @@
-import { useEffect, useRef, type FC } from 'react';
+import { type FC, useEffect, useRef } from 'react';
+
 import { type ComponentProps } from '../../type';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';

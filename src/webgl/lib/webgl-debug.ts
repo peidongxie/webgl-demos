@@ -190,9 +190,9 @@ const makeDebugContext = (
 };
 
 export {
-  init,
-  mightBeEnum,
   glEnumToString,
   glFunctionArgToString,
+  init,
   makeDebugContext,
+  mightBeEnum,
 };

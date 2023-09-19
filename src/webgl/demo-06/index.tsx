@@ -1,11 +1,12 @@
 import {
+  type FC,
+  type MouseEventHandler,
   useCallback,
   useEffect,
   useRef,
   useState,
-  type FC,
-  type MouseEventHandler,
 } from 'react';
+
 import { type ComponentProps } from '../../type';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';

@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState, type FC } from 'react';
+import { type FC, useEffect, useMemo, useRef, useState } from 'react';
+
 import { type ComponentProps } from '../../type';
 import { Matrix4 } from '../lib/cuon-matrix';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
