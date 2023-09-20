@@ -9,6 +9,7 @@ import {
 import App from './app';
 import Galacean from './galacean';
 import GalaceanDemo01 from './galacean/demo-01';
+import GalaceanDemo02 from './galacean/demo-02';
 import Mars from './mars';
 import MarsDemo01 from './mars/demo-01';
 import { type MatchData } from './type';
@@ -253,6 +254,14 @@ const galaceanChildren: RouteObject[] = [
     element: <GalaceanDemo01 />,
     loader: (): MatchData => ({
       value: ['01 初始化画布', '/demo-01'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-02',
+    element: <GalaceanDemo02 />,
+    loader: (): MatchData => ({
+      value: ['02 绘制立方体', '/demo-02'],
       children: [],
     }),
   },
