@@ -10,6 +10,7 @@ import App from './app';
 import Galacean from './galacean';
 import GalaceanDemo01 from './galacean/demo-01';
 import GalaceanDemo02 from './galacean/demo-02';
+import GalaceanDemo03 from './galacean/demo-03';
 import Mars from './mars';
 import MarsDemo01 from './mars/demo-01';
 import { type MatchData } from './type';
@@ -262,6 +263,14 @@ const galaceanChildren: RouteObject[] = [
     element: <GalaceanDemo02 />,
     loader: (): MatchData => ({
       value: ['02 绘制立方体', '/demo-02'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-03',
+    element: <GalaceanDemo03 />,
+    loader: (): MatchData => ({
+      value: ['03 加载模型', '/demo-03'],
       children: [],
     }),
   },

@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@galacean/engine": "^1.0.4",
+    "@galacean/engine-toolkit-controls": "1.1.0-beta.1",
     "@galacean/mars-player": "^2.4.1",
     "lil-gui": "^0.18.2",
     "react": "^18.2.0",
