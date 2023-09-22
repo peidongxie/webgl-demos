@@ -22,7 +22,7 @@ const Demo17: FC<ComponentProps> = () => {
     [0.5, -0.5],
   ]);
   const vertices = useMemo(() => new Float32Array(points.flat()), [points]);
-  const [[scaleX, scaleY, scaleZ]] = useState([1.0, 1.5, 1.0]);
+  const [[scaleX, scaleY, scaleZ]] = useState([1, 1.5, 1]);
   const transformMatrix = useMemo(() => {
     return new Float32Array([
       scaleX,
