@@ -38,6 +38,7 @@ import WebglDemo20 from './webgl/demo-20';
 import WebglDemo21 from './webgl/demo-21';
 import WebglDemo22 from './webgl/demo-22';
 import WebglDemo23 from './webgl/demo-23';
+import WebglDemo24 from './webgl/demo-24';
 
 const webglChildren: RouteObject[] = [
   {
@@ -225,6 +226,14 @@ const webglChildren: RouteObject[] = [
     element: <WebglDemo23 />,
     loader: (): MatchData => ({
       value: ['23 控制动画', '/demo-23'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-24',
+    element: <WebglDemo24 />,
+    loader: (): MatchData => ({
+      value: ['24 绘制多尺寸点', '/demo-24'],
       children: [],
     }),
   },
