@@ -20,12 +20,8 @@ const Demo23: FC<ComponentProps> = () => {
     [-0.5, -0.5, 20],
     [0.5, -0.5, 30],
   ]);
-  const vertices = useMemo(
-    () => new Float32Array(points.map((point) => [point[0], point[1]]).flat()),
-    [points],
-  );
-  const sizes = useMemo(
-    () => new Float32Array(points.map((point) => point[2])),
+  const verticesSizes = useMemo(
+    () => new Float32Array(points.flat()),
     [points],
   );
 
@@ -102,22 +98,27 @@ const Demo23: FC<ComponentProps> = () => {
      * 数据写入缓冲区并分配到变量，绘制
      */
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+    gl.bufferData(gl.ARRAY_BUFFER, verticesSizes, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(
+      positionAttributeLocation,
+      2,
+      gl.FLOAT,
+      false,
+      verticesSizes.BYTES_PER_ELEMENT * 3,
+      0,
+    );
     gl.enableVertexAttribArray(positionAttributeLocation);
-    gl.bindBuffer(gl.ARRAY_BUFFER, sizeBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, sizes, gl.STATIC_DRAW);
     gl.vertexAttribPointer(
       pointSizeAttributeLocation,
       1,
       gl.FLOAT,
       false,
-      0,
-      0,
+      verticesSizes.BYTES_PER_ELEMENT * 3,
+      verticesSizes.BYTES_PER_ELEMENT * 2,
     );
     gl.enableVertexAttribArray(pointSizeAttributeLocation);
-    gl.drawArrays(gl.POINTS, 0, Math.floor(vertices.length / 2));
-  }, [vertices, sizes]);
+    gl.drawArrays(gl.POINTS, 0, Math.floor(verticesSizes.length / 3));
+  }, [verticesSizes]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>
