@@ -13,7 +13,7 @@ import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 绘制多色点
+ * 绘制彩点
  */
 const Demo06: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);

@@ -6,9 +6,9 @@ import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 多缓冲绘制点
+ * 单缓冲绘制点
  */
-const Demo23: FC<ComponentProps> = () => {
+const Demo25: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const positionAttributeLocationRef = useRef(-1);
@@ -127,4 +127,4 @@ const Demo23: FC<ComponentProps> = () => {
   );
 };
 
-export default Demo23;
+export default Demo25;

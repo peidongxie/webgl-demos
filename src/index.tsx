@@ -90,7 +90,7 @@ const webglChildren: RouteObject[] = [
     path: 'demo-06',
     element: <WebglDemo06 />,
     loader: (): MatchData => ({
-      value: ['06 绘制多色点', '/demo-06'],
+      value: ['06 绘制彩点', '/demo-06'],
       children: [],
     }),
   },
