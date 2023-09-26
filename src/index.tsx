@@ -40,6 +40,7 @@ import WebglDemo22 from './webgl/demo-22';
 import WebglDemo23 from './webgl/demo-23';
 import WebglDemo24 from './webgl/demo-24';
 import WebglDemo25 from './webgl/demo-25';
+import WebglDemo26 from './webgl/demo-26';
 
 const webglChildren: RouteObject[] = [
   {
@@ -243,6 +244,14 @@ const webglChildren: RouteObject[] = [
     element: <WebglDemo25 />,
     loader: (): MatchData => ({
       value: ['25 单缓冲绘制点', '/demo-25'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-26',
+    element: <WebglDemo26 />,
+    loader: (): MatchData => ({
+      value: ['26 动态绘制彩点', '/demo-26'],
       children: [],
     }),
   },
