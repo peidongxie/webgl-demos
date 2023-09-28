@@ -42,6 +42,7 @@ import WebglDemo24 from './webgl/demo-24';
 import WebglDemo25 from './webgl/demo-25';
 import WebglDemo26 from './webgl/demo-26';
 import WebglDemo27 from './webgl/demo-27';
+import WebglDemo28 from './webgl/demo-28';
 
 const webglChildren: RouteObject[] = [
   {
@@ -260,7 +261,15 @@ const webglChildren: RouteObject[] = [
     path: 'demo-27',
     element: <WebglDemo27 />,
     loader: (): MatchData => ({
-      value: ['27 绘制彩色三角', '/demo-27'],
+      value: ['27 渐变', '/demo-27'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-28',
+    element: <WebglDemo28 />,
+    loader: (): MatchData => ({
+      value: ['28 逐片元渐变', '/demo-28'],
       children: [],
     }),
   },

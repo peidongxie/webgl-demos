@@ -6,24 +6,21 @@ import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 渐变
+ * 逐片元渐变
  */
-const Demo27: FC<ComponentProps> = () => {
+const Demo28: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const positionAttributeLocationRef = useRef(-1);
-  const colorAttributeLocationRef = useRef(-1);
+  const widthUniformLocationRef = useRef<WebGLUniformLocation | null>(null);
+  const heightUniformLocationRef = useRef<WebGLUniformLocation | null>(null);
   const vertexBufferRef = useRef<WebGLBuffer | null>(null);
-  const colorBufferRef = useRef<WebGLBuffer | null>(null);
-  const [points] = useState<[number, number, number, number, number][]>([
-    [0, 0.5, 1, 0, 0],
-    [-0.5, -0.5, 0, 1, 0],
-    [0.5, -0.5, 0, 0, 1],
+  const [points] = useState<[number, number][]>([
+    [0, 0.5],
+    [-0.5, -0.5],
+    [0.5, -0.5],
   ]);
-  const verticesColors = useMemo(
-    () => new Float32Array(points.flat()),
-    [points],
-  );
+  const vertices = useMemo(() => new Float32Array(points.flat()), [points]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -59,19 +56,19 @@ const Demo27: FC<ComponentProps> = () => {
         gl.program,
         'a_Position',
       );
-      const colorAttributeLocation = gl.getAttribLocation(
+      const widthUniformLocation = gl.getUniformLocation(gl.program, 'u_Width');
+      const heightUniformLocation = gl.getUniformLocation(
         gl.program,
-        'a_Color',
+        'u_Height',
       );
       positionAttributeLocationRef.current = positionAttributeLocation;
-      colorAttributeLocationRef.current = colorAttributeLocation;
+      widthUniformLocationRef.current = widthUniformLocation;
+      heightUniformLocationRef.current = heightUniformLocation;
       /**
        * 缓冲区
        */
       const vertexBuffer = gl.createBuffer();
-      const sizeBuffer = gl.createBuffer();
       vertexBufferRef.current = vertexBuffer;
-      colorBufferRef.current = sizeBuffer;
       /**
        * 清空设置
        */
@@ -84,12 +81,12 @@ const Demo27: FC<ComponentProps> = () => {
     if (!gl) return;
     const positionAttributeLocation = positionAttributeLocationRef.current;
     if (positionAttributeLocation < 0) return;
-    const colorAttributeLocation = colorAttributeLocationRef.current;
-    if (colorAttributeLocation < 0) return;
+    const widthUniformLocation = widthUniformLocationRef.current;
+    if (!widthUniformLocation) return;
+    const heightUniformLocation = heightUniformLocationRef.current;
+    if (!heightUniformLocation) return;
     const vertexBuffer = vertexBufferRef.current;
     if (!vertexBuffer) return;
-    const sizeBuffer = colorBufferRef.current;
-    if (!sizeBuffer) return;
     /**
      * 清空
      */
@@ -98,27 +95,13 @@ const Demo27: FC<ComponentProps> = () => {
      * 数据写入缓冲区并分配到变量，绘制
      */
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, verticesColors, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(
-      positionAttributeLocation,
-      2,
-      gl.FLOAT,
-      false,
-      verticesColors.BYTES_PER_ELEMENT * 5,
-      0,
-    );
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(positionAttributeLocation);
-    gl.vertexAttribPointer(
-      colorAttributeLocation,
-      3,
-      gl.FLOAT,
-      false,
-      verticesColors.BYTES_PER_ELEMENT * 5,
-      verticesColors.BYTES_PER_ELEMENT * 2,
-    );
-    gl.enableVertexAttribArray(colorAttributeLocation);
-    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(verticesColors.length / 5));
-  }, [verticesColors]);
+    gl.uniform1f(widthUniformLocation, gl.drawingBufferWidth);
+    gl.uniform1f(heightUniformLocation, gl.drawingBufferHeight);
+    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(vertices.length / 2));
+  }, [vertices]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>
@@ -127,4 +110,4 @@ const Demo27: FC<ComponentProps> = () => {
   );
 };
 
-export default Demo27;
+export default Demo28;
