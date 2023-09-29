@@ -13,8 +13,7 @@ const Demo25: FC<ComponentProps> = () => {
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const positionAttributeLocationRef = useRef(-1);
   const pointSizeAttributeLocationRef = useRef(-1);
-  const vertexBufferRef = useRef<WebGLBuffer | null>(null);
-  const sizeBufferRef = useRef<WebGLBuffer | null>(null);
+  const vertexSizeBufferRef = useRef<WebGLBuffer | null>(null);
   const [points] = useState<[number, number, number][]>([
     [0, 0.5, 10],
     [-0.5, -0.5, 20],
@@ -69,9 +68,7 @@ const Demo25: FC<ComponentProps> = () => {
        * 缓冲区
        */
       const vertexBuffer = gl.createBuffer();
-      const sizeBuffer = gl.createBuffer();
-      vertexBufferRef.current = vertexBuffer;
-      sizeBufferRef.current = sizeBuffer;
+      vertexSizeBufferRef.current = vertexBuffer;
       /**
        * 清空设置
        */
@@ -86,10 +83,8 @@ const Demo25: FC<ComponentProps> = () => {
     if (positionAttributeLocation < 0) return;
     const pointSizeAttributeLocation = pointSizeAttributeLocationRef.current;
     if (pointSizeAttributeLocation < 0) return;
-    const vertexBuffer = vertexBufferRef.current;
-    if (!vertexBuffer) return;
-    const sizeBuffer = sizeBufferRef.current;
-    if (!sizeBuffer) return;
+    const vertexSizeBuffer = vertexSizeBufferRef.current;
+    if (!vertexSizeBuffer) return;
     /**
      * 清空
      */
@@ -97,7 +92,7 @@ const Demo25: FC<ComponentProps> = () => {
     /**
      * 数据写入缓冲区并分配到变量，绘制
      */
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexSizeBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, verticesSizes, gl.STATIC_DRAW);
     gl.vertexAttribPointer(
       positionAttributeLocation,
