@@ -19,17 +19,15 @@ import VSHADER_SOURCE from './vertex.glsl?raw';
 const Demo21: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
-  const positionAttributeLocationRef = useRef(-1);
-  const modelMatrixUniformLocationRef = useRef<WebGLUniformLocation | null>(
-    null,
-  );
-  const vertexBufferRef = useRef<WebGLBuffer | null>(null);
+  const positionAttributeRef = useRef(-1);
+  const modelMatrixUniformRef = useRef<WebGLUniformLocation | null>(null);
+  const positionBufferRef = useRef<WebGLBuffer | null>(null);
   const [points] = useState<[number, number][]>([
     [0, 0.5],
     [-0.5, -0.5],
     [0.5, -0.5],
   ]);
-  const vertices = useMemo(() => new Float32Array(points.flat()), [points]);
+  const positions = useMemo(() => new Float32Array(points.flat()), [points]);
   const [timeStart] = useState(() => Date.now());
   const [[angleStart, angleStep]] = useState([0, 45]);
   const modelMatrixRef = useRef(new Matrix4());
@@ -48,22 +46,18 @@ const Demo21: FC<ComponentProps> = () => {
       if (!canvas) return;
       const gl = glRef.current;
       if (!gl) return;
-      const modelMatrixUniformLocation = modelMatrixUniformLocationRef.current;
-      if (!modelMatrixUniformLocation) return;
+      const modelMatrixUniform = modelMatrixUniformRef.current;
+      if (!modelMatrixUniform) return;
       gl.clear(gl.COLOR_BUFFER_BIT);
       /**
        * 调整模型矩阵，绘制
        */
       const modelMatrix = modelMatrixRef.current;
       modelMatrix.setRotate(angle, 0, 0, 1);
-      gl.uniformMatrix4fv(
-        modelMatrixUniformLocation,
-        false,
-        modelMatrix.elements,
-      );
-      gl.drawArrays(gl.TRIANGLES, 0, Math.floor(vertices.length / 2));
+      gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
+      gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positions.length / 2));
     },
-    [vertices],
+    [positions],
   );
 
   const tick = useCallback(() => {
@@ -102,21 +96,18 @@ const Demo21: FC<ComponentProps> = () => {
       /**
        * 变量位置
        */
-      const positionAttributeLocation = gl.getAttribLocation(
-        gl.program,
-        'a_Position',
-      );
-      const modelMatrixUniformLocation = gl.getUniformLocation(
+      const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
+      const modelMatrixUniform = gl.getUniformLocation(
         gl.program,
         'u_ModelMatrix',
       );
-      positionAttributeLocationRef.current = positionAttributeLocation;
-      modelMatrixUniformLocationRef.current = modelMatrixUniformLocation;
+      positionAttributeRef.current = positionAttribute;
+      modelMatrixUniformRef.current = modelMatrixUniform;
       /**
        * 缓冲区
        */
-      const vertexBuffer = gl.createBuffer();
-      vertexBufferRef.current = vertexBuffer;
+      const positionBuffer = gl.createBuffer();
+      positionBufferRef.current = positionBuffer;
       /**
        * 清空设置
        */
@@ -127,10 +118,10 @@ const Demo21: FC<ComponentProps> = () => {
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
-    const positionAttributeLocation = positionAttributeLocationRef.current;
-    if (positionAttributeLocation < 0) return;
-    const vertexBuffer = vertexBufferRef.current;
-    if (!vertexBuffer) return;
+    const positionAttribute = positionAttributeRef.current;
+    if (positionAttribute < 0) return;
+    const positionBuffer = positionBufferRef.current;
+    if (!positionBuffer) return;
     /**
      * 清空
      */
@@ -138,12 +129,12 @@ const Demo21: FC<ComponentProps> = () => {
     /**
      * 数据写入缓冲区并分配到变量
      */
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(positionAttributeLocation);
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(positionAttribute);
     tick();
-  }, [vertices, tick]);
+  }, [positions, tick]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>

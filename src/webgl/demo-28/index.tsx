@@ -11,16 +11,16 @@ import VSHADER_SOURCE from './vertex.glsl?raw';
 const Demo28: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
-  const positionAttributeLocationRef = useRef(-1);
-  const widthUniformLocationRef = useRef<WebGLUniformLocation | null>(null);
-  const heightUniformLocationRef = useRef<WebGLUniformLocation | null>(null);
-  const vertexBufferRef = useRef<WebGLBuffer | null>(null);
+  const positionAttributeRef = useRef(-1);
+  const widthUniformRef = useRef<WebGLUniformLocation | null>(null);
+  const heightUniformRef = useRef<WebGLUniformLocation | null>(null);
+  const positionBufferRef = useRef<WebGLBuffer | null>(null);
   const [points] = useState<[number, number][]>([
     [0, 0.5],
     [-0.5, -0.5],
     [0.5, -0.5],
   ]);
-  const vertices = useMemo(() => new Float32Array(points.flat()), [points]);
+  const positions = useMemo(() => new Float32Array(points.flat()), [points]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -52,23 +52,17 @@ const Demo28: FC<ComponentProps> = () => {
       /**
        * 变量位置
        */
-      const positionAttributeLocation = gl.getAttribLocation(
-        gl.program,
-        'a_Position',
-      );
-      const widthUniformLocation = gl.getUniformLocation(gl.program, 'u_Width');
-      const heightUniformLocation = gl.getUniformLocation(
-        gl.program,
-        'u_Height',
-      );
-      positionAttributeLocationRef.current = positionAttributeLocation;
-      widthUniformLocationRef.current = widthUniformLocation;
-      heightUniformLocationRef.current = heightUniformLocation;
+      const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
+      const widthUniform = gl.getUniformLocation(gl.program, 'u_Width');
+      const heightUniform = gl.getUniformLocation(gl.program, 'u_Height');
+      positionAttributeRef.current = positionAttribute;
+      widthUniformRef.current = widthUniform;
+      heightUniformRef.current = heightUniform;
       /**
        * 缓冲区
        */
-      const vertexBuffer = gl.createBuffer();
-      vertexBufferRef.current = vertexBuffer;
+      const positionBuffer = gl.createBuffer();
+      positionBufferRef.current = positionBuffer;
       /**
        * 清空设置
        */
@@ -79,14 +73,14 @@ const Demo28: FC<ComponentProps> = () => {
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
-    const positionAttributeLocation = positionAttributeLocationRef.current;
-    if (positionAttributeLocation < 0) return;
-    const widthUniformLocation = widthUniformLocationRef.current;
-    if (!widthUniformLocation) return;
-    const heightUniformLocation = heightUniformLocationRef.current;
-    if (!heightUniformLocation) return;
-    const vertexBuffer = vertexBufferRef.current;
-    if (!vertexBuffer) return;
+    const positionAttribute = positionAttributeRef.current;
+    if (positionAttribute < 0) return;
+    const widthUniform = widthUniformRef.current;
+    if (!widthUniform) return;
+    const heightUniform = heightUniformRef.current;
+    if (!heightUniform) return;
+    const positionBuffer = positionBufferRef.current;
+    if (!positionBuffer) return;
     /**
      * 清空
      */
@@ -94,14 +88,14 @@ const Demo28: FC<ComponentProps> = () => {
     /**
      * 数据写入缓冲区并分配到变量，绘制
      */
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(positionAttributeLocation);
-    gl.uniform1f(widthUniformLocation, gl.drawingBufferWidth);
-    gl.uniform1f(heightUniformLocation, gl.drawingBufferHeight);
-    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(vertices.length / 2));
-  }, [vertices]);
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(positionAttribute);
+    gl.uniform1f(widthUniform, gl.drawingBufferWidth);
+    gl.uniform1f(heightUniform, gl.drawingBufferHeight);
+    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positions.length / 2));
+  }, [positions]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>

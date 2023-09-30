@@ -11,15 +11,15 @@ import VSHADER_SOURCE from './vertex.glsl?raw';
 const Demo25: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
-  const positionAttributeLocationRef = useRef(-1);
-  const pointSizeAttributeLocationRef = useRef(-1);
-  const vertexSizeBufferRef = useRef<WebGLBuffer | null>(null);
+  const positionAttributeRef = useRef(-1);
+  const pointSizeAttributeRef = useRef(-1);
+  const positionSizeBufferRef = useRef<WebGLBuffer | null>(null);
   const [points] = useState<[number, number, number][]>([
     [0, 0.5, 10],
     [-0.5, -0.5, 20],
     [0.5, -0.5, 30],
   ]);
-  const verticesSizes = useMemo(
+  const positionsSizes = useMemo(
     () => new Float32Array(points.flat()),
     [points],
   );
@@ -54,21 +54,18 @@ const Demo25: FC<ComponentProps> = () => {
       /**
        * 变量位置
        */
-      const positionAttributeLocation = gl.getAttribLocation(
-        gl.program,
-        'a_Position',
-      );
-      const pointSizeAttributeLocation = gl.getAttribLocation(
+      const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
+      const pointSizeAttribute = gl.getAttribLocation(
         gl.program,
         'a_PointSize',
       );
-      positionAttributeLocationRef.current = positionAttributeLocation;
-      pointSizeAttributeLocationRef.current = pointSizeAttributeLocation;
+      positionAttributeRef.current = positionAttribute;
+      pointSizeAttributeRef.current = pointSizeAttribute;
       /**
        * 缓冲区
        */
-      const vertexBuffer = gl.createBuffer();
-      vertexSizeBufferRef.current = vertexBuffer;
+      const positionSizeBuffer = gl.createBuffer();
+      positionSizeBufferRef.current = positionSizeBuffer;
       /**
        * 清空设置
        */
@@ -79,12 +76,12 @@ const Demo25: FC<ComponentProps> = () => {
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
-    const positionAttributeLocation = positionAttributeLocationRef.current;
-    if (positionAttributeLocation < 0) return;
-    const pointSizeAttributeLocation = pointSizeAttributeLocationRef.current;
-    if (pointSizeAttributeLocation < 0) return;
-    const vertexSizeBuffer = vertexSizeBufferRef.current;
-    if (!vertexSizeBuffer) return;
+    const positionAttribute = positionAttributeRef.current;
+    if (positionAttribute < 0) return;
+    const pointSizeAttribute = pointSizeAttributeRef.current;
+    if (pointSizeAttribute < 0) return;
+    const positionSizeBuffer = positionSizeBufferRef.current;
+    if (!positionSizeBuffer) return;
     /**
      * 清空
      */
@@ -92,28 +89,28 @@ const Demo25: FC<ComponentProps> = () => {
     /**
      * 数据写入缓冲区并分配到变量，绘制
      */
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexSizeBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, verticesSizes, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionSizeBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, positionsSizes, gl.STATIC_DRAW);
     gl.vertexAttribPointer(
-      positionAttributeLocation,
+      positionAttribute,
       2,
       gl.FLOAT,
       false,
-      verticesSizes.BYTES_PER_ELEMENT * 3,
+      positionsSizes.BYTES_PER_ELEMENT * 3,
       0,
     );
-    gl.enableVertexAttribArray(positionAttributeLocation);
+    gl.enableVertexAttribArray(positionAttribute);
     gl.vertexAttribPointer(
-      pointSizeAttributeLocation,
+      pointSizeAttribute,
       1,
       gl.FLOAT,
       false,
-      verticesSizes.BYTES_PER_ELEMENT * 3,
-      verticesSizes.BYTES_PER_ELEMENT * 2,
+      positionsSizes.BYTES_PER_ELEMENT * 3,
+      positionsSizes.BYTES_PER_ELEMENT * 2,
     );
-    gl.enableVertexAttribArray(pointSizeAttributeLocation);
-    gl.drawArrays(gl.POINTS, 0, Math.floor(verticesSizes.length / 3));
-  }, [verticesSizes]);
+    gl.enableVertexAttribArray(pointSizeAttribute);
+    gl.drawArrays(gl.POINTS, 0, Math.floor(positionsSizes.length / 3));
+  }, [positionsSizes]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>

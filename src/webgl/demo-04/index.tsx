@@ -11,7 +11,7 @@ import VSHADER_SOURCE from './vertex.glsl?raw';
 const Demo04: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
-  const positionAttributeLocationRef = useRef(-1);
+  const positionAttributeRef = useRef(-1);
   const [point] = useState<[number, number]>([0, 0]);
 
   useEffect(() => {
@@ -44,11 +44,8 @@ const Demo04: FC<ComponentProps> = () => {
       /**
        * 变量位置
        */
-      const positionAttributeLocation = gl.getAttribLocation(
-        gl.program,
-        'a_Position',
-      );
-      positionAttributeLocationRef.current = positionAttributeLocation;
+      const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
+      positionAttributeRef.current = positionAttribute;
       /**
        * 清空设置
        */
@@ -59,8 +56,8 @@ const Demo04: FC<ComponentProps> = () => {
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
-    const positionAttributeLocation = positionAttributeLocationRef.current;
-    if (positionAttributeLocation < 0) return;
+    const positionAttribute = positionAttributeRef.current;
+    if (positionAttribute < 0) return;
     /**
      * 清空
      */
@@ -69,7 +66,7 @@ const Demo04: FC<ComponentProps> = () => {
      * 数据分配到变量，绘制
      */
     const [x, y] = point;
-    gl.vertexAttrib3f(positionAttributeLocation, x, y, 0);
+    gl.vertexAttrib3f(positionAttribute, x, y, 0);
     gl.drawArrays(gl.POINTS, 0, 1);
   }, [point]);
 
