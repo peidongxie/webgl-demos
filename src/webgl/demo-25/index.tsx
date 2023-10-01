@@ -1,7 +1,8 @@
-import { type FC, useEffect, useMemo, useRef, useState } from 'react';
+import { type FC, useEffect, useRef, useState } from 'react';
 
 import { type ComponentProps } from '../../type';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
+import { useFloat32Array } from '../lib/react-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
@@ -19,10 +20,7 @@ const Demo25: FC<ComponentProps> = () => {
     [-0.5, -0.5, 20],
     [0.5, -0.5, 30],
   ]);
-  const positionsSizes = useMemo(
-    () => new Float32Array(points.flat()),
-    [points],
-  );
+  const positionsSizes = useFloat32Array(points);
 
   useEffect(() => {
     const canvas = canvasRef.current;

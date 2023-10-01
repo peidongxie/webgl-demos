@@ -11,6 +11,7 @@ import { type GuiOptions, type GuiSchema, useGui } from '../../lib/gui-utils';
 import { type ComponentProps } from '../../type';
 import { Matrix4 } from '../lib/cuon-matrix';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
+import { useFloat32Array } from '../lib/react-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
@@ -28,7 +29,7 @@ const Demo23: FC<ComponentProps> = () => {
     [-0.5, -0.5],
     [0.5, -0.5],
   ]);
-  const positions = useMemo(() => new Float32Array(points.flat()), [points]);
+  const positions = useFloat32Array(points);
   const timeRef = useRef(Date.now());
   const angleRef = useRef(0);
   const stepRef = useRef(45);

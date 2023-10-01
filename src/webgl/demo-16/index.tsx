@@ -2,6 +2,7 @@ import { type FC, useEffect, useMemo, useRef, useState } from 'react';
 
 import { type ComponentProps } from '../../type';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
+import { useFloat32Array } from '../lib/react-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
@@ -19,7 +20,7 @@ const Demo16: FC<ComponentProps> = () => {
     [-0.5, -0.5],
     [0.5, -0.5],
   ]);
-  const positions = useMemo(() => new Float32Array(points.flat()), [points]);
+  const positions = useFloat32Array(points);
   const [angle] = useState(90);
   const xformMatrix = useMemo(() => {
     const radian = (Math.PI * angle) / 180;

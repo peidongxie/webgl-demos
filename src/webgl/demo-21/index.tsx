@@ -1,15 +1,9 @@
-import {
-  type FC,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { type FC, useCallback, useEffect, useRef, useState } from 'react';
 
 import { type ComponentProps } from '../../type';
 import { Matrix4 } from '../lib/cuon-matrix';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
+import { useFloat32Array } from '../lib/react-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
@@ -27,7 +21,7 @@ const Demo21: FC<ComponentProps> = () => {
     [-0.5, -0.5],
     [0.5, -0.5],
   ]);
-  const positions = useMemo(() => new Float32Array(points.flat()), [points]);
+  const positions = useFloat32Array(points);
   const [timeStart] = useState(() => Date.now());
   const [[angleStart, angleStep]] = useState([0, 45]);
   const modelMatrixRef = useRef(new Matrix4());
