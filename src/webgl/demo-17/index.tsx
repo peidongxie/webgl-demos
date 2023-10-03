@@ -5,16 +5,40 @@ import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 绘制三角
+ * 缩放三角-矩阵
  */
-const Demo08: FC<ComponentProps> = () => {
+const Demo17: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const positionAttributeLocationRef = useRef(-1);
+  const transformMatrixUniformLocationRef = useRef<WebGLUniformLocation | null>(
+    null,
+  );
   const vertexBufferRef = useRef<WebGLBuffer | null>(null);
   const [vertices] = useState(
     () => new Float32Array([0, 0.5, -0.5, -0.5, 0.5, -0.5]),
   );
+  const [transformMatrix] = useState(() => {
+    const scale = [1.0, 1.5, 1.0];
+    return new Float32Array([
+      scale[0],
+      0,
+      0,
+      0,
+      0,
+      scale[1],
+      0,
+      0,
+      0,
+      0,
+      scale[2],
+      0,
+      0,
+      0,
+      0,
+      1,
+    ]);
+  });
 
   useEffect(() => {
     /**
@@ -37,7 +61,12 @@ const Demo08: FC<ComponentProps> = () => {
       gl.program,
       'a_Position',
     );
+    const transformMatrixUniformLocation = gl.getUniformLocation(
+      gl.program,
+      'u_xformMatrix',
+    );
     positionAttributeLocationRef.current = positionAttributeLocation;
+    transformMatrixUniformLocationRef.current = transformMatrixUniformLocation;
     /**
      * 缓冲区
      */
@@ -57,6 +86,9 @@ const Demo08: FC<ComponentProps> = () => {
     if (!gl) return;
     const positionAttributeLocation = positionAttributeLocationRef.current;
     if (positionAttributeLocation < 0) return;
+    const transformMatrixUniformLocation =
+      transformMatrixUniformLocationRef.current;
+    if (!transformMatrixUniformLocation) return;
     const vertexBuffer = vertexBufferRef.current;
     if (!vertexBuffer) return;
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -67,8 +99,9 @@ const Demo08: FC<ComponentProps> = () => {
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
     gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(positionAttributeLocation);
+    gl.uniformMatrix4fv(transformMatrixUniformLocation, false, transformMatrix);
     gl.drawArrays(gl.TRIANGLES, 0, Math.floor(vertices.length / 2));
-  }, [vertices]);
+  }, [vertices, transformMatrix]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>
@@ -77,4 +110,4 @@ const Demo08: FC<ComponentProps> = () => {
   );
 };
 
-export default Demo08;
+export default Demo17;

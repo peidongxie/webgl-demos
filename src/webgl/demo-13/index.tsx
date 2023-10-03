@@ -5,15 +5,15 @@ import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 绘制三角
+ * 绘制飘带
  */
-const Demo08: FC<ComponentProps> = () => {
+const Demo12: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const positionAttributeLocationRef = useRef(-1);
   const vertexBufferRef = useRef<WebGLBuffer | null>(null);
   const [vertices] = useState(
-    () => new Float32Array([0, 0.5, -0.5, -0.5, 0.5, -0.5]),
+    () => new Float32Array([-0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5]),
   );
 
   useEffect(() => {
@@ -67,7 +67,7 @@ const Demo08: FC<ComponentProps> = () => {
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
     gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(positionAttributeLocation);
-    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(vertices.length / 2));
+    gl.drawArrays(gl.TRIANGLE_FAN, 0, Math.floor(vertices.length / 2));
   }, [vertices]);
 
   return (
@@ -77,4 +77,4 @@ const Demo08: FC<ComponentProps> = () => {
   );
 };
 
-export default Demo08;
+export default Demo12;

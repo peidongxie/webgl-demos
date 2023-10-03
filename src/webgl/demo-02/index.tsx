@@ -1,14 +1,11 @@
 import { useEffect, useRef, type FC } from 'react';
+import { type ComponentProps } from '../../type';
 import { getWebGLContext } from '../lib/cuon-utils';
-
-interface Demo02Props {
-  [key: string]: never;
-}
 
 /**
  * 清空画布
  */
-const Demo02: FC<Demo02Props> = () => {
+const Demo02: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {

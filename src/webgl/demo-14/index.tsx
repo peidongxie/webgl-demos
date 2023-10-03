@@ -5,16 +5,20 @@ import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 绘制三角
+ * 移动三角
  */
-const Demo08: FC<ComponentProps> = () => {
+const Demo14: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const positionAttributeLocationRef = useRef(-1);
+  const translationUniformLocationRef = useRef<WebGLUniformLocation | null>(
+    null,
+  );
   const vertexBufferRef = useRef<WebGLBuffer | null>(null);
   const [vertices] = useState(
     () => new Float32Array([0, 0.5, -0.5, -0.5, 0.5, -0.5]),
   );
+  const [translation] = useState([0.5, 0.5, 0]);
 
   useEffect(() => {
     /**
@@ -37,7 +41,12 @@ const Demo08: FC<ComponentProps> = () => {
       gl.program,
       'a_Position',
     );
+    const translationUniformLocation = gl.getUniformLocation(
+      gl.program,
+      'u_Translation',
+    );
     positionAttributeLocationRef.current = positionAttributeLocation;
+    translationUniformLocationRef.current = translationUniformLocation;
     /**
      * 缓冲区
      */
@@ -57,6 +66,8 @@ const Demo08: FC<ComponentProps> = () => {
     if (!gl) return;
     const positionAttributeLocation = positionAttributeLocationRef.current;
     if (positionAttributeLocation < 0) return;
+    const translationUniformLocation = translationUniformLocationRef.current;
+    if (!translationUniformLocation) return;
     const vertexBuffer = vertexBufferRef.current;
     if (!vertexBuffer) return;
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -67,8 +78,15 @@ const Demo08: FC<ComponentProps> = () => {
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
     gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(positionAttributeLocation);
+    gl.uniform4f(
+      translationUniformLocation,
+      translation[0],
+      translation[1],
+      translation[2],
+      0,
+    );
     gl.drawArrays(gl.TRIANGLES, 0, Math.floor(vertices.length / 2));
-  }, [vertices]);
+  }, [vertices, translation]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>
@@ -77,4 +95,4 @@ const Demo08: FC<ComponentProps> = () => {
   );
 };
 
-export default Demo08;
+export default Demo14;

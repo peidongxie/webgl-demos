@@ -1,13 +1,10 @@
 import { useEffect, useRef, type FC } from 'react';
-
-interface Demo01Props {
-  [key: string]: never;
-}
+import { type ComponentProps } from '../../type';
 
 /**
  * 使用画布
  */
-const Demo01: FC<Demo01Props> = () => {
+const Demo01: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {

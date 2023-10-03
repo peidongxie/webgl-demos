@@ -1,16 +1,13 @@
 import { useEffect, useRef, type FC } from 'react';
+import { type ComponentProps } from '../../type';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
-interface Demo03Props {
-  [key: string]: never;
-}
-
 /**
  * 绘制点
  */
-const Demo03: FC<Demo03Props> = () => {
+const Demo03: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
 
