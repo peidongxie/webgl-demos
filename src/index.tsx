@@ -44,6 +44,7 @@ import WebglDemo26 from './webgl/demo-26';
 import WebglDemo27 from './webgl/demo-27';
 import WebglDemo28 from './webgl/demo-28';
 import WebglDemo29 from './webgl/demo-29';
+import WebglDemo30 from './webgl/demo-30';
 
 const webglChildren: RouteObject[] = [
   {
@@ -279,6 +280,14 @@ const webglChildren: RouteObject[] = [
     element: <WebglDemo29 />,
     loader: (): MatchData => ({
       value: ['29 绘制纹理', '/demo-29'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-30',
+    element: <WebglDemo30 />,
+    loader: (): MatchData => ({
+      value: ['30 绘制重复纹理', '/demo-30'],
       children: [],
     }),
   },
