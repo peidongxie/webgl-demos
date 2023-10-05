@@ -25,6 +25,12 @@ import WebglDemo14 from './webgl/demo-14';
 import WebglDemo15 from './webgl/demo-15';
 import WebglDemo16 from './webgl/demo-16';
 import WebglDemo17 from './webgl/demo-17';
+import WebglDemo18 from './webgl/demo-18';
+import WebglDemo19 from './webgl/demo-19';
+import WebglDemo20 from './webgl/demo-20';
+import WebglDemo21 from './webgl/demo-21';
+import WebglDemo22 from './webgl/demo-22';
+import WebglDemo23 from './webgl/demo-23';
 
 const webglChildren: RouteObject[] = [
   {
@@ -135,7 +141,7 @@ const webglChildren: RouteObject[] = [
     path: 'demo-14',
     element: <WebglDemo14 />,
     loader: (): MatchData => ({
-      value: ['14 移动三角', '/demo-14'],
+      value: ['14 向量平移', '/demo-14'],
       children: [],
     }),
   },
@@ -143,7 +149,7 @@ const webglChildren: RouteObject[] = [
     path: 'demo-15',
     element: <WebglDemo15 />,
     loader: (): MatchData => ({
-      value: ['15 旋转三角', '/demo-15'],
+      value: ['15 向量旋转', '/demo-15'],
       children: [],
     }),
   },
@@ -151,7 +157,7 @@ const webglChildren: RouteObject[] = [
     path: 'demo-16',
     element: <WebglDemo16 />,
     loader: (): MatchData => ({
-      value: ['16 旋转三角-矩阵', '/demo-16'],
+      value: ['16 矩阵旋转', '/demo-16'],
       children: [],
     }),
   },
@@ -159,7 +165,55 @@ const webglChildren: RouteObject[] = [
     path: 'demo-17',
     element: <WebglDemo17 />,
     loader: (): MatchData => ({
-      value: ['17 缩放三角-矩阵', '/demo-17'],
+      value: ['17 矩阵缩放', '/demo-17'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-18',
+    element: <WebglDemo18 />,
+    loader: (): MatchData => ({
+      value: ['18 旋转', '/demo-18'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-19',
+    element: <WebglDemo19 />,
+    loader: (): MatchData => ({
+      value: ['19 先平移再旋转', '/demo-19'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-20',
+    element: <WebglDemo20 />,
+    loader: (): MatchData => ({
+      value: ['20 先旋转再平移', '/demo-20'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-21',
+    element: <WebglDemo21 />,
+    loader: (): MatchData => ({
+      value: ['21 绘制动画', '/demo-21'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-22',
+    element: <WebglDemo22 />,
+    loader: (): MatchData => ({
+      value: ['22 绘制复合动画', '/demo-22'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-23',
+    element: <WebglDemo23 />,
+    loader: (): MatchData => ({
+      value: ['23 控制动画', '/demo-23'],
       children: [],
     }),
   },
@@ -208,7 +262,7 @@ const router = createBrowserRouter([
   },
 ]);
 
-createRoot(document.getElementById('root')!).render(
+createRoot(document.querySelector('#root')!).render(
   <StrictMode>
     <RouterProvider router={router} />
   </StrictMode>,

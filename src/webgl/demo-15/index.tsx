@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState, type FC } from 'react';
+import { useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { type ComponentProps } from '../../type';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 旋转三角
+ * 向量旋转
  */
 const Demo15: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -14,16 +14,19 @@ const Demo15: FC<ComponentProps> = () => {
   const cosUniformLocationRef = useRef<WebGLUniformLocation | null>(null);
   const sinUniformLocationRef = useRef<WebGLUniformLocation | null>(null);
   const vertexBufferRef = useRef<WebGLBuffer | null>(null);
-  const [vertices] = useState(
-    () => new Float32Array([0, 0.5, -0.5, -0.5, 0.5, -0.5]),
-  );
-  const [[cos, sin]] = useState(() => {
-    const angle = 90;
+  const [points] = useState<[number, number][]>([
+    [0, 0.5],
+    [-0.5, -0.5],
+    [0.5, -0.5],
+  ]);
+  const vertices = useMemo(() => new Float32Array(points.flat()), [points]);
+  const [angle] = useState(90);
+  const [cos, sin] = useMemo(() => {
     const radian = (Math.PI * angle) / 180;
     const cos = Math.cos(radian);
     const sin = Math.sin(radian);
     return [cos, sin] as const;
-  });
+  }, [angle]);
 
   useEffect(() => {
     /**

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FC } from 'react';
+import { useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { type ComponentProps } from '../../type';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
@@ -12,9 +12,12 @@ const Demo11: FC<ComponentProps> = () => {
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const positionAttributeLocationRef = useRef(-1);
   const vertexBufferRef = useRef<WebGLBuffer | null>(null);
-  const [vertices] = useState(
-    () => new Float32Array([0, 0.5, -0.5, -0.5, 0.5, -0.5]),
-  );
+  const [points] = useState<[number, number][]>([
+    [0, 0.5],
+    [-0.5, -0.5],
+    [0.5, -0.5],
+  ]);
+  const vertices = useMemo(() => new Float32Array(points.flat()), [points]);
 
   useEffect(() => {
     /**

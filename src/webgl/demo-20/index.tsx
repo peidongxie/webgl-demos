@@ -1,23 +1,35 @@
 import { useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { type ComponentProps } from '../../type';
+import { Matrix4 } from '../lib/cuon-matrix';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 绘制三角
+ * 先旋转再平移
  */
-const Demo08: FC<ComponentProps> = () => {
+const Demo20: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const positionAttributeLocationRef = useRef(-1);
+  const modelMatrixUniformLocationRef = useRef<WebGLUniformLocation | null>(
+    null,
+  );
   const vertexBufferRef = useRef<WebGLBuffer | null>(null);
   const [points] = useState<[number, number][]>([
-    [0, 0.5],
-    [-0.5, -0.5],
-    [0.5, -0.5],
+    [0, 0.3],
+    [-0.3, -0.3],
+    [0.3, -0.3],
   ]);
   const vertices = useMemo(() => new Float32Array(points.flat()), [points]);
+  const [angle] = useState(60);
+  const [[translationX, translationY, translationZ]] = useState([0.5, 0, 0]);
+  const modelMatrix = useMemo(() => {
+    const modelMatrix = new Matrix4();
+    modelMatrix.setTranslate(translationX, translationY, translationZ);
+    modelMatrix.rotate(angle, 0, 0, 1);
+    return modelMatrix;
+  }, [angle, translationX, translationY, translationZ]);
 
   useEffect(() => {
     /**
@@ -40,7 +52,12 @@ const Demo08: FC<ComponentProps> = () => {
       gl.program,
       'a_Position',
     );
+    const modelMatrixUniformLocation = gl.getUniformLocation(
+      gl.program,
+      'u_ModelMatrix',
+    );
     positionAttributeLocationRef.current = positionAttributeLocation;
+    modelMatrixUniformLocationRef.current = modelMatrixUniformLocation;
     /**
      * 缓冲区
      */
@@ -60,6 +77,8 @@ const Demo08: FC<ComponentProps> = () => {
     if (!gl) return;
     const positionAttributeLocation = positionAttributeLocationRef.current;
     if (positionAttributeLocation < 0) return;
+    const modelMatrixUniformLocation = modelMatrixUniformLocationRef.current;
+    if (!modelMatrixUniformLocation) return;
     const vertexBuffer = vertexBufferRef.current;
     if (!vertexBuffer) return;
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -70,8 +89,13 @@ const Demo08: FC<ComponentProps> = () => {
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
     gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(positionAttributeLocation);
+    gl.uniformMatrix4fv(
+      modelMatrixUniformLocation,
+      false,
+      modelMatrix.elements,
+    );
     gl.drawArrays(gl.TRIANGLES, 0, Math.floor(vertices.length / 2));
-  }, [vertices]);
+  }, [vertices, modelMatrix]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>
@@ -80,4 +104,4 @@ const Demo08: FC<ComponentProps> = () => {
   );
 };
 
-export default Demo08;
+export default Demo20;

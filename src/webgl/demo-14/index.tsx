@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState, type FC } from 'react';
+import { useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { type ComponentProps } from '../../type';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 移动三角
+ * 向量平移
  */
 const Demo14: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -15,10 +15,13 @@ const Demo14: FC<ComponentProps> = () => {
     null,
   );
   const vertexBufferRef = useRef<WebGLBuffer | null>(null);
-  const [vertices] = useState(
-    () => new Float32Array([0, 0.5, -0.5, -0.5, 0.5, -0.5]),
-  );
-  const [translation] = useState([0.5, 0.5, 0]);
+  const [points] = useState<[number, number][]>([
+    [0, 0.5],
+    [-0.5, -0.5],
+    [0.5, -0.5],
+  ]);
+  const vertices = useMemo(() => new Float32Array(points.flat()), [points]);
+  const [[translationX, translationY, translationZ]] = useState([0.5, 0.5, 0]);
 
   useEffect(() => {
     /**
@@ -80,13 +83,13 @@ const Demo14: FC<ComponentProps> = () => {
     gl.enableVertexAttribArray(positionAttributeLocation);
     gl.uniform4f(
       translationUniformLocation,
-      translation[0],
-      translation[1],
-      translation[2],
+      translationX,
+      translationY,
+      translationZ,
       0,
     );
     gl.drawArrays(gl.TRIANGLES, 0, Math.floor(vertices.length / 2));
-  }, [vertices, translation]);
+  }, [vertices, translationX, translationY, translationZ]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>

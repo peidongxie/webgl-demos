@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState, type FC } from 'react';
+import { useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { type ComponentProps } from '../../type';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 缩放三角-矩阵
+ * 矩阵缩放
  */
 const Demo17: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -15,30 +15,33 @@ const Demo17: FC<ComponentProps> = () => {
     null,
   );
   const vertexBufferRef = useRef<WebGLBuffer | null>(null);
-  const [vertices] = useState(
-    () => new Float32Array([0, 0.5, -0.5, -0.5, 0.5, -0.5]),
-  );
-  const [transformMatrix] = useState(() => {
-    const scale = [1.0, 1.5, 1.0];
+  const [points] = useState<[number, number][]>([
+    [0, 0.5],
+    [-0.5, -0.5],
+    [0.5, -0.5],
+  ]);
+  const vertices = useMemo(() => new Float32Array(points.flat()), [points]);
+  const [[scaleX, scaleY, scaleZ]] = useState([1.0, 1.5, 1.0]);
+  const transformMatrix = useMemo(() => {
     return new Float32Array([
-      scale[0],
+      scaleX,
       0,
       0,
       0,
       0,
-      scale[1],
+      scaleY,
       0,
       0,
       0,
       0,
-      scale[2],
+      scaleZ,
       0,
       0,
       0,
       0,
       1,
     ]);
-  });
+  }, [scaleX, scaleY, scaleZ]);
 
   useEffect(() => {
     /**
