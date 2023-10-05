@@ -262,7 +262,7 @@ const router = createBrowserRouter(
       children: appChildren,
     },
   ],
-  { basename: import.meta.env.VITE_BASENAME || '/' },
+  { basename: import.meta.env.BASE_URL },
 );
 
 createRoot(document.querySelector('#root')!).render(
