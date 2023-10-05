@@ -242,25 +242,28 @@ const appChildren: RouteObject[] = [
   },
 ];
 
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <App />,
-    loader: (args): MatchData => ({
-      value: ['All', ''],
-      children: appChildren
-        .map((child) => child.loader?.(args))
-        .filter<MatchData>((childData): childData is MatchData => {
-          if (!childData) return false;
-          if (!Reflect.has(childData, 'value')) return false;
-          if (!Reflect.has(childData, 'children')) return false;
-          return true;
-        })
-        .map((childData) => childData.value),
-    }),
-    children: appChildren,
-  },
-]);
+const router = createBrowserRouter(
+  [
+    {
+      path: '/',
+      element: <App />,
+      loader: (args): MatchData => ({
+        value: ['All', ''],
+        children: appChildren
+          .map((child) => child.loader?.(args))
+          .filter<MatchData>((childData): childData is MatchData => {
+            if (!childData) return false;
+            if (!Reflect.has(childData, 'value')) return false;
+            if (!Reflect.has(childData, 'children')) return false;
+            return true;
+          })
+          .map((childData) => childData.value),
+      }),
+      children: appChildren,
+    },
+  ],
+  { basename: import.meta.env.VITE_BASENAME || '/' },
+);
 
 createRoot(document.querySelector('#root')!).render(
   <StrictMode>
