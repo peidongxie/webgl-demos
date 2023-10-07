@@ -101,7 +101,7 @@ const Demo30: FC<ComponentProps> = () => {
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
     /**
-     * 数据写入缓冲区并分配到变量，绘制
+     * 数据写入缓冲区并分配到变量
      */
     gl.bindBuffer(gl.ARRAY_BUFFER, positionTexCoordBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, positionsTexCoords, gl.STATIC_DRAW);
@@ -129,6 +129,9 @@ const Demo30: FC<ComponentProps> = () => {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
     gl.uniform1i(samplerUniform, 0);
+    /**
+     * 绘制
+     */
     gl.drawArrays(
       gl.TRIANGLE_STRIP,
       0,

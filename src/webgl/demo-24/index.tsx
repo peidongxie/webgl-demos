@@ -93,7 +93,7 @@ const Demo24: FC<ComponentProps> = () => {
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
     /**
-     * 数据写入缓冲区并分配到变量，绘制
+     * 数据写入缓冲区并分配到变量
      */
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
@@ -103,6 +103,9 @@ const Demo24: FC<ComponentProps> = () => {
     gl.bufferData(gl.ARRAY_BUFFER, sizes, gl.STATIC_DRAW);
     gl.vertexAttribPointer(pointSizeAttribute, 1, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(pointSizeAttribute);
+    /**
+     * 绘制
+     */
     gl.drawArrays(gl.POINTS, 0, Math.floor(positions.length / 2));
   }, [positions, sizes]);
 

@@ -78,7 +78,7 @@ const Demo32: FC<ComponentProps> = () => {
       const positionTexCoordBuffer = gl.createBuffer();
       positionTexCoordBufferRef.current = positionTexCoordBuffer;
       /**
-       * 纹理
+       * 纹理对象
        */
       const imageTexture0 = gl.createTexture();
       const imageTexture1 = gl.createTexture();
@@ -115,7 +115,7 @@ const Demo32: FC<ComponentProps> = () => {
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
     /**
-     * 数据写入缓冲区并分配到变量，绘制
+     * 数据写入缓冲区并分配到变量
      */
     gl.bindBuffer(gl.ARRAY_BUFFER, positionTexCoordBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, positionsTexCoords, gl.STATIC_DRAW);
@@ -137,6 +137,9 @@ const Demo32: FC<ComponentProps> = () => {
       positionsTexCoords.BYTES_PER_ELEMENT * 2,
     );
     gl.enableVertexAttribArray(texCoordAttribute);
+    /**
+     * 图像分配给纹理对象并分配到变量
+     */
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, imageTexture0);
@@ -148,6 +151,9 @@ const Demo32: FC<ComponentProps> = () => {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image1);
     gl.uniform1i(sampler1Uniform, 1);
+    /**
+     * 绘制
+     */
     gl.drawArrays(
       gl.TRIANGLE_STRIP,
       0,

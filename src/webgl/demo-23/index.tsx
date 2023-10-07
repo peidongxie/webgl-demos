@@ -81,13 +81,16 @@ const Demo23: FC<ComponentProps> = () => {
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
     /**
-     * 调整模型矩阵，绘制
+     * 调整模型矩阵
      */
     const modelMatrix = modelMatrixRef.current;
     const angle = angleRef.current;
     modelMatrix.setRotate(angle, 0, 0, 1);
     modelMatrix.translate(0.35, 0, 0);
     gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
+    /**
+     * 绘制
+     */
     gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positions.length / 2));
   }, [positions]);
 

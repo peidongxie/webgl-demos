@@ -108,12 +108,16 @@ const Demo06: FC<ComponentProps> = () => {
      * 清空
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
-    /**
-     * 数据分配到变量，绘制
-     */
-    for (const [x, y, red, green, blue, alpha] of points) {
+    for (const point of points) {
+      /**
+       * 数据分配到变量
+       */
+      const [x, y, red, green, blue, alpha] = point;
       gl.vertexAttrib3f(positionAttribute, x, y, 0);
       gl.uniform4f(fragColorUniform, red, green, blue, alpha);
+      /**
+       * 绘制
+       */
       gl.drawArrays(gl.POINTS, 0, 1);
     }
   }, [points]);

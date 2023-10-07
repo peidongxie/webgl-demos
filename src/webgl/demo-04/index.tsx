@@ -63,10 +63,13 @@ const Demo04: FC<ComponentProps> = () => {
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
     /**
-     * 数据分配到变量，绘制
+     * 数据分配到变量
      */
     const [x, y] = point;
     gl.vertexAttrib3f(positionAttribute, x, y, 0);
+    /**
+     * 绘制
+     */
     gl.drawArrays(gl.POINTS, 0, 1);
   }, [point]);
 

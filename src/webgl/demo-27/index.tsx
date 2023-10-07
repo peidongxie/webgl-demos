@@ -82,7 +82,7 @@ const Demo27: FC<ComponentProps> = () => {
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
     /**
-     * 数据写入缓冲区并分配到变量，绘制
+     * 数据写入缓冲区并分配到变量
      */
     gl.bindBuffer(gl.ARRAY_BUFFER, positionColorBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, positionsColors, gl.STATIC_DRAW);
@@ -104,6 +104,9 @@ const Demo27: FC<ComponentProps> = () => {
       positionsColors.BYTES_PER_ELEMENT * 2,
     );
     gl.enableVertexAttribArray(colorAttribute);
+    /**
+     * 绘制
+     */
     gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positionsColors.length / 5));
   }, [positionsColors]);
 

@@ -90,11 +90,15 @@ const Demo05: FC<ComponentProps> = () => {
      * 清空
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
-    /**
-     * 数据分配到变量，绘制
-     */
-    for (const [x, y] of points) {
+    for (const point of points) {
+      /**
+       * 数据分配到变量
+       */
+      const [x, y] = point;
       gl.vertexAttrib3f(positionAttribute, x, y, 0);
+      /**
+       * 绘制
+       */
       gl.drawArrays(gl.POINTS, 0, 1);
     }
   }, [points]);

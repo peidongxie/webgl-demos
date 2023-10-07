@@ -86,7 +86,7 @@ const Demo14: FC<ComponentProps> = () => {
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
     /**
-     * 数据写入缓冲区并分配到变量，绘制
+     * 数据写入缓冲区并分配到变量
      */
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
@@ -99,6 +99,9 @@ const Demo14: FC<ComponentProps> = () => {
       translationZ,
       0,
     );
+    /**
+     * 绘制
+     */
     gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positions.length / 2));
   }, [positions, translationX, translationY, translationZ]);
 
