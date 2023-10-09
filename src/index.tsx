@@ -1,4 +1,4 @@
-import { StrictMode } from 'react';
+import { lazy, StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   createBrowserRouter,
@@ -8,45 +8,46 @@ import {
 
 import App from './app';
 import Galacean from './galacean';
-import GalaceanDemo01 from './galacean/demo-01';
-import GalaceanDemo02 from './galacean/demo-02';
-import GalaceanDemo03 from './galacean/demo-03';
 import Mars from './mars';
-import MarsDemo01 from './mars/demo-01';
 import { type MatchData } from './type';
 import Webgl from './webgl';
-import WebglDemo01 from './webgl/demo-01';
-import WebglDemo02 from './webgl/demo-02';
-import WebglDemo03 from './webgl/demo-03';
-import WebglDemo04 from './webgl/demo-04';
-import WebglDemo05 from './webgl/demo-05';
-import WebglDemo06 from './webgl/demo-06';
-import WebglDemo07 from './webgl/demo-07';
-import WebglDemo08 from './webgl/demo-08';
-import WebglDemo09 from './webgl/demo-09';
-import WebglDemo10 from './webgl/demo-10';
-import WebglDemo11 from './webgl/demo-11';
-import WebglDemo12 from './webgl/demo-12';
-import WebglDemo13 from './webgl/demo-13';
-import WebglDemo14 from './webgl/demo-14';
-import WebglDemo15 from './webgl/demo-15';
-import WebglDemo16 from './webgl/demo-16';
-import WebglDemo17 from './webgl/demo-17';
-import WebglDemo18 from './webgl/demo-18';
-import WebglDemo19 from './webgl/demo-19';
-import WebglDemo20 from './webgl/demo-20';
-import WebglDemo21 from './webgl/demo-21';
-import WebglDemo22 from './webgl/demo-22';
-import WebglDemo23 from './webgl/demo-23';
-import WebglDemo24 from './webgl/demo-24';
-import WebglDemo25 from './webgl/demo-25';
-import WebglDemo26 from './webgl/demo-26';
-import WebglDemo27 from './webgl/demo-27';
-import WebglDemo28 from './webgl/demo-28';
-import WebglDemo29 from './webgl/demo-29';
-import WebglDemo30 from './webgl/demo-30';
-import WebglDemo31 from './webgl/demo-31';
-import WebglDemo32 from './webgl/demo-32';
+
+const WebglDemo01 = lazy(() => import('./webgl/demo-01'));
+const WebglDemo02 = lazy(() => import('./webgl/demo-02'));
+const WebglDemo03 = lazy(() => import('./webgl/demo-03'));
+const WebglDemo04 = lazy(() => import('./webgl/demo-04'));
+const WebglDemo05 = lazy(() => import('./webgl/demo-05'));
+const WebglDemo06 = lazy(() => import('./webgl/demo-06'));
+const WebglDemo07 = lazy(() => import('./webgl/demo-07'));
+const WebglDemo08 = lazy(() => import('./webgl/demo-08'));
+const WebglDemo09 = lazy(() => import('./webgl/demo-09'));
+const WebglDemo10 = lazy(() => import('./webgl/demo-10'));
+const WebglDemo11 = lazy(() => import('./webgl/demo-11'));
+const WebglDemo12 = lazy(() => import('./webgl/demo-12'));
+const WebglDemo13 = lazy(() => import('./webgl/demo-13'));
+const WebglDemo14 = lazy(() => import('./webgl/demo-14'));
+const WebglDemo15 = lazy(() => import('./webgl/demo-15'));
+const WebglDemo16 = lazy(() => import('./webgl/demo-16'));
+const WebglDemo17 = lazy(() => import('./webgl/demo-17'));
+const WebglDemo18 = lazy(() => import('./webgl/demo-18'));
+const WebglDemo19 = lazy(() => import('./webgl/demo-19'));
+const WebglDemo20 = lazy(() => import('./webgl/demo-20'));
+const WebglDemo21 = lazy(() => import('./webgl/demo-21'));
+const WebglDemo22 = lazy(() => import('./webgl/demo-22'));
+const WebglDemo23 = lazy(() => import('./webgl/demo-23'));
+const WebglDemo24 = lazy(() => import('./webgl/demo-24'));
+const WebglDemo25 = lazy(() => import('./webgl/demo-25'));
+const WebglDemo26 = lazy(() => import('./webgl/demo-26'));
+const WebglDemo27 = lazy(() => import('./webgl/demo-27'));
+const WebglDemo28 = lazy(() => import('./webgl/demo-28'));
+const WebglDemo29 = lazy(() => import('./webgl/demo-29'));
+const WebglDemo30 = lazy(() => import('./webgl/demo-30'));
+const WebglDemo31 = lazy(() => import('./webgl/demo-31'));
+const WebglDemo32 = lazy(() => import('./webgl/demo-32'));
+const MarsDemo01 = lazy(() => import('./mars/demo-01'));
+const GalaceanDemo01 = lazy(() => import('./galacean/demo-01'));
+const GalaceanDemo02 = lazy(() => import('./galacean/demo-02'));
+const GalaceanDemo03 = lazy(() => import('./galacean/demo-03'));
 
 const webglChildren: RouteObject[] = [
   {
