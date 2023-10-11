@@ -1,4 +1,4 @@
-import { lazy } from 'react';
+import { lazy, Suspense } from 'react';
 import {
   createBrowserRouter,
   type RouteObject,
@@ -425,7 +425,11 @@ const router = createBrowserRouter(
   [
     {
       path: '/',
-      element: <App />,
+      element: (
+        <Suspense>
+          <App />
+        </Suspense>
+      ),
       loader: (args): MatchData => ({
         value: ['All', ''],
         children: appChildren
