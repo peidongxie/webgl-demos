@@ -1,4 +1,4 @@
-import { MarsPlayer } from '@galacean/mars-player';
+import { MarsPlayer, spec } from '@galacean/mars-player';
 import { type FC, useEffect, useRef, useState } from 'react';
 
 import { type ComponentProps } from '../../type';
@@ -14,7 +14,8 @@ const IMAGE_URL =
 const Demo01: FC<ComponentProps> = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<MarsPlayer | null>(null);
-  const [background, setBackground] = useState('');
+  const [backgroundImage, setBackgroundImage] = useState('');
+  const [backgroundSize, setBackgroundSize] = useState('cover');
 
   useEffect(() => {
     const container = containerRef.current;
@@ -26,7 +27,7 @@ const Demo01: FC<ComponentProps> = () => {
 
   useEffect(
     () => () => {
-      playerRef.current?.dispose();
+      if (playerRef.current) playerRef.current.dispose();
       playerRef.current = null;
     },
     [],
@@ -36,13 +37,22 @@ const Demo01: FC<ComponentProps> = () => {
     const player = playerRef.current;
     if (!player) return;
     (async () => {
+      let clipMode: spec.CameraClipMode | undefined;
       try {
         const composition = await player.loadScene(SCENE_URL);
         if (playerRef.current !== player) return;
+        clipMode = composition.camera.clipMode;
         await player.play(composition);
       } catch {
         if (playerRef.current !== player) return;
-        setBackground(IMAGE_URL);
+        setBackgroundImage(`url(${IMAGE_URL})`);
+        if (clipMode === spec.CameraClipMode.portrait) {
+          setBackgroundSize('100% auto');
+        } else if (clipMode === spec.CameraClipMode.landscape) {
+          setBackgroundSize('auto 100%');
+        } else {
+          setBackgroundSize('auto 100%');
+        }
       }
     })();
   }, []);
@@ -53,9 +63,10 @@ const Demo01: FC<ComponentProps> = () => {
       style={{
         width: '100vw',
         height: '100vh',
-        backgroundImage: background ? `url(${background})` : '',
+        backgroundImage,
         backgroundPosition: 'center',
-        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize,
       }}
     />
   );
