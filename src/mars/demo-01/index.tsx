@@ -51,7 +51,7 @@ const Demo01: FC<ComponentProps> = () => {
         } else if (clipMode === spec.CameraClipMode.landscape) {
           setBackgroundSize('auto 100%');
         } else {
-          setBackgroundSize('auto 100%');
+          setBackgroundSize('cover');
         }
       }
     })();

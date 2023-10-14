@@ -26,7 +26,7 @@ const main = async (engine: WebGLEngine): Promise<void> => {
   /**
    * 设置相机的朝向和位置
    */
-  const cameraEntity = rootEntity.createChild('camera_entity');
+  const cameraEntity = rootEntity.createChild('camera');
   cameraEntity.transform.setPosition(0, 5, 10);
   cameraEntity.transform.lookAt(new Vector3(0, 0, 0));
   cameraEntity.addComponent(Camera);
