@@ -7,25 +7,31 @@ import { getWebGLContext } from '../lib/cuon-utils';
  */
 const Demo02: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const glRef = useRef<WebGLRenderingContext | null>(null);
 
   useEffect(() => {
-    /**
-     * 画布
-     */
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-    /**
-     * 上下文
-     */
-    const gl = getWebGLContext(canvas);
-    if (!gl) return;
-    /**
-     * 清空
-     */
-    gl.clearColor(0, 0, 0, 1);
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    if (canvasRef.current) {
+      const canvas = canvasRef.current;
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (canvasRef.current && !glRef.current) {
+      const gl = getWebGLContext(canvasRef.current);
+      if (gl) {
+        /**
+         * 清空
+         */
+        gl.clearColor(0, 0, 0, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+      }
+      glRef.current = gl;
+    }
+    return () => {
+      glRef.current = null;
+    };
   }, []);
 
   return (
