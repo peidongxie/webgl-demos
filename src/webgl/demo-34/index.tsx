@@ -8,14 +8,15 @@ import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 观察三角
+ * 观察旋转三角
  */
-const Demo33: FC<ComponentProps> = () => {
+const Demo34: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const positionAttributeRef = useRef(-1);
   const colorAttributeRef = useRef(-1);
   const viewMatrixUniformRef = useRef<WebGLUniformLocation | null>(null);
+  const modelMatrixUniformRef = useRef<WebGLUniformLocation | null>(null);
   const positionColorBufferRef = useRef<WebGLBuffer | null>(null);
   const [points] = useState<
     [number, number, number, number, number, number][][]
@@ -74,9 +75,14 @@ const Demo33: FC<ComponentProps> = () => {
         gl.program,
         'u_ViewMatrix',
       );
+      const modelMatrixUniform = gl.getUniformLocation(
+        gl.program,
+        'u_ModelMatrix',
+      );
       positionAttributeRef.current = positionAttribute;
       colorAttributeRef.current = colorAttribute;
       viewMatrixUniformRef.current = viewMatrixUniform;
+      modelMatrixUniformRef.current = modelMatrixUniform;
       /**
        * 缓冲区
        */
@@ -98,6 +104,8 @@ const Demo33: FC<ComponentProps> = () => {
     if (colorAttribute < 0) return;
     const viewMatrixUniform = viewMatrixUniformRef.current;
     if (!viewMatrixUniform) return;
+    const modelMatrixUniform = modelMatrixUniformRef.current;
+    if (!modelMatrixUniform) return;
     const positionColorBuffer = positionColorBufferRef.current;
     if (!positionColorBuffer) return;
     /**
@@ -130,6 +138,9 @@ const Demo33: FC<ComponentProps> = () => {
     const viewMatrix = new Matrix4();
     viewMatrix.setLookAt(0.2, 0.25, 0.25, 0, 0, 0, 0, 1, 0);
     gl.uniformMatrix4fv(viewMatrixUniform, false, viewMatrix.elements);
+    const modelMatrix = new Matrix4();
+    modelMatrix.setRotate(-10, 0, 0, 1);
+    gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
     /**
      * 绘制
      */
@@ -143,4 +154,4 @@ const Demo33: FC<ComponentProps> = () => {
   );
 };
 
-export default Demo33;
+export default Demo34;
