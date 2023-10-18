@@ -6,24 +6,45 @@ import { type ComponentProps } from '../../type';
  */
 const Demo01: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
 
   useEffect(() => {
-    /**
-     * 画布
-     */
     const canvas = canvasRef.current;
     if (!canvas) return;
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = ctxRef.current;
+    if (ctx) return;
+    ctxRef.current = canvas.getContext('2d');
+  }, []);
+
+  useEffect(
+    () => () => {
+      ctxRef.current = null;
+    },
+    [],
+  );
+
+  useEffect(() => {
+    const ctx = ctxRef.current;
+    if (!ctx) return;
     /**
-     * 上下文
+     * 绘制设置
      */
-    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'rgba(0, 0, 255, 1)';
+  }, []);
+
+  useEffect(() => {
+    const ctx = ctxRef.current;
     if (!ctx) return;
     /**
      * 绘制
      */
-    ctx.fillStyle = 'rgba(0, 0, 255, 1)';
     ctx.fillRect(120, 10, 150, 150);
   }, []);
 

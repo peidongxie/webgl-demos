@@ -1,5 +1,5 @@
 import { MarsPlayer } from '@galacean/mars-player';
-import { useEffect, useRef, type FC } from 'react';
+import { useEffect, useRef, type FC, useState } from 'react';
 import { type ComponentProps } from '../../type';
 
 const SCENE_URL =
@@ -13,22 +13,25 @@ const IMAGE_URL =
 const Demo01: FC<ComponentProps> = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<MarsPlayer | null>(null);
-
-  useEffect(() => {
-    if (containerRef.current && !playerRef.current) {
-      const container = containerRef.current;
-      const player = new MarsPlayer({ container });
-      playerRef.current = player;
-    }
-    return () => {
-      playerRef.current?.dispose();
-      playerRef.current = null;
-    };
-  }, []);
+  const [background, setBackground] = useState('');
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+    const player = playerRef.current;
+    if (player) return;
+    playerRef.current = new MarsPlayer({ container });
+  }, []);
+
+  useEffect(
+    () => () => {
+      playerRef.current?.dispose();
+      playerRef.current = null;
+    },
+    [],
+  );
+
+  useEffect(() => {
     const player = playerRef.current;
     if (!player) return;
     (async () => {
@@ -38,7 +41,7 @@ const Demo01: FC<ComponentProps> = () => {
         await player.play(composition);
       } catch {
         if (playerRef.current !== player) return;
-        container.style.backgroundImage = `url(${IMAGE_URL})`;
+        setBackground(IMAGE_URL);
       }
     })();
   }, []);
@@ -49,6 +52,7 @@ const Demo01: FC<ComponentProps> = () => {
       style={{
         width: '100vw',
         height: '100vh',
+        backgroundImage: background ? `url(${background})` : '',
         backgroundPosition: 'center',
         backgroundSize: 'cover',
       }}

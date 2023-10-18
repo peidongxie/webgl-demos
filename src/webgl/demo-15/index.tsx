@@ -29,50 +29,57 @@ const Demo15: FC<ComponentProps> = () => {
   }, [angle]);
 
   useEffect(() => {
-    if (canvasRef.current) {
-      const canvas = canvasRef.current;
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
-    }
-  }, []);
-
-  useEffect(() => {
-    if (canvasRef.current && !glRef.current) {
-      const gl = getWebGLContext(canvasRef.current);
-      if (gl && initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
-        /**
-         * 变量位置
-         */
-        const positionAttributeLocation = gl.getAttribLocation(
-          gl.program,
-          'a_Position',
-        );
-        const cosUniformLocation = gl.getUniformLocation(gl.program, 'u_CosB');
-        const sinUniformLocation = gl.getUniformLocation(gl.program, 'u_SinB');
-        positionAttributeLocationRef.current = positionAttributeLocation;
-        cosUniformLocationRef.current = cosUniformLocation;
-        sinUniformLocationRef.current = sinUniformLocation;
-        /**
-         * 缓冲区
-         */
-        const vertexBuffer = gl.createBuffer();
-        vertexBufferRef.current = vertexBuffer;
-        /**
-         * 清空
-         */
-        gl.clearColor(0, 0, 0, 1);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-      }
-      glRef.current = gl;
-    }
-    return () => {
-      glRef.current = null;
-    };
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
   }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    const gl = glRef.current;
+    if (gl) return;
+    glRef.current = getWebGLContext(canvasRef.current);
+  }, []);
+
+  useEffect(
+    () => () => {
+      glRef.current = null;
+    },
+    [],
+  );
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    const success = initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE);
+    if (success) {
+      /**
+       * 变量位置
+       */
+      const positionAttributeLocation = gl.getAttribLocation(
+        gl.program,
+        'a_Position',
+      );
+      const cosUniformLocation = gl.getUniformLocation(gl.program, 'u_CosB');
+      const sinUniformLocation = gl.getUniformLocation(gl.program, 'u_SinB');
+      positionAttributeLocationRef.current = positionAttributeLocation;
+      cosUniformLocationRef.current = cosUniformLocation;
+      sinUniformLocationRef.current = sinUniformLocation;
+      /**
+       * 缓冲区
+       */
+      const vertexBuffer = gl.createBuffer();
+      vertexBufferRef.current = vertexBuffer;
+      /**
+       * 清空设置
+       */
+      gl.clearColor(0, 0, 0, 1);
+    }
+  }, []);
+
+  useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
     const positionAttributeLocation = positionAttributeLocationRef.current;
@@ -83,6 +90,9 @@ const Demo15: FC<ComponentProps> = () => {
     if (!sinUniformLocation) return;
     const vertexBuffer = vertexBufferRef.current;
     if (!vertexBuffer) return;
+    /**
+     * 清空
+     */
     gl.clear(gl.COLOR_BUFFER_BIT);
     /**
      * 数据写入缓冲区并分配到变量，绘制
