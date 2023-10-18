@@ -59,17 +59,19 @@ const Demo04: FC<ComponentProps> = () => {
     const positionAttribute = positionAttributeRef.current;
     if (positionAttribute < 0) return;
     /**
-     * 清空
-     */
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    /**
-     * 数据分配到变量
+     * 数据直接分配到变量
      */
     const [x, y] = point;
     gl.vertexAttrib3f(positionAttribute, x, y, 0);
+  }, [point]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
     /**
-     * 绘制
+     * 清空并绘制
      */
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.POINTS, 0, 1);
   }, [point]);
 

@@ -89,17 +89,8 @@ const Demo29: FC<ComponentProps> = () => {
     if (positionAttribute < 0) return;
     const texCoordAttribute = texCoordAttributeRef.current;
     if (texCoordAttribute < 0) return;
-    const samplerUniform = samplerUniformRef.current;
-    if (!samplerUniform) return;
     const positionTexCoordBuffer = positionTexCoordBufferRef.current;
     if (!positionTexCoordBuffer) return;
-    const imageTexture = imageTextureRef.current;
-    if (!imageTexture) return;
-    if (!image) return;
-    /**
-     * 清空
-     */
-    gl.clear(gl.COLOR_BUFFER_BIT);
     /**
      * 数据写入缓冲区并分配到变量
      */
@@ -123,15 +114,42 @@ const Demo29: FC<ComponentProps> = () => {
       positionsTexCoords.BYTES_PER_ELEMENT * 2,
     );
     gl.enableVertexAttribArray(texCoordAttribute);
+  }, [positionsTexCoords]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    const samplerUniform = samplerUniformRef.current;
+    if (!samplerUniform) return;
+    /**
+     * 数据直接分配到变量
+     */
+    gl.uniform1i(samplerUniform, 0);
+  }, []);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    const imageTexture = imageTextureRef.current;
+    if (!imageTexture) return;
+    if (!image) return;
+    /**
+     * 图像分配到纹理
+     */
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, imageTexture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
-    gl.uniform1i(samplerUniform, 0);
+  }, [image]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
     /**
-     * 绘制
+     * 清空并绘制
      */
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(
       gl.TRIANGLE_STRIP,
       0,

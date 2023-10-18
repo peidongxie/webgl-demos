@@ -83,16 +83,8 @@ const Demo15: FC<ComponentProps> = () => {
     if (!gl) return;
     const positionAttribute = positionAttributeRef.current;
     if (positionAttribute < 0) return;
-    const cosBUniform = cosBUniformRef.current;
-    if (!cosBUniform) return;
-    const sinBUniform = sinBUniformRef.current;
-    if (!sinBUniform) return;
     const positionBuffer = positionBufferRef.current;
     if (!positionBuffer) return;
-    /**
-     * 清空
-     */
-    gl.clear(gl.COLOR_BUFFER_BIT);
     /**
      * 数据写入缓冲区并分配到变量
      */
@@ -100,11 +92,37 @@ const Demo15: FC<ComponentProps> = () => {
     gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
     gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(positionAttribute);
-    gl.uniform1f(cosBUniform, cos);
-    gl.uniform1f(sinBUniform, sin);
+  }, [positions]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    const cosBUniform = cosBUniformRef.current;
+    if (!cosBUniform) return;
     /**
-     * 绘制
+     * 数据直接分配到变量
      */
+    gl.uniform1f(cosBUniform, cos);
+  }, [cos]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    const sinBUniform = sinBUniformRef.current;
+    if (!sinBUniform) return;
+    /**
+     * 数据直接分配到变量
+     */
+    gl.uniform1f(sinBUniform, sin);
+  }, [sin]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    /**
+     * 清空并绘制
+     */
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positions.length / 2));
   }, [positions, cos, sin]);
 

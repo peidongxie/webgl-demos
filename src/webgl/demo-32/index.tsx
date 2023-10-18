@@ -98,22 +98,8 @@ const Demo32: FC<ComponentProps> = () => {
     if (positionAttribute < 0) return;
     const texCoordAttribute = texCoordAttributeRef.current;
     if (texCoordAttribute < 0) return;
-    const sampler0Uniform = sampler0UniformRef.current;
-    if (!sampler0Uniform) return;
-    const sampler1Uniform = sampler1UniformRef.current;
-    if (!sampler1Uniform) return;
     const positionTexCoordBuffer = positionTexCoordBufferRef.current;
     if (!positionTexCoordBuffer) return;
-    const imageTexture0 = imageTexture0Ref.current;
-    if (!imageTexture0) return;
-    const imageTexture1 = imageTexture1Ref.current;
-    if (!imageTexture1) return;
-    if (!image0) return;
-    if (!image1) return;
-    /**
-     * 清空
-     */
-    gl.clear(gl.COLOR_BUFFER_BIT);
     /**
      * 数据写入缓冲区并分配到变量
      */
@@ -137,23 +123,69 @@ const Demo32: FC<ComponentProps> = () => {
       positionsTexCoords.BYTES_PER_ELEMENT * 2,
     );
     gl.enableVertexAttribArray(texCoordAttribute);
+  }, [positionsTexCoords]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    const sampler0Uniform = sampler0UniformRef.current;
+    if (!sampler0Uniform) return;
     /**
-     * 图像分配给纹理对象并分配到变量
+     * 数据直接分配到变量
+     */
+    gl.uniform1i(sampler0Uniform, 0);
+  }, []);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    const sampler1Uniform = sampler1UniformRef.current;
+    if (!sampler1Uniform) return;
+    /**
+     * 数据直接分配到变量
+     */
+    gl.uniform1i(sampler1Uniform, 1);
+  }, []);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    const imageTexture0 = imageTexture0Ref.current;
+    if (!imageTexture0) return;
+    if (!image0) return;
+    /**
+     * 图像分配到纹理
      */
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, imageTexture0);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image0);
-    gl.uniform1i(sampler0Uniform, 0);
+  }, [image0]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    const imageTexture1 = imageTexture1Ref.current;
+    if (!imageTexture1) return;
+    if (!image1) return;
+    /**
+     * 图像分配到纹理
+     */
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, imageTexture1);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image1);
-    gl.uniform1i(sampler1Uniform, 1);
+  }, [image1]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
     /**
-     * 绘制
+     * 清空并绘制
      */
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(
       gl.TRIANGLE_STRIP,
       0,

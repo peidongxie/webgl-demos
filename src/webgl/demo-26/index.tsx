@@ -78,10 +78,6 @@ const Demo26: FC<ComponentProps> = () => {
     const positionColorBuffer = positionColorBufferRef.current;
     if (!positionColorBuffer) return;
     /**
-     * 清空
-     */
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    /**
      * 数据写入缓冲区并分配到变量
      */
     gl.bindBuffer(gl.ARRAY_BUFFER, positionColorBuffer);
@@ -104,9 +100,15 @@ const Demo26: FC<ComponentProps> = () => {
       positionsColors.BYTES_PER_ELEMENT * 2,
     );
     gl.enableVertexAttribArray(colorAttribute);
+  }, [positionsColors]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
     /**
-     * 绘制
+     * 清空并绘制
      */
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.POINTS, 0, Math.floor(positionsColors.length / 5));
   }, [positionsColors]);
 

@@ -124,18 +124,22 @@ const Demo22: FC<ComponentProps> = () => {
     const positionBuffer = positionBufferRef.current;
     if (!positionBuffer) return;
     /**
-     * 清空
-     */
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    /**
      * 数据写入缓冲区并分配到变量
      */
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
     gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(positionAttribute);
+  }, [positions]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    /**
+     * 动画帧
+     */
     tick();
-  }, [positions, tick]);
+  }, [tick]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>

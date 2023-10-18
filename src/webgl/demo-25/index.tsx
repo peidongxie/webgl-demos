@@ -81,10 +81,6 @@ const Demo25: FC<ComponentProps> = () => {
     const positionSizeBuffer = positionSizeBufferRef.current;
     if (!positionSizeBuffer) return;
     /**
-     * 清空
-     */
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    /**
      * 数据写入缓冲区并分配到变量
      */
     gl.bindBuffer(gl.ARRAY_BUFFER, positionSizeBuffer);
@@ -107,9 +103,15 @@ const Demo25: FC<ComponentProps> = () => {
       positionsSizes.BYTES_PER_ELEMENT * 2,
     );
     gl.enableVertexAttribArray(pointSizeAttribute);
+  }, [positionsSizes]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
     /**
-     * 绘制
+     * 清空并绘制
      */
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.POINTS, 0, Math.floor(positionsSizes.length / 3));
   }, [positionsSizes]);
 

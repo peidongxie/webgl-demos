@@ -96,14 +96,8 @@ const Demo33: FC<ComponentProps> = () => {
     if (positionAttribute < 0) return;
     const colorAttribute = colorAttributeRef.current;
     if (colorAttribute < 0) return;
-    const viewMatrixUniform = viewMatrixUniformRef.current;
-    if (!viewMatrixUniform) return;
     const positionColorBuffer = positionColorBufferRef.current;
     if (!positionColorBuffer) return;
-    /**
-     * 清空
-     */
-    gl.clear(gl.COLOR_BUFFER_BIT);
     /**
      * 数据写入缓冲区并分配到变量
      */
@@ -127,12 +121,28 @@ const Demo33: FC<ComponentProps> = () => {
       positionsColors.BYTES_PER_ELEMENT * 3,
     );
     gl.enableVertexAttribArray(colorAttribute);
+  }, [positionsColors]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    const viewMatrixUniform = viewMatrixUniformRef.current;
+    if (!viewMatrixUniform) return;
+    /**
+     * 数据直接分配到变量
+     */
     const viewMatrix = new Matrix4();
     viewMatrix.setLookAt(0.2, 0.25, 0.25, 0, 0, 0, 0, 1, 0);
     gl.uniformMatrix4fv(viewMatrixUniform, false, viewMatrix.elements);
+  }, []);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
     /**
-     * 绘制
+     * 清空并绘制
      */
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positionsColors.length / 6));
   }, [positionsColors]);
 

@@ -83,14 +83,8 @@ const Demo18: FC<ComponentProps> = () => {
     if (!gl) return;
     const positionAttribute = positionAttributeRef.current;
     if (positionAttribute < 0) return;
-    const xformMatrixUniform = xformMatrixUniformRef.current;
-    if (!xformMatrixUniform) return;
     const positionBuffer = positionBufferRef.current;
     if (!positionBuffer) return;
-    /**
-     * 清空
-     */
-    gl.clear(gl.COLOR_BUFFER_BIT);
     /**
      * 数据写入缓冲区并分配到变量
      */
@@ -98,10 +92,26 @@ const Demo18: FC<ComponentProps> = () => {
     gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
     gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(positionAttribute);
-    gl.uniformMatrix4fv(xformMatrixUniform, false, xformMatrix.elements);
+  }, [positions]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    const xformMatrixUniform = xformMatrixUniformRef.current;
+    if (!xformMatrixUniform) return;
     /**
-     * 绘制
+     * 数据直接分配到变量
      */
+    gl.uniformMatrix4fv(xformMatrixUniform, false, xformMatrix.elements);
+  }, [xformMatrix]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    /**
+     * 清空并绘制
+     */
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positions.length / 2));
   }, [positions, xformMatrix]);
 
