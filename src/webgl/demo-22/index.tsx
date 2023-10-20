@@ -27,43 +27,36 @@ const Demo22: FC<ComponentProps> = () => {
   const modelMatrixRef = useRef(new Matrix4());
 
   const animate = useCallback(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    const modelMatrixUniform = modelMatrixUniformRef.current;
+    if (!modelMatrixUniform) return;
+    /**
+     * 数据直接分配到变量
+     */
     const time = Date.now();
     const timeSpan = time - timeStart;
     const angleSpan = (angleStep * timeSpan) / 1000;
     const angle = angleStart + angleSpan;
-    return angle;
+    const modelMatrix = modelMatrixRef.current;
+    modelMatrix.setRotate(angle, 0, 0, 1);
+    modelMatrix.translate(0.35, 0, 0);
+    gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
   }, [timeStart, angleStart, angleStep]);
 
-  const draw = useCallback(
-    (angle: number) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const gl = glRef.current;
-      if (!gl) return;
-      const modelMatrixUniform = modelMatrixUniformRef.current;
-      if (!modelMatrixUniform) return;
-      /**
-       * 清空
-       */
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      /**
-       * 调整模型矩阵
-       */
-      const modelMatrix = modelMatrixRef.current;
-      modelMatrix.setRotate(angle, 0, 0, 1);
-      modelMatrix.translate(0.35, 0, 0);
-      gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
-      /**
-       * 绘制
-       */
-      gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positions.length / 2));
-    },
-    [positions],
-  );
+  const draw = useCallback(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    /**
+     * 清空并绘制
+     */
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positions.length / 2));
+  }, [positions]);
 
   const tick = useCallback(() => {
-    const angle = animate();
-    draw(angle);
+    animate();
+    draw();
     requestAnimationFrame(tick);
   }, [animate, draw]);
 

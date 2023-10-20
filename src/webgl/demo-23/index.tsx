@@ -61,6 +61,13 @@ const Demo23: FC<ComponentProps> = () => {
   );
 
   const animate = useCallback(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    const modelMatrixUniform = modelMatrixUniformRef.current;
+    if (!modelMatrixUniform) return;
+    /**
+     * 数据直接分配到变量
+     */
     const timeEnd = Date.now();
     const timeStart = timeRef.current;
     const timeSpan = timeEnd - timeStart;
@@ -69,28 +76,20 @@ const Demo23: FC<ComponentProps> = () => {
     const angleEnd = angleStart + angleSpan;
     timeRef.current = timeEnd;
     angleRef.current = angleEnd;
-  }, []);
-
-  const draw = useCallback(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const modelMatrixUniform = modelMatrixUniformRef.current;
-    if (!modelMatrixUniform) return;
-    /**
-     * 清空
-     */
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    /**
-     * 调整模型矩阵
-     */
     const modelMatrix = modelMatrixRef.current;
     const angle = angleRef.current;
     modelMatrix.setRotate(angle, 0, 0, 1);
     modelMatrix.translate(0.35, 0, 0);
     gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
+  }, []);
+
+  const draw = useCallback(() => {
+    const gl = glRef.current;
+    if (!gl) return;
     /**
-     * 绘制
+     * 清空并绘制
      */
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positions.length / 2));
   }, [positions]);
 
