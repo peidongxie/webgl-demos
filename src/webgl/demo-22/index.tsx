@@ -22,8 +22,9 @@ const Demo22: FC<ComponentProps> = () => {
     [0.5, -0.5],
   ]);
   const positions = useFloat32Array(points);
-  const [timeStart] = useState(() => Date.now());
-  const [[angleStart, angleStep]] = useState([0, 45]);
+  const timeRef = useRef(Date.now());
+  const angleRef = useRef(0);
+  const stepRef = useRef(45);
   const modelMatrixRef = useRef(new Matrix4());
 
   const animate = useCallback(() => {
@@ -34,15 +35,17 @@ const Demo22: FC<ComponentProps> = () => {
     /**
      * 数据直接分配到变量
      */
-    const time = Date.now();
-    const timeSpan = time - timeStart;
-    const angleSpan = (angleStep * timeSpan) / 1000;
-    const angle = angleStart + angleSpan;
+    const timeEnd = Date.now();
+    const timeStart = timeRef.current;
+    const timeSpan = timeEnd - timeStart;
+    const angleStart = angleRef.current;
+    const angleSpan = (stepRef.current * timeSpan) / 1000;
+    const angleEnd = angleStart + angleSpan;
     const modelMatrix = modelMatrixRef.current;
-    modelMatrix.setRotate(angle, 0, 0, 1);
+    modelMatrix.setRotate(angleEnd, 0, 0, 1);
     modelMatrix.translate(0.35, 0, 0);
     gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
-  }, [timeStart, angleStart, angleStep]);
+  }, []);
 
   const draw = useCallback(() => {
     const gl = glRef.current;
