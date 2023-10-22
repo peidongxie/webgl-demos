@@ -68,17 +68,16 @@ const Demo05: FC<ComponentProps> = () => {
     const gl = glRef.current;
     if (!gl) return;
     const success = initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE);
-    if (success) {
-      /**
-       * 变量位置
-       */
-      const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
-      positionAttributeRef.current = positionAttribute;
-      /**
-       * 清空设置
-       */
-      gl.clearColor(0, 0, 0, 1);
-    }
+    if (!success) return;
+    /**
+     * 变量位置
+     */
+    const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
+    positionAttributeRef.current = positionAttribute;
+    /**
+     * 清空设置
+     */
+    gl.clearColor(0, 0, 0, 1);
   }, []);
 
   useEffect(() => {
