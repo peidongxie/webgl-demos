@@ -25,13 +25,16 @@ const Demo21: FC<ComponentProps> = () => {
   const timeRef = useRef(Date.now());
   const angleRef = useRef(0);
   const stepRef = useRef(45);
-  const modelMatrixRef = useRef(new Matrix4());
+  const modelMatrixRef = useRef<Matrix4 | null>(null);
+  if (!modelMatrixRef.current) modelMatrixRef.current = new Matrix4();
 
   const animate = useCallback(() => {
     const gl = glRef.current;
     if (!gl) return;
     const modelMatrixUniform = modelMatrixUniformRef.current;
     if (!modelMatrixUniform) return;
+    const modelMatrix = modelMatrixRef.current;
+    if (!modelMatrix) return;
     /**
      * 数据直接分配到变量
      */
@@ -41,7 +44,6 @@ const Demo21: FC<ComponentProps> = () => {
     const angleStart = angleRef.current;
     const angleSpan = (stepRef.current * timeSpan) / 1000;
     const angleEnd = angleStart + angleSpan;
-    const modelMatrix = modelMatrixRef.current;
     modelMatrix.setRotate(angleEnd, 0, 0, 1);
     gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
   }, []);
