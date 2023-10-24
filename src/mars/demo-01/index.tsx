@@ -27,7 +27,7 @@ const Demo01: FC<ComponentProps> = () => {
 
   useEffect(
     () => () => {
-      if (playerRef.current) playerRef.current.dispose();
+      playerRef.current?.dispose();
       playerRef.current = null;
     },
     [],

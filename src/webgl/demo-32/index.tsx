@@ -49,13 +49,6 @@ const Demo32: FC<ComponentProps> = () => {
     glRef.current = getWebGLContext(canvasRef.current);
   }, []);
 
-  useEffect(
-    () => () => {
-      glRef.current = null;
-    },
-    [],
-  );
-
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
