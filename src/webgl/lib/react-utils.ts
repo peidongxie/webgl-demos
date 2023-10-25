@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 type NumberArray = number[] | NumberArray[];
 
@@ -17,17 +17,14 @@ const useFloat32Array = (data: NumberArray, mask?: number[]) => {
 };
 
 const useImage = (src: string): HTMLImageElement | null => {
-  const loaderRef = useRef<HTMLImageElement | null>(null);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
 
   useEffect(() => {
     const loader = new Image();
-    loaderRef.current = loader;
-    loader.addEventListener('load', () => {
-      if (loaderRef.current !== loader) return;
-      setImage(loader);
-    });
+    const listener = () => setImage(loader);
+    loader.addEventListener('load', listener);
     loader.src = src;
+    return () => loader.removeEventListener('load', listener);
   }, [src]);
 
   return image;
