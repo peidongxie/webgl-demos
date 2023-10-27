@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type NumberArray = number[] | NumberArray[];
 
@@ -30,4 +30,31 @@ const useImage = (src: string): HTMLImageElement | null => {
   return image;
 };
 
-export { useFloat32Array, useImage };
+const useFrameRequest = (frameRequest: FrameRequestCallback | null): void => {
+  const frameRequestRef = useRef<FrameRequestCallback | null>(null);
+  const nextFrameRef = useRef<FrameRequestCallback | null>(null);
+
+  const nextFrame = useCallback<FrameRequestCallback>((time) => {
+    const frameRequest = frameRequestRef.current;
+    if (frameRequest) {
+      frameRequest(time);
+      nextFrameRef.current = nextFrame;
+      requestAnimationFrame(nextFrame);
+    } else {
+      nextFrameRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    frameRequestRef.current = frameRequest;
+    if (frameRequestRef.current && !nextFrameRef.current) {
+      nextFrameRef.current = nextFrame;
+      requestAnimationFrame(nextFrame);
+    }
+    return () => {
+      frameRequestRef.current = null;
+    };
+  }, [frameRequest]);
+};
+
+export { useFloat32Array, useFrameRequest, useImage };
