@@ -11,7 +11,7 @@ import { type GuiOptions, type GuiSchema, useGui } from '../../lib/gui-utils';
 import { type ComponentProps } from '../../type';
 import { Matrix4 } from '../lib/cuon-matrix';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
-import { useFloat32Array } from '../lib/react-utils';
+import { useFloat32Array, useFrameRequest } from '../lib/react-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
@@ -61,6 +61,8 @@ const Demo23: FC<ComponentProps> = () => {
     [],
   );
 
+  useGui(schemas, options);
+
   const animate = useCallback(() => {
     const gl = glRef.current;
     if (!gl) return;
@@ -98,10 +100,9 @@ const Demo23: FC<ComponentProps> = () => {
   const tick = useCallback(() => {
     animate();
     draw();
-    requestAnimationFrame(tick);
   }, [animate, draw]);
 
-  useGui(schemas, options);
+  useFrameRequest(tick);
 
   useEffect(() => {
     const canvas = canvasRef.current;

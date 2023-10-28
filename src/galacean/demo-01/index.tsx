@@ -15,32 +15,32 @@ const main = async (engine: WebGLEngine): Promise<void> => {
  */
 const Demo01: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const promiseRef = useRef<Promise<WebGLEngine> | null>(null);
+  const loaderRef = useRef<Promise<WebGLEngine> | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const promise = promiseRef.current;
-    if (promise) return;
-    promiseRef.current = WebGLEngine.create({ canvas });
+    const loader = loaderRef.current;
+    if (loader) return;
+    loaderRef.current = WebGLEngine.create({ canvas });
   }, []);
 
   useEffect(
     () => () => {
-      promiseRef.current?.then((engine) => engine.destroy());
-      promiseRef.current = null;
+      loaderRef.current?.then((engine) => engine.destroy());
+      loaderRef.current = null;
     },
     [],
   );
 
   useEffect(() => {
-    const promise = promiseRef.current;
-    if (!promise) return;
+    const loader = loaderRef.current;
+    if (!loader) return;
     (async () => {
-      const engine = await promise;
-      if (promiseRef.current !== promise) return;
+      const engine = await loader;
+      if (loaderRef.current !== loader) return;
       await main(engine);
-      if (promiseRef.current !== promise) return;
+      if (loaderRef.current !== loader) return;
       engine.run();
     })();
   }, []);
