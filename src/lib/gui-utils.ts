@@ -123,25 +123,25 @@ const addSchema = (gui: GUI, schema: GuiSchema): void => {
       const { name, initialValue, onChange, onFinishChange } = schema;
       const controller = gui.add({ initialValue }, 'initialValue').name(name);
       onChange && controller.onChange(onChange);
-      onFinishChange && controller.onChange(onFinishChange);
+      onFinishChange && controller.onFinishChange(onFinishChange);
       return;
     }
     case 'number': {
       const { name, initialValue, min, max, step, onChange, onFinishChange } =
         schema;
       const controller = gui.add({ initialValue }, 'initialValue').name(name);
-      min && controller.min(min);
-      max && controller.max(max);
-      step && controller.step(step);
+      min !== undefined && controller.min(min);
+      max !== undefined && controller.max(max);
+      step !== undefined && controller.step(step);
       onChange && controller.onChange(onChange);
-      onFinishChange && controller.onChange(onFinishChange);
+      onFinishChange && controller.onFinishChange(onFinishChange);
       return;
     }
     case 'string': {
       const { name, initialValue, onChange, onFinishChange } = schema;
       const controller = gui.add({ initialValue }, 'initialValue').name(name);
       onChange && controller.onChange(onChange);
-      onFinishChange && controller.onChange(onFinishChange);
+      onFinishChange && controller.onFinishChange(onFinishChange);
       return;
     }
     case 'dropdown': {
@@ -150,7 +150,7 @@ const addSchema = (gui: GUI, schema: GuiSchema): void => {
         .add({ initialValue }, 'initialValue', options)
         .name(name);
       onChange && controller.onChange(onChange);
-      onFinishChange && controller.onChange(onFinishChange);
+      onFinishChange && controller.onFinishChange(onFinishChange);
       return;
     }
     case 'color': {
@@ -159,7 +159,7 @@ const addSchema = (gui: GUI, schema: GuiSchema): void => {
         .addColor({ initialValue }, 'initialValue', rgbScale)
         .name(name);
       onChange && controller.onChange(onChange);
-      onFinishChange && controller.onChange(onFinishChange);
+      onFinishChange && controller.onFinishChange(onFinishChange);
       return;
     }
     case 'function': {
