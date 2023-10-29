@@ -1,16 +1,19 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
-  RouterProvider,
   createBrowserRouter,
   type RouteObject,
+  RouterProvider,
 } from 'react-router-dom';
+
 import App from './app';
-import { type MatchData } from './type';
 import Galacean from './galacean';
 import GalaceanDemo01 from './galacean/demo-01';
+import GalaceanDemo02 from './galacean/demo-02';
+import GalaceanDemo03 from './galacean/demo-03';
 import Mars from './mars';
 import MarsDemo01 from './mars/demo-01';
+import { type MatchData } from './type';
 import Webgl from './webgl';
 import WebglDemo01 from './webgl/demo-01';
 import WebglDemo02 from './webgl/demo-02';
@@ -35,6 +38,15 @@ import WebglDemo20 from './webgl/demo-20';
 import WebglDemo21 from './webgl/demo-21';
 import WebglDemo22 from './webgl/demo-22';
 import WebglDemo23 from './webgl/demo-23';
+import WebglDemo24 from './webgl/demo-24';
+import WebglDemo25 from './webgl/demo-25';
+import WebglDemo26 from './webgl/demo-26';
+import WebglDemo27 from './webgl/demo-27';
+import WebglDemo28 from './webgl/demo-28';
+import WebglDemo29 from './webgl/demo-29';
+import WebglDemo30 from './webgl/demo-30';
+import WebglDemo31 from './webgl/demo-31';
+import WebglDemo32 from './webgl/demo-32';
 
 const webglChildren: RouteObject[] = [
   {
@@ -85,7 +97,7 @@ const webglChildren: RouteObject[] = [
     path: 'demo-06',
     element: <WebglDemo06 />,
     loader: (): MatchData => ({
-      value: ['06 绘制多色点', '/demo-06'],
+      value: ['06 绘制彩点', '/demo-06'],
       children: [],
     }),
   },
@@ -225,6 +237,78 @@ const webglChildren: RouteObject[] = [
       children: [],
     }),
   },
+  {
+    path: 'demo-24',
+    element: <WebglDemo24 />,
+    loader: (): MatchData => ({
+      value: ['24 多缓冲绘制点', '/demo-24'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-25',
+    element: <WebglDemo25 />,
+    loader: (): MatchData => ({
+      value: ['25 单缓冲绘制点', '/demo-25'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-26',
+    element: <WebglDemo26 />,
+    loader: (): MatchData => ({
+      value: ['26 动态绘制彩点', '/demo-26'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-27',
+    element: <WebglDemo27 />,
+    loader: (): MatchData => ({
+      value: ['27 渐变', '/demo-27'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-28',
+    element: <WebglDemo28 />,
+    loader: (): MatchData => ({
+      value: ['28 逐片元渐变', '/demo-28'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-29',
+    element: <WebglDemo29 />,
+    loader: (): MatchData => ({
+      value: ['29 绘制纹理', '/demo-29'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-30',
+    element: <WebglDemo30 />,
+    loader: (): MatchData => ({
+      value: ['30 绘制重复纹理', '/demo-30'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-31',
+    element: <WebglDemo31 />,
+    loader: (): MatchData => ({
+      value: ['31 绘制镜像纹理', '/demo-31'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-32',
+    element: <WebglDemo32 />,
+    loader: (): MatchData => ({
+      value: ['32 绘制多纹理', '/demo-32'],
+      children: [],
+    }),
+  },
 ];
 
 const marsChildren: RouteObject[] = [
@@ -252,6 +336,22 @@ const galaceanChildren: RouteObject[] = [
     element: <GalaceanDemo01 />,
     loader: (): MatchData => ({
       value: ['01 初始化画布', '/demo-01'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-02',
+    element: <GalaceanDemo02 />,
+    loader: (): MatchData => ({
+      value: ['02 绘制立方体', '/demo-02'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-03',
+    element: <GalaceanDemo03 />,
+    loader: (): MatchData => ({
+      value: ['03 加载模型', '/demo-03'],
       children: [],
     }),
   },

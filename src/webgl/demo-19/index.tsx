@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useRef, useState, type FC } from 'react';
+import { type FC, useEffect, useMemo, useRef, useState } from 'react';
+
 import { type ComponentProps } from '../../type';
 import { Matrix4 } from '../lib/cuon-matrix';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
+import { useFloat32Array } from '../lib/react-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
@@ -11,17 +13,15 @@ import VSHADER_SOURCE from './vertex.glsl?raw';
 const Demo19: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
-  const positionAttributeLocationRef = useRef(-1);
-  const modelMatrixUniformLocationRef = useRef<WebGLUniformLocation | null>(
-    null,
-  );
-  const vertexBufferRef = useRef<WebGLBuffer | null>(null);
+  const positionAttributeRef = useRef(-1);
+  const modelMatrixUniformRef = useRef<WebGLUniformLocation | null>(null);
+  const positionBufferRef = useRef<WebGLBuffer | null>(null);
   const [points] = useState<[number, number][]>([
     [0, 0.3],
     [-0.3, -0.3],
     [0.3, -0.3],
   ]);
-  const vertices = useMemo(() => new Float32Array(points.flat()), [points]);
+  const positions = useFloat32Array(points);
   const [angle] = useState(60);
   const [[translationX, translationY, translationZ]] = useState([0.5, 0, 0]);
   const modelMatrix = useMemo(() => {
@@ -61,21 +61,18 @@ const Demo19: FC<ComponentProps> = () => {
       /**
        * 变量位置
        */
-      const positionAttributeLocation = gl.getAttribLocation(
-        gl.program,
-        'a_Position',
-      );
-      const modelMatrixUniformLocation = gl.getUniformLocation(
+      const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
+      const modelMatrixUniform = gl.getUniformLocation(
         gl.program,
         'u_ModelMatrix',
       );
-      positionAttributeLocationRef.current = positionAttributeLocation;
-      modelMatrixUniformLocationRef.current = modelMatrixUniformLocation;
+      positionAttributeRef.current = positionAttribute;
+      modelMatrixUniformRef.current = modelMatrixUniform;
       /**
        * 缓冲区
        */
-      const vertexBuffer = gl.createBuffer();
-      vertexBufferRef.current = vertexBuffer;
+      const positionBuffer = gl.createBuffer();
+      positionBufferRef.current = positionBuffer;
       /**
        * 清空设置
        */
@@ -86,30 +83,29 @@ const Demo19: FC<ComponentProps> = () => {
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
-    const positionAttributeLocation = positionAttributeLocationRef.current;
-    if (positionAttributeLocation < 0) return;
-    const modelMatrixUniformLocation = modelMatrixUniformLocationRef.current;
-    if (!modelMatrixUniformLocation) return;
-    const vertexBuffer = vertexBufferRef.current;
-    if (!vertexBuffer) return;
+    const positionAttribute = positionAttributeRef.current;
+    if (positionAttribute < 0) return;
+    const modelMatrixUniform = modelMatrixUniformRef.current;
+    if (!modelMatrixUniform) return;
+    const positionBuffer = positionBufferRef.current;
+    if (!positionBuffer) return;
     /**
      * 清空
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
     /**
-     * 数据写入缓冲区并分配到变量，绘制
+     * 数据写入缓冲区并分配到变量
      */
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(positionAttributeLocation);
-    gl.uniformMatrix4fv(
-      modelMatrixUniformLocation,
-      false,
-      modelMatrix.elements,
-    );
-    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(vertices.length / 2));
-  }, [vertices, modelMatrix]);
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(positionAttribute);
+    gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
+    /**
+     * 绘制
+     */
+    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positions.length / 2));
+  }, [positions, modelMatrix]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>

@@ -6,6 +6,7 @@
     "FSHADER",
     "Galacean",
     "glsl",
+    "mediump",
     "Renderbuffers",
     "VSHADER",
     "webglcontextcreationerror",

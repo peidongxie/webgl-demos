@@ -1,11 +1,12 @@
 import {
+  type FC,
+  type MouseEventHandler,
   useCallback,
   useEffect,
   useRef,
   useState,
-  type FC,
-  type MouseEventHandler,
 } from 'react';
+
 import { type ComponentProps } from '../../type';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
@@ -17,7 +18,7 @@ import VSHADER_SOURCE from './vertex.glsl?raw';
 const Demo05: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
-  const positionAttributeLocationRef = useRef(-1);
+  const positionAttributeRef = useRef(-1);
   const [points, setPoints] = useState<[number, number][]>([]);
 
   const handleCanvasMouseDown = useCallback<
@@ -71,11 +72,8 @@ const Demo05: FC<ComponentProps> = () => {
       /**
        * 变量位置
        */
-      const positionAttributeLocation = gl.getAttribLocation(
-        gl.program,
-        'a_Position',
-      );
-      positionAttributeLocationRef.current = positionAttributeLocation;
+      const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
+      positionAttributeRef.current = positionAttribute;
       /**
        * 清空设置
        */
@@ -86,17 +84,21 @@ const Demo05: FC<ComponentProps> = () => {
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
-    const positionAttributeLocation = positionAttributeLocationRef.current;
-    if (positionAttributeLocation < 0) return;
+    const positionAttribute = positionAttributeRef.current;
+    if (positionAttribute < 0) return;
     /**
      * 清空
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
-    /**
-     * 数据分配到变量，绘制
-     */
-    for (const [x, y] of points) {
-      gl.vertexAttrib3f(positionAttributeLocation, x, y, 0);
+    for (const point of points) {
+      /**
+       * 数据分配到变量
+       */
+      const [x, y] = point;
+      gl.vertexAttrib3f(positionAttribute, x, y, 0);
+      /**
+       * 绘制
+       */
       gl.drawArrays(gl.POINTS, 0, 1);
     }
   }, [points]);

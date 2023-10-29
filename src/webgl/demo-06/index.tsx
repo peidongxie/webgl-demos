@@ -1,24 +1,25 @@
 import {
+  type FC,
+  type MouseEventHandler,
   useCallback,
   useEffect,
   useRef,
   useState,
-  type FC,
-  type MouseEventHandler,
 } from 'react';
+
 import { type ComponentProps } from '../../type';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 绘制多色点
+ * 绘制彩点
  */
 const Demo06: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
-  const positionAttributeLocationRef = useRef(-1);
-  const fragColorUniformLocationRef = useRef<WebGLUniformLocation | null>(null);
+  const positionAttributeRef = useRef(-1);
+  const fragColorUniformRef = useRef<WebGLUniformLocation | null>(null);
   const [points, setPoints] = useState<
     [number, number, number, number, number, number][]
   >([]);
@@ -85,16 +86,10 @@ const Demo06: FC<ComponentProps> = () => {
       /**
        * 变量位置
        */
-      const positionAttributeLocation = gl.getAttribLocation(
-        gl.program,
-        'a_Position',
-      );
-      const fragColorUniformLocation = gl.getUniformLocation(
-        gl.program,
-        'u_FragColor',
-      );
-      positionAttributeLocationRef.current = positionAttributeLocation;
-      fragColorUniformLocationRef.current = fragColorUniformLocation;
+      const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
+      const fragColorUniform = gl.getUniformLocation(gl.program, 'u_FragColor');
+      positionAttributeRef.current = positionAttribute;
+      fragColorUniformRef.current = fragColorUniform;
       /**
        * 清空设置
        */
@@ -105,20 +100,24 @@ const Demo06: FC<ComponentProps> = () => {
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
-    const positionAttributeLocation = positionAttributeLocationRef.current;
-    if (positionAttributeLocation < 0) return;
-    const fragColorUniformLocation = fragColorUniformLocationRef.current;
-    if (!fragColorUniformLocation) return;
+    const positionAttribute = positionAttributeRef.current;
+    if (positionAttribute < 0) return;
+    const fragColorUniform = fragColorUniformRef.current;
+    if (!fragColorUniform) return;
     /**
      * 清空
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
-    /**
-     * 数据分配到变量，绘制
-     */
-    for (const [x, y, red, green, blue, alpha] of points) {
-      gl.vertexAttrib3f(positionAttributeLocation, x, y, 0);
-      gl.uniform4f(fragColorUniformLocation, red, green, blue, alpha);
+    for (const point of points) {
+      /**
+       * 数据分配到变量
+       */
+      const [x, y, red, green, blue, alpha] = point;
+      gl.vertexAttrib3f(positionAttribute, x, y, 0);
+      gl.uniform4f(fragColorUniform, red, green, blue, alpha);
+      /**
+       * 绘制
+       */
       gl.drawArrays(gl.POINTS, 0, 1);
     }
   }, [points]);

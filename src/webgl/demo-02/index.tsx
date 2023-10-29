@@ -1,4 +1,5 @@
-import { useEffect, useRef, type FC } from 'react';
+import { type FC, useEffect, useRef } from 'react';
+
 import { type ComponentProps } from '../../type';
 import { getWebGLContext } from '../lib/cuon-utils';
 

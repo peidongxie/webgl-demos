@@ -1,5 +1,6 @@
 import { MarsPlayer } from '@galacean/mars-player';
-import { useEffect, useRef, type FC, useState } from 'react';
+import { type FC, useEffect, useRef, useState } from 'react';
+
 import { type ComponentProps } from '../../type';
 
 const SCENE_URL =
