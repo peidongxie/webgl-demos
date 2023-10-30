@@ -12,8 +12,8 @@ dependencies:
     specifier: 1.1.0-beta.1
     version: 1.1.0-beta.1(@galacean/engine@1.1.0-beta.1)
   '@galacean/mars-player':
-    specifier: ^2.4.1
-    version: 2.4.1
+    specifier: ^2.4.2
+    version: 2.4.2
   lil-gui:
     specifier: ^0.19.0
     version: 0.19.0
@@ -50,8 +50,8 @@ devDependencies:
     specifier: ^6.9.0
     version: 6.9.0(eslint@8.52.0)(typescript@5.2.2)
   '@vitejs/plugin-react-swc':
-    specifier: ^3.4.0
-    version: 3.4.0(vite@4.5.0)
+    specifier: ^3.4.1
+    version: 3.4.1(vite@4.5.0)
   eslint:
     specifier: ^8.52.0
     version: 8.52.0
@@ -65,8 +65,8 @@ devDependencies:
     specifier: ^4.6.0
     version: 4.6.0(eslint@8.52.0)
   eslint-plugin-react-refresh:
-    specifier: ^0.4.3
-    version: 0.4.3(eslint@8.52.0)
+    specifier: ^0.4.4
+    version: 0.4.4(eslint@8.52.0)
   eslint-plugin-simple-import-sort:
     specifier: ^10.0.0
     version: 10.0.0(eslint@8.52.0)
@@ -383,27 +383,27 @@ packages:
       '@galacean/engine-rhi-webgl': 1.1.0-beta.1
     dev: false
 
-  /@galacean/mars-core@2.4.1:
-    resolution: {integrity: sha512-tOctXpesqKlhrCvrNAE2mhG9ZNEbpNNyKX6I2mOHA2nhJHppL8fx3yeoUd+C9SypfrmjNPO+ZjN7tXk2Ji3gLg==}
+  /@galacean/mars-core@2.4.2:
+    resolution: {integrity: sha512-TRV7e5+Zq3ACJxjqZtBdBqRXiUL83/f57b1JJAoN0QtGJQPkLKk/Vrp6KYRGAhpM26ezd9fS+2FUIz5T5i4dPQ==}
     dependencies:
       '@galacean/mars-specification': 2.3.1
     dev: false
 
-  /@galacean/mars-player@2.4.1:
-    resolution: {integrity: sha512-ikbVl/ncHIgfQwmfycc+pLeOIvqljYT9QTpqEGeGNIsEN9qyK1a//KLUTWmwrmEo+vjJv8cgxxwoQuNbXBAanQ==}
+  /@galacean/mars-player@2.4.2:
+    resolution: {integrity: sha512-f5wFcSLEas3W+BC4cutzk83229tOT2eDHell4LBgvvJivOyy3nZr0eie1Rg2fpfA0GUy3zB4sic5EEsA1Nitjw==}
     dependencies:
-      '@galacean/mars-core': 2.4.1
-      '@galacean/mars-webgl': 2.4.1
+      '@galacean/mars-core': 2.4.2
+      '@galacean/mars-webgl': 2.4.2
     dev: false
 
   /@galacean/mars-specification@2.3.1:
     resolution: {integrity: sha512-XzkPabxduPDKYse1nnDiovom7bHL+qT8qPq1BN+lGTa7wub/3DsQBEFtr2Gx0C0Vtad41uoSTjZHadxeOor/vg==}
     dev: false
 
-  /@galacean/mars-webgl@2.4.1:
-    resolution: {integrity: sha512-hxBBIJtj1OEE5/rfCVtlaZa50gtu3ngHLLGzzird7FjkhLOaacxeZzufzeorW3YxxDViAdmpDI+gYMLyH8We3g==}
+  /@galacean/mars-webgl@2.4.2:
+    resolution: {integrity: sha512-Iz2ZF7DHU/YiYDUmRZgW8DSneL/lq496QRorU4wDcZDPJOQLgdtMCO5eVBwQ1pqEIatxVkriMvcH48jP5o27gw==}
     dependencies:
-      '@galacean/mars-core': 2.4.1
+      '@galacean/mars-core': 2.4.2
     dev: false
 
   /@humanwhocodes/config-array@0.11.13:
@@ -762,8 +762,8 @@ packages:
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
     dev: true
 
-  /@vitejs/plugin-react-swc@3.4.0(vite@4.5.0):
-    resolution: {integrity: sha512-m7UaA4Uvz82N/0EOVpZL4XsFIakRqrFKeSNxa1FBLSXGvWrWRBwmZb4qxk+ZIVAZcW3c3dn5YosomDgx62XWcQ==}
+  /@vitejs/plugin-react-swc@3.4.1(vite@4.5.0):
+    resolution: {integrity: sha512-7YQOQcVV5x1luD8nkbCDdyYygFvn1hjqJk68UvNAzY2QG4o4N5EwAhLLFNOcd1HrdMwDl0VElP8VutoWf9IvJg==}
     peerDependencies:
       vite: ^4
     dependencies:
@@ -1086,8 +1086,8 @@ packages:
       eslint: 8.52.0
     dev: true
 
-  /eslint-plugin-react-refresh@0.4.3(eslint@8.52.0):
-    resolution: {integrity: sha512-Hh0wv8bUNY877+sI0BlCUlsS0TYYQqvzEwJsJJPM2WF4RnTStSnSR3zdJYa2nPOJgg3UghXi54lVyMSmpCalzA==}
+  /eslint-plugin-react-refresh@0.4.4(eslint@8.52.0):
+    resolution: {integrity: sha512-eD83+65e8YPVg6603Om2iCIwcQJf/y7++MWm4tACtEswFLYMwxwVWAfwN+e19f5Ad/FOyyNg9Dfi5lXhH3Y3rA==}
     peerDependencies:
       eslint: '>=7'
     dependencies:

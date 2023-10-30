@@ -1,8 +1,8 @@
 import { type FC, useEffect, useRef, useState } from 'react';
 
-import CIRCLE_IMAGE from '../../../public/static/webgl/circle.gif';
-import SKY_IMAGE from '../../../public/static/webgl/sky.jpg';
 import { type ComponentProps } from '../../type';
+import CIRCLE_IMAGE from '../assets/circle.gif';
+import SKY_IMAGE from '../assets/sky.jpg';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
 import { useFloat32Array } from '../lib/react-utils';
 import { useImage } from '../lib/react-utils';
