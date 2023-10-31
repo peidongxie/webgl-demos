@@ -21,7 +21,9 @@ const Demo14: FC<ComponentProps> = () => {
     [0.5, -0.5],
   ]);
   const positions = useFloat32Array(points);
-  const [[translationX, translationY, translationZ]] = useState([0.5, 0.5, 0]);
+  const [[translationX, translationY, translationZ]] = useState<
+    [number, number, number]
+  >([0.5, 0.5, 0]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

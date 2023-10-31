@@ -38,7 +38,9 @@ const Demo36: FC<ComponentProps> = () => {
     ],
   ]);
   const positionsColors = useFloat32Array(points);
-  const [[eyeX, eyeY, eyeZ], setEye] = useState([0.2, 0.25, 0.25]);
+  const [[eyeX, eyeY, eyeZ], setEye] = useState<[number, number, number]>([
+    0.2, 0.25, 0.25,
+  ]);
   const schemas = useMemo<GuiSchema[]>(() => {
     return [
       {

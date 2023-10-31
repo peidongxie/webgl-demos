@@ -23,7 +23,9 @@ const Demo19: FC<ComponentProps> = () => {
   ]);
   const positions = useFloat32Array(points);
   const [angle] = useState(60);
-  const [[translationX, translationY, translationZ]] = useState([0.5, 0, 0]);
+  const [[translationX, translationY, translationZ]] = useState<
+    [number, number, number]
+  >([0.5, 0, 0]);
   const modelMatrix = useMemo(() => {
     const modelMatrix = new Matrix4();
     modelMatrix.setRotate(angle, 0, 0, 1);
