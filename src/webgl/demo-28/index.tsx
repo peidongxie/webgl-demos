@@ -22,6 +22,9 @@ const Demo28: FC<ComponentProps> = () => {
     [0.5, -0.5],
   ]);
   const positions = useFloat32Array(points);
+  const [deps, setDeps] = useState<
+    [Float32Array | null, number | null, number | null]
+  >([null, null, null]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -77,6 +80,7 @@ const Demo28: FC<ComponentProps> = () => {
     gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
     gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(positionAttribute);
+    setDeps((deps) => [positions, deps[1], deps[2]]);
   }, [positions]);
 
   useEffect(() => {
@@ -88,7 +92,8 @@ const Demo28: FC<ComponentProps> = () => {
      * 数据直接分配到变量
      */
     gl.uniform1f(widthUniform, gl.drawingBufferWidth);
-  }, [positions]);
+    setDeps((deps) => [deps[0], gl.drawingBufferWidth, deps[2]]);
+  }, []);
 
   useEffect(() => {
     const gl = glRef.current;
@@ -99,17 +104,19 @@ const Demo28: FC<ComponentProps> = () => {
      * 数据直接分配到变量
      */
     gl.uniform1f(heightUniform, gl.drawingBufferHeight);
-  }, [positions]);
+    setDeps((deps) => [deps[0], deps[1], gl.drawingBufferHeight]);
+  }, []);
 
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
+    if (deps.some((dep) => dep === null)) return;
     /**
      * 清空并绘制
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positions.length / 2));
-  }, [positions]);
+    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(deps[0]!.length / 2));
+  }, [deps]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>

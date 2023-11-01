@@ -41,6 +41,9 @@ const Demo36: FC<ComponentProps> = () => {
   const [[eyeX, eyeY, eyeZ], setEye] = useState<[number, number, number]>([
     0.2, 0.25, 0.25,
   ]);
+  const [deps, setDeps] = useState<
+    [Float32Array | null, [number, number, number] | null]
+  >([null, null]);
   const schemas = useMemo<GuiSchema[]>(() => {
     return [
       {
@@ -141,6 +144,7 @@ const Demo36: FC<ComponentProps> = () => {
       positionsColors.BYTES_PER_ELEMENT * 3,
     );
     gl.enableVertexAttribArray(colorAttribute);
+    setDeps((deps) => [positionsColors, deps[1]]);
   }, [positionsColors]);
 
   useEffect(() => {
@@ -154,17 +158,19 @@ const Demo36: FC<ComponentProps> = () => {
     const viewMatrix = new Matrix4();
     viewMatrix.setLookAt(eyeX, eyeY, eyeZ, 0, 0, 0, 0, 1, 0);
     gl.uniformMatrix4fv(viewMatrixUniform, false, viewMatrix.elements);
+    setDeps((deps) => [deps[0], [eyeX, eyeY, eyeZ]]);
   }, [eyeX, eyeY, eyeZ]);
 
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
+    if (deps.some((dep) => dep === null)) return;
     /**
      * 清空并绘制
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positionsColors.length / 6));
-  }, [positionsColors, eyeX, eyeY, eyeZ]);
+    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(deps[0]!.length / 6));
+  }, [deps]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>

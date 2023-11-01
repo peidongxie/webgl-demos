@@ -21,6 +21,7 @@ const Demo25: FC<ComponentProps> = () => {
     [0.5, -0.5, 30],
   ]);
   const positionsSizes = useFloat32Array(points);
+  const [deps, setDeps] = useState<[Float32Array | null]>([null]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -92,17 +93,19 @@ const Demo25: FC<ComponentProps> = () => {
       positionsSizes.BYTES_PER_ELEMENT * 2,
     );
     gl.enableVertexAttribArray(pointSizeAttribute);
+    setDeps([positionsSizes]);
   }, [positionsSizes]);
 
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
+    if (deps.some((dep) => dep === null)) return;
     /**
      * 清空并绘制
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.POINTS, 0, Math.floor(positionsSizes.length / 3));
-  }, [positionsSizes]);
+    gl.drawArrays(gl.POINTS, 0, Math.floor(deps[0]!.length / 3));
+  }, [deps]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>

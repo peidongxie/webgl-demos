@@ -37,6 +37,10 @@ const Demo35: FC<ComponentProps> = () => {
     ],
   ]);
   const positionsColors = useFloat32Array(points);
+  const [deps, setDeps] = useState<[Float32Array | null, Matrix4 | null]>([
+    null,
+    null,
+  ]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -113,6 +117,7 @@ const Demo35: FC<ComponentProps> = () => {
       positionsColors.BYTES_PER_ELEMENT * 3,
     );
     gl.enableVertexAttribArray(colorAttribute);
+    setDeps((deps) => [positionsColors, deps[1]]);
   }, [positionsColors]);
 
   useEffect(() => {
@@ -133,17 +138,19 @@ const Demo35: FC<ComponentProps> = () => {
       false,
       modelViewMatrix.elements,
     );
+    setDeps((deps) => [deps[0], modelViewMatrix]);
   }, []);
 
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
+    if (deps.some((dep) => dep === null)) return;
     /**
      * 清空并绘制
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positionsColors.length / 6));
-  }, [positionsColors]);
+    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(deps[0]!.length / 6));
+  }, [deps]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>

@@ -32,6 +32,10 @@ const Demo19: FC<ComponentProps> = () => {
     modelMatrix.translate(translationX, translationY, translationZ);
     return modelMatrix;
   }, [angle, translationX, translationY, translationZ]);
+  const [deps, setDeps] = useState<[Float32Array | null, Matrix4 | null]>([
+    null,
+    null,
+  ]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -88,6 +92,7 @@ const Demo19: FC<ComponentProps> = () => {
     gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
     gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(positionAttribute);
+    setDeps((deps) => [positions, deps[1]]);
   }, [positions]);
 
   useEffect(() => {
@@ -99,17 +104,19 @@ const Demo19: FC<ComponentProps> = () => {
      * 数据直接分配到变量
      */
     gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
+    setDeps((deps) => [deps[0], modelMatrix]);
   }, [modelMatrix]);
 
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
+    if (deps.some((dep) => dep === null)) return;
     /**
      * 清空并绘制
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positions.length / 2));
-  }, [positions, modelMatrix]);
+    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(deps[0]!.length / 2));
+  }, [deps]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>
