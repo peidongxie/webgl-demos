@@ -38,26 +38,69 @@ const Demo36: FC<ComponentProps> = () => {
     ],
   ]);
   const positionsColors = useFloat32Array(points);
-  const [[eyeX, eyeY, eyeZ], setEye] = useState<[number, number, number]>([
-    0.2, 0.25, 0.25,
+  const [
+    [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ],
+    setLookAt,
+  ] = useState<
+    [number, number, number, number, number, number, number, number, number]
+  >([0.2, 0.25, 0.25, 0, 0, 0, 0, 1, 0]);
+  const viewMatrix = useMemo(() => {
+    const viewMatrix = new Matrix4();
+    viewMatrix.setLookAt(
+      eyeX,
+      eyeY,
+      eyeZ,
+      centerX,
+      centerY,
+      centerZ,
+      upX,
+      upY,
+      upZ,
+    );
+    return viewMatrix;
+  }, [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]);
+  const [deps, setDeps] = useState<[Float32Array | null, Matrix4 | null]>([
+    null,
+    null,
   ]);
-  const [deps, setDeps] = useState<
-    [Float32Array | null, [number, number, number] | null]
-  >([null, null]);
   const schemas = useMemo<GuiSchema[]>(() => {
     return [
       {
         type: 'function',
         name: 'LEFT',
         initialValue: () => {
-          setEye(([eyeX, eyeY, eyeZ]) => [eyeX - 0.01, eyeY, eyeZ]);
+          setLookAt(
+            ([eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]) => [
+              eyeX - 0.01,
+              eyeY,
+              eyeZ,
+              centerX,
+              centerY,
+              centerZ,
+              upX,
+              upY,
+              upZ,
+            ],
+          );
         },
       },
       {
         type: 'function',
         name: 'RIGHT',
         initialValue: () => {
-          setEye(([eyeX, eyeY, eyeZ]) => [eyeX + 0.01, eyeY, eyeZ]);
+          setLookAt(
+            ([eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]) => [
+              eyeX + 0.01,
+              eyeY,
+              eyeZ,
+              centerX,
+              centerY,
+              centerZ,
+              upX,
+              upY,
+              upZ,
+            ],
+          );
         },
       },
     ];
@@ -155,11 +198,9 @@ const Demo36: FC<ComponentProps> = () => {
     /**
      * 数据直接分配到变量
      */
-    const viewMatrix = new Matrix4();
-    viewMatrix.setLookAt(eyeX, eyeY, eyeZ, 0, 0, 0, 0, 1, 0);
     gl.uniformMatrix4fv(viewMatrixUniform, false, viewMatrix.elements);
-    setDeps((deps) => [deps[0], [eyeX, eyeY, eyeZ]]);
-  }, [eyeX, eyeY, eyeZ]);
+    setDeps((deps) => [deps[0], viewMatrix]);
+  }, [viewMatrix]);
 
   useEffect(() => {
     const gl = glRef.current;

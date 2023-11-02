@@ -1,4 +1,4 @@
-import { type FC, useEffect, useRef, useState } from 'react';
+import { type FC, useEffect, useMemo, useRef, useState } from 'react';
 
 import { type ComponentProps } from '../../type';
 import { Matrix4 } from '../lib/cuon-matrix';
@@ -37,6 +37,25 @@ const Demo33: FC<ComponentProps> = () => {
     ],
   ]);
   const positionsColors = useFloat32Array(points);
+  const [[eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]] =
+    useState<
+      [number, number, number, number, number, number, number, number, number]
+    >([0.2, 0.25, 0.25, 0, 0, 0, 0, 1, 0]);
+  const viewMatrix = useMemo(() => {
+    const viewMatrix = new Matrix4();
+    viewMatrix.setLookAt(
+      eyeX,
+      eyeY,
+      eyeZ,
+      centerX,
+      centerY,
+      centerZ,
+      upX,
+      upY,
+      upZ,
+    );
+    return viewMatrix;
+  }, [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]);
   const [deps, setDeps] = useState<[Float32Array | null, Matrix4 | null]>([
     null,
     null,
@@ -125,11 +144,9 @@ const Demo33: FC<ComponentProps> = () => {
     /**
      * 数据直接分配到变量
      */
-    const viewMatrix = new Matrix4();
-    viewMatrix.setLookAt(0.2, 0.25, 0.25, 0, 0, 0, 0, 1, 0);
     gl.uniformMatrix4fv(viewMatrixUniform, false, viewMatrix.elements);
     setDeps((deps) => [deps[0], viewMatrix]);
-  }, []);
+  }, [viewMatrix]);
 
   useEffect(() => {
     const gl = glRef.current;

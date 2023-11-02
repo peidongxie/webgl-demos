@@ -22,14 +22,24 @@ const Demo20: FC<ComponentProps> = () => {
     [0.3, -0.3],
   ]);
   const positions = useFloat32Array(points);
-  const [angle] = useState(60);
+  const [[angle, rotationX, rotationY, rotationZ]] = useState<
+    [number, number, number, number]
+  >([60, 0, 0, 1]);
   const [[translationX, translationY, translationZ]] = useState([0.5, 0, 0]);
   const modelMatrix = useMemo(() => {
     const modelMatrix = new Matrix4();
     modelMatrix.setTranslate(translationX, translationY, translationZ);
-    modelMatrix.rotate(angle, 0, 0, 1);
+    modelMatrix.rotate(angle, rotationX, rotationY, rotationZ);
     return modelMatrix;
-  }, [angle, translationX, translationY, translationZ]);
+  }, [
+    angle,
+    rotationX,
+    rotationY,
+    rotationZ,
+    translationX,
+    translationY,
+    translationZ,
+  ]);
   const [deps, setDeps] = useState<[Float32Array | null, Matrix4 | null]>([
     null,
     null,
