@@ -82,16 +82,8 @@ const Demo24: FC<ComponentProps> = () => {
     if (!gl) return;
     const positionAttribute = positionAttributeRef.current;
     if (positionAttribute < 0) return;
-    const pointSizeAttribute = pointSizeAttributeRef.current;
-    if (pointSizeAttribute < 0) return;
     const positionBuffer = positionBufferRef.current;
     if (!positionBuffer) return;
-    const sizeBuffer = sizeBufferRef.current;
-    if (!sizeBuffer) return;
-    /**
-     * 清空
-     */
-    gl.clear(gl.COLOR_BUFFER_BIT);
     /**
      * 数据写入缓冲区并分配到变量
      */
@@ -99,13 +91,31 @@ const Demo24: FC<ComponentProps> = () => {
     gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
     gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(positionAttribute);
+  }, [positions]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    const pointSizeAttribute = pointSizeAttributeRef.current;
+    if (pointSizeAttribute < 0) return;
+    const sizeBuffer = sizeBufferRef.current;
+    if (!sizeBuffer) return;
+    /**
+     * 数据写入缓冲区并分配到变量
+     */
     gl.bindBuffer(gl.ARRAY_BUFFER, sizeBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, sizes, gl.STATIC_DRAW);
     gl.vertexAttribPointer(pointSizeAttribute, 1, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(pointSizeAttribute);
+  }, [sizes]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
     /**
-     * 绘制
+     * 清空并绘制
      */
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.POINTS, 0, Math.floor(positions.length / 2));
   }, [positions, sizes]);
 

@@ -1,24 +1,40 @@
 import { type FC, useEffect, useRef, useState } from 'react';
 
 import { type ComponentProps } from '../../type';
+import { Matrix4 } from '../lib/cuon-matrix';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
 import { useFloat32Array } from '../lib/react-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 渐变
+ * 组合观察旋转
  */
-const Demo27: FC<ComponentProps> = () => {
+const Demo35: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const positionAttributeRef = useRef(-1);
   const colorAttributeRef = useRef(-1);
+  const modelViewMatrixUniformRef = useRef<WebGLUniformLocation | null>(null);
   const positionColorBufferRef = useRef<WebGLBuffer | null>(null);
-  const [points] = useState<[number, number, number, number, number][]>([
-    [0, 0.5, 1, 0, 0],
-    [-0.5, -0.5, 0, 1, 0],
-    [0.5, -0.5, 0, 0, 1],
+  const [points] = useState<
+    [number, number, number, number, number, number][][]
+  >([
+    [
+      [0.0, 0.5, -0.4, 0.4, 1, 0.4],
+      [-0.5, -0.5, -0.4, 0.4, 1, 0.4],
+      [0.5, -0.5, -0.4, 1, 0.4, 0.4],
+    ],
+    [
+      [0.5, 0.4, -0.2, 1, 0.4, 0.4],
+      [-0.5, 0.4, -0.2, 1, 1, 0.4],
+      [0.0, -0.6, -0.2, 1, 1, 0.4],
+    ],
+    [
+      [0.0, 0.5, 0.0, 0.4, 0.4, 1],
+      [-0.5, -0.5, 0.0, 0.4, 0.4, 1],
+      [0.5, -0.5, 0.0, 1, 0.4, 0.4],
+    ],
   ]);
   const positionsColors = useFloat32Array(points);
 
@@ -54,8 +70,13 @@ const Demo27: FC<ComponentProps> = () => {
        */
       const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
       const colorAttribute = gl.getAttribLocation(gl.program, 'a_Color');
+      const modelViewMatrixUniform = gl.getUniformLocation(
+        gl.program,
+        'u_ModelViewMatrix',
+      );
       positionAttributeRef.current = positionAttribute;
       colorAttributeRef.current = colorAttribute;
+      modelViewMatrixUniformRef.current = modelViewMatrixUniform;
       /**
        * 缓冲区
        */
@@ -84,10 +105,10 @@ const Demo27: FC<ComponentProps> = () => {
     gl.bufferData(gl.ARRAY_BUFFER, positionsColors, gl.STATIC_DRAW);
     gl.vertexAttribPointer(
       positionAttribute,
-      2,
+      3,
       gl.FLOAT,
       false,
-      positionsColors.BYTES_PER_ELEMENT * 5,
+      positionsColors.BYTES_PER_ELEMENT * 6,
       0,
     );
     gl.enableVertexAttribArray(positionAttribute);
@@ -96,11 +117,31 @@ const Demo27: FC<ComponentProps> = () => {
       3,
       gl.FLOAT,
       false,
-      positionsColors.BYTES_PER_ELEMENT * 5,
-      positionsColors.BYTES_PER_ELEMENT * 2,
+      positionsColors.BYTES_PER_ELEMENT * 6,
+      positionsColors.BYTES_PER_ELEMENT * 3,
     );
     gl.enableVertexAttribArray(colorAttribute);
   }, [positionsColors]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    const modelViewMatrixUniform = modelViewMatrixUniformRef.current;
+    if (!modelViewMatrixUniform) return;
+    /**
+     * 数据直接分配到变量
+     */
+    const viewMatrix = new Matrix4();
+    viewMatrix.setLookAt(0.2, 0.25, 0.25, 0, 0, 0, 0, 1, 0);
+    const modelMatrix = new Matrix4();
+    modelMatrix.setRotate(-10, 0, 0, 1);
+    const modelViewMatrix = viewMatrix.multiply(modelMatrix);
+    gl.uniformMatrix4fv(
+      modelViewMatrixUniform,
+      false,
+      modelViewMatrix.elements,
+    );
+  }, []);
 
   useEffect(() => {
     const gl = glRef.current;
@@ -109,7 +150,7 @@ const Demo27: FC<ComponentProps> = () => {
      * 清空并绘制
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positionsColors.length / 5));
+    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positionsColors.length / 6));
   }, [positionsColors]);
 
   return (
@@ -119,4 +160,4 @@ const Demo27: FC<ComponentProps> = () => {
   );
 };
 
-export default Demo27;
+export default Demo35;

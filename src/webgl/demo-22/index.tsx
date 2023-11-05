@@ -22,48 +22,44 @@ const Demo22: FC<ComponentProps> = () => {
     [0.5, -0.5],
   ]);
   const positions = useFloat32Array(points);
-  const [timeStart] = useState(() => Date.now());
-  const [[angleStart, angleStep]] = useState([0, 45]);
+  const timeRef = useRef(Date.now());
+  const angleRef = useRef(0);
+  const stepRef = useRef(45);
   const modelMatrixRef = useRef(new Matrix4());
 
   const animate = useCallback(() => {
-    const time = Date.now();
-    const timeSpan = time - timeStart;
-    const angleSpan = (angleStep * timeSpan) / 1000;
-    const angle = angleStart + angleSpan;
-    return angle;
-  }, [timeStart, angleStart, angleStep]);
+    const gl = glRef.current;
+    if (!gl) return;
+    const modelMatrixUniform = modelMatrixUniformRef.current;
+    if (!modelMatrixUniform) return;
+    /**
+     * 数据直接分配到变量
+     */
+    const timeEnd = Date.now();
+    const timeStart = timeRef.current;
+    const timeSpan = timeEnd - timeStart;
+    const angleStart = angleRef.current;
+    const angleSpan = (stepRef.current * timeSpan) / 1000;
+    const angleEnd = angleStart + angleSpan;
+    const modelMatrix = modelMatrixRef.current;
+    modelMatrix.setRotate(angleEnd, 0, 0, 1);
+    modelMatrix.translate(0.35, 0, 0);
+    gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
+  }, []);
 
-  const draw = useCallback(
-    (angle: number) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const gl = glRef.current;
-      if (!gl) return;
-      const modelMatrixUniform = modelMatrixUniformRef.current;
-      if (!modelMatrixUniform) return;
-      /**
-       * 清空
-       */
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      /**
-       * 调整模型矩阵
-       */
-      const modelMatrix = modelMatrixRef.current;
-      modelMatrix.setRotate(angle, 0, 0, 1);
-      modelMatrix.translate(0.35, 0, 0);
-      gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
-      /**
-       * 绘制
-       */
-      gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positions.length / 2));
-    },
-    [positions],
-  );
+  const draw = useCallback(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    /**
+     * 清空并绘制
+     */
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positions.length / 2));
+  }, [positions]);
 
   const tick = useCallback(() => {
-    const angle = animate();
-    draw(angle);
+    animate();
+    draw();
     requestAnimationFrame(tick);
   }, [animate, draw]);
 
@@ -124,18 +120,22 @@ const Demo22: FC<ComponentProps> = () => {
     const positionBuffer = positionBufferRef.current;
     if (!positionBuffer) return;
     /**
-     * 清空
-     */
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    /**
      * 数据写入缓冲区并分配到变量
      */
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
     gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(positionAttribute);
+  }, [positions]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    /**
+     * 动画帧
+     */
     tick();
-  }, [positions, tick]);
+  }, [tick]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>

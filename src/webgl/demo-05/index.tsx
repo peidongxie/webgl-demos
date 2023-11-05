@@ -92,7 +92,7 @@ const Demo05: FC<ComponentProps> = () => {
     gl.clear(gl.COLOR_BUFFER_BIT);
     for (const point of points) {
       /**
-       * 数据分配到变量
+       * 数据直接分配到变量
        */
       const [x, y] = point;
       gl.vertexAttrib3f(positionAttribute, x, y, 0);

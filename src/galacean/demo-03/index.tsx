@@ -4,6 +4,9 @@ import { type FC, useEffect, useRef } from 'react';
 
 import { type ComponentProps } from '../../type';
 
+const GLTF_URL =
+  'https://gw.alipayobjects.com/os/OasisHub/267000040/9994/%25E5%25BD%2592%25E6%25A1%25A3.gltf';
+
 const main = async (engine: WebGLEngine): Promise<void> => {
   /**
    * 根据 DOM 元素显示尺寸调整画布尺寸
@@ -32,9 +35,7 @@ const main = async (engine: WebGLEngine): Promise<void> => {
   /**
    * 加载模型
    */
-  const gltf = await engine.resourceManager.load<GLTFResource>(
-    'https://gw.alipayobjects.com/os/OasisHub/267000040/9994/%25E5%25BD%2592%25E6%25A1%25A3.gltf',
-  );
+  const gltf = await engine.resourceManager.load<GLTFResource>(GLTF_URL);
   rootEntity.addChild(gltf.defaultSceneRoot);
 };
 

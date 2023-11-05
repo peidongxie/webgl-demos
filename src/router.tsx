@@ -43,6 +43,10 @@ const WebglDemo29 = lazy(() => import('./webgl/demo-29'));
 const WebglDemo30 = lazy(() => import('./webgl/demo-30'));
 const WebglDemo31 = lazy(() => import('./webgl/demo-31'));
 const WebglDemo32 = lazy(() => import('./webgl/demo-32'));
+const WebglDemo33 = lazy(() => import('./webgl/demo-33'));
+const WebglDemo34 = lazy(() => import('./webgl/demo-34'));
+const WebglDemo35 = lazy(() => import('./webgl/demo-35'));
+const WebglDemo36 = lazy(() => import('./webgl/demo-36'));
 const MarsDemo01 = lazy(() => import('./mars/demo-01'));
 const GalaceanDemo01 = lazy(() => import('./galacean/demo-01'));
 const GalaceanDemo02 = lazy(() => import('./galacean/demo-02'));
@@ -306,6 +310,38 @@ const webglChildren: RouteObject[] = [
     element: <WebglDemo32 />,
     loader: (): MatchData => ({
       value: ['32 绘制多纹理', '/demo-32'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-33',
+    element: <WebglDemo33 />,
+    loader: (): MatchData => ({
+      value: ['33 观察三角', '/demo-33'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-34',
+    element: <WebglDemo34 />,
+    loader: (): MatchData => ({
+      value: ['34 观察旋转三角', '/demo-34'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-35',
+    element: <WebglDemo35 />,
+    loader: (): MatchData => ({
+      value: ['35 组合观察旋转', '/demo-35'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-36',
+    element: <WebglDemo36 />,
+    loader: (): MatchData => ({
+      value: ['36 控制观察', '/demo-36'],
       children: [],
     }),
   },

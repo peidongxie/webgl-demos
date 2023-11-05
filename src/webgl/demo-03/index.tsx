@@ -50,12 +50,9 @@ const Demo03: FC<ComponentProps> = () => {
     const gl = glRef.current;
     if (!gl) return;
     /**
-     * 清空
+     * 清空并绘制
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
-    /**
-     * 绘制
-     */
     gl.drawArrays(gl.POINTS, 0, 1);
   }, []);
 

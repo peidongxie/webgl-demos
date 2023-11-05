@@ -77,13 +77,8 @@ const Demo14: FC<ComponentProps> = () => {
     if (!gl) return;
     const positionAttribute = positionAttributeRef.current;
     if (positionAttribute < 0) return;
-    const translationUniform = translationUniformRef.current;
-    if (!translationUniform) return;
     const positionBuffer = positionBufferRef.current;
     if (!positionBuffer) return;
-    /**
-     * 清空
-     */
     gl.clear(gl.COLOR_BUFFER_BIT);
     /**
      * 数据写入缓冲区并分配到变量
@@ -92,6 +87,16 @@ const Demo14: FC<ComponentProps> = () => {
     gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
     gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(positionAttribute);
+  }, [positions]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    const translationUniform = translationUniformRef.current;
+    if (!translationUniform) return;
+    /**
+     * 数据直接分配到变量
+     */
     gl.uniform4f(
       translationUniform,
       translationX,
@@ -99,9 +104,15 @@ const Demo14: FC<ComponentProps> = () => {
       translationZ,
       0,
     );
+  }, [translationX, translationY, translationZ]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
     /**
-     * 绘制
+     * 清空并绘制
      */
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positions.length / 2));
   }, [positions, translationX, translationY, translationZ]);
 

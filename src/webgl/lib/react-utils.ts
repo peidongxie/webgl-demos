@@ -16,28 +16,18 @@ const useFloat32Array = (data: NumberArray, mask?: number[]) => {
   return useMemo(() => new Float32Array(flatArray(data, mask)), [data, mask]);
 };
 
-const useImage = (src: string): TexImageSource | null => {
-  const srcRef = useRef('');
-  const [image, setImage] = useState<TexImageSource | null>(null);
+const useImage = (src: string): HTMLImageElement | null => {
+  const loaderRef = useRef<HTMLImageElement | null>(null);
+  const [image, setImage] = useState<HTMLImageElement | null>(null);
 
   useEffect(() => {
-    srcRef.current = src;
-  }, [src]);
-
-  useEffect(
-    () => () => {
-      srcRef.current = '';
-    },
-    [],
-  );
-
-  useEffect(() => {
-    const image = new Image();
-    image.src = src;
-    image.onload = () => {
-      if (srcRef.current !== src) return;
-      setImage(image);
-    };
+    const loader = new Image();
+    loaderRef.current = loader;
+    loader.addEventListener('load', () => {
+      if (loaderRef.current !== loader) return;
+      setImage(loader);
+    });
+    loader.src = src;
   }, [src]);
 
   return image;
