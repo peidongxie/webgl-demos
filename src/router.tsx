@@ -50,6 +50,7 @@ const WebglDemo36 = lazy(() => import('./webgl/demo-36'));
 const WebglDemo37 = lazy(() => import('./webgl/demo-37'));
 const WebglDemo38 = lazy(() => import('./webgl/demo-38'));
 const WebglDemo39 = lazy(() => import('./webgl/demo-39'));
+const WebglDemo40 = lazy(() => import('./webgl/demo-40'));
 const MarsDemo01 = lazy(() => import('./mars/demo-01'));
 const GalaceanDemo01 = lazy(() => import('./galacean/demo-01'));
 const GalaceanDemo02 = lazy(() => import('./galacean/demo-02'));
@@ -368,7 +369,15 @@ const webglChildren: RouteObject[] = [
     path: 'demo-39',
     element: <WebglDemo39 />,
     loader: (): MatchData => ({
-      value: ['39 收窄视野', '/demo-39'],
+      value: ['39 收窄可视视野', '/demo-39'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-40',
+    element: <WebglDemo40 />,
+    loader: (): MatchData => ({
+      value: ['40 改变纵深', '/demo-40'],
       children: [],
     }),
   },
