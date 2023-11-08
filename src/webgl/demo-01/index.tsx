@@ -24,13 +24,6 @@ const Demo01: FC<ComponentProps> = () => {
     ctxRef.current = canvas.getContext('2d');
   }, []);
 
-  useEffect(
-    () => () => {
-      ctxRef.current = null;
-    },
-    [],
-  );
-
   useEffect(() => {
     const ctx = ctxRef.current;
     if (!ctx) return;

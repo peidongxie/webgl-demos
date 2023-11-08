@@ -27,23 +27,15 @@ const Demo03: FC<ComponentProps> = () => {
     glRef.current = getWebGLContext(canvasRef.current);
   }, []);
 
-  useEffect(
-    () => () => {
-      glRef.current = null;
-    },
-    [],
-  );
-
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
     const success = initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE);
-    if (success) {
-      /**
-       * 清空设置
-       */
-      gl.clearColor(0, 0, 0, 1);
-    }
+    if (!success) return;
+    /**
+     * 清空设置
+     */
+    gl.clearColor(0, 0, 0, 1);
   }, []);
 
   useEffect(() => {

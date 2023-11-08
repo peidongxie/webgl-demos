@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type NumberArray = number[] | NumberArray[];
 
@@ -17,20 +17,44 @@ const useFloat32Array = (data: NumberArray, mask?: number[]) => {
 };
 
 const useImage = (src: string): HTMLImageElement | null => {
-  const loaderRef = useRef<HTMLImageElement | null>(null);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
 
   useEffect(() => {
     const loader = new Image();
-    loaderRef.current = loader;
-    loader.addEventListener('load', () => {
-      if (loaderRef.current !== loader) return;
-      setImage(loader);
-    });
+    const listener = () => setImage(loader);
+    loader.addEventListener('load', listener);
     loader.src = src;
+    return () => loader.removeEventListener('load', listener);
   }, [src]);
 
   return image;
 };
 
-export { useFloat32Array, useImage };
+const useFrameRequest = (frameRequest: FrameRequestCallback | null): void => {
+  const frameRequestRef = useRef<FrameRequestCallback | null>(null);
+  const nextFrameRef = useRef<FrameRequestCallback | null>(null);
+
+  const nextFrame = useCallback<FrameRequestCallback>((time) => {
+    const frameRequest = frameRequestRef.current;
+    if (frameRequest) {
+      frameRequest(time);
+      nextFrameRef.current = nextFrame;
+      requestAnimationFrame(nextFrame);
+    } else {
+      nextFrameRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    frameRequestRef.current = frameRequest;
+    if (frameRequestRef.current && !nextFrameRef.current) {
+      nextFrameRef.current = nextFrame;
+      requestAnimationFrame(nextFrame);
+    }
+    return () => {
+      frameRequestRef.current = null;
+    };
+  }, [frameRequest]);
+};
+
+export { useFloat32Array, useFrameRequest, useImage };

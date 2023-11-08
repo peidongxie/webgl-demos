@@ -38,37 +38,29 @@ const Demo28: FC<ComponentProps> = () => {
     glRef.current = getWebGLContext(canvasRef.current);
   }, []);
 
-  useEffect(
-    () => () => {
-      glRef.current = null;
-    },
-    [],
-  );
-
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
     const success = initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE);
-    if (success) {
-      /**
-       * 变量位置
-       */
-      const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
-      const widthUniform = gl.getUniformLocation(gl.program, 'u_Width');
-      const heightUniform = gl.getUniformLocation(gl.program, 'u_Height');
-      positionAttributeRef.current = positionAttribute;
-      widthUniformRef.current = widthUniform;
-      heightUniformRef.current = heightUniform;
-      /**
-       * 缓冲区
-       */
-      const positionBuffer = gl.createBuffer();
-      positionBufferRef.current = positionBuffer;
-      /**
-       * 清空设置
-       */
-      gl.clearColor(0, 0, 0, 1);
-    }
+    if (!success) return;
+    /**
+     * 变量位置
+     */
+    const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
+    const widthUniform = gl.getUniformLocation(gl.program, 'u_Width');
+    const heightUniform = gl.getUniformLocation(gl.program, 'u_Height');
+    positionAttributeRef.current = positionAttribute;
+    widthUniformRef.current = widthUniform;
+    heightUniformRef.current = heightUniform;
+    /**
+     * 缓冲区
+     */
+    const positionBuffer = gl.createBuffer();
+    positionBufferRef.current = positionBuffer;
+    /**
+     * 清空设置
+     */
+    gl.clearColor(0, 0, 0, 1);
   }, []);
 
   useEffect(() => {

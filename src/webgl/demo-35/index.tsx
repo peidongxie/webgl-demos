@@ -53,40 +53,32 @@ const Demo35: FC<ComponentProps> = () => {
     glRef.current = getWebGLContext(canvasRef.current);
   }, []);
 
-  useEffect(
-    () => () => {
-      glRef.current = null;
-    },
-    [],
-  );
-
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
     const success = initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE);
-    if (success) {
-      /**
-       * 变量位置
-       */
-      const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
-      const colorAttribute = gl.getAttribLocation(gl.program, 'a_Color');
-      const modelViewMatrixUniform = gl.getUniformLocation(
-        gl.program,
-        'u_ModelViewMatrix',
-      );
-      positionAttributeRef.current = positionAttribute;
-      colorAttributeRef.current = colorAttribute;
-      modelViewMatrixUniformRef.current = modelViewMatrixUniform;
-      /**
-       * 缓冲区
-       */
-      const positionColorBuffer = gl.createBuffer();
-      positionColorBufferRef.current = positionColorBuffer;
-      /**
-       * 清空设置
-       */
-      gl.clearColor(0, 0, 0, 1);
-    }
+    if (!success) return;
+    /**
+     * 变量位置
+     */
+    const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
+    const colorAttribute = gl.getAttribLocation(gl.program, 'a_Color');
+    const modelViewMatrixUniform = gl.getUniformLocation(
+      gl.program,
+      'u_ModelViewMatrix',
+    );
+    positionAttributeRef.current = positionAttribute;
+    colorAttributeRef.current = colorAttribute;
+    modelViewMatrixUniformRef.current = modelViewMatrixUniform;
+    /**
+     * 缓冲区
+     */
+    const positionColorBuffer = gl.createBuffer();
+    positionColorBufferRef.current = positionColorBuffer;
+    /**
+     * 清空设置
+     */
+    gl.clearColor(0, 0, 0, 1);
   }, []);
 
   useEffect(() => {

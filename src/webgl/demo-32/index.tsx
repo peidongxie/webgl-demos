@@ -49,46 +49,38 @@ const Demo32: FC<ComponentProps> = () => {
     glRef.current = getWebGLContext(canvasRef.current);
   }, []);
 
-  useEffect(
-    () => () => {
-      glRef.current = null;
-    },
-    [],
-  );
-
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
     const success = initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE);
-    if (success) {
-      /**
-       * 变量位置
-       */
-      const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
-      const texCoordAttribute = gl.getAttribLocation(gl.program, 'a_TexCoord');
-      const sampler0Uniform = gl.getUniformLocation(gl.program, 'u_Sampler0');
-      const sampler1Uniform = gl.getUniformLocation(gl.program, 'u_Sampler1');
-      positionAttributeRef.current = positionAttribute;
-      texCoordAttributeRef.current = texCoordAttribute;
-      sampler0UniformRef.current = sampler0Uniform;
-      sampler1UniformRef.current = sampler1Uniform;
-      /**
-       * 缓冲区
-       */
-      const positionTexCoordBuffer = gl.createBuffer();
-      positionTexCoordBufferRef.current = positionTexCoordBuffer;
-      /**
-       * 纹理对象
-       */
-      const imageTexture0 = gl.createTexture();
-      const imageTexture1 = gl.createTexture();
-      imageTexture0Ref.current = imageTexture0;
-      imageTexture1Ref.current = imageTexture1;
-      /**
-       * 清空设置
-       */
-      gl.clearColor(0, 0, 0, 1);
-    }
+    if (!success) return;
+    /**
+     * 变量位置
+     */
+    const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
+    const texCoordAttribute = gl.getAttribLocation(gl.program, 'a_TexCoord');
+    const sampler0Uniform = gl.getUniformLocation(gl.program, 'u_Sampler0');
+    const sampler1Uniform = gl.getUniformLocation(gl.program, 'u_Sampler1');
+    positionAttributeRef.current = positionAttribute;
+    texCoordAttributeRef.current = texCoordAttribute;
+    sampler0UniformRef.current = sampler0Uniform;
+    sampler1UniformRef.current = sampler1Uniform;
+    /**
+     * 缓冲区
+     */
+    const positionTexCoordBuffer = gl.createBuffer();
+    positionTexCoordBufferRef.current = positionTexCoordBuffer;
+    /**
+     * 纹理对象
+     */
+    const imageTexture0 = gl.createTexture();
+    const imageTexture1 = gl.createTexture();
+    imageTexture0Ref.current = imageTexture0;
+    imageTexture1Ref.current = imageTexture1;
+    /**
+     * 清空设置
+     */
+    gl.clearColor(0, 0, 0, 1);
   }, []);
 
   useEffect(() => {
