@@ -9,7 +9,7 @@ import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 收窄视野
+ * 缩小视野
  */
 const Demo39: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -40,7 +40,7 @@ const Demo39: FC<ComponentProps> = () => {
   const positionsColors = useFloat32Array(points);
   const [[left, right, bottom, top, near, far], setOrtho] = useState<
     [number, number, number, number, number, number]
-  >([-0.3, 0.3, -1, 1, 0, 0.5]);
+  >([-0.5, 0.5, -0.5, 0.5, 0, 0.5]);
   const projMatrix = useMemo(() => {
     const projMatrix = new Matrix4();
     projMatrix.setOrtho(left, right, bottom, top, near, far);

@@ -361,7 +361,7 @@ const webglChildren: RouteObject[] = [
     path: 'demo-38',
     element: <WebglDemo38 />,
     loader: (): MatchData => ({
-      value: ['38 缩小视野', '/demo-38'],
+      value: ['38 改变纵深', '/demo-38'],
       children: [],
     }),
   },
@@ -369,7 +369,7 @@ const webglChildren: RouteObject[] = [
     path: 'demo-39',
     element: <WebglDemo39 />,
     loader: (): MatchData => ({
-      value: ['39 收窄可视视野', '/demo-39'],
+      value: ['39 缩小视野', '/demo-39'],
       children: [],
     }),
   },
@@ -377,7 +377,7 @@ const webglChildren: RouteObject[] = [
     path: 'demo-40',
     element: <WebglDemo40 />,
     loader: (): MatchData => ({
-      value: ['40 改变纵深', '/demo-40'],
+      value: ['40 收窄视野', '/demo-40'],
       children: [],
     }),
   },
