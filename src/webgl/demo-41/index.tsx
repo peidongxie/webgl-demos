@@ -1,6 +1,5 @@
 import { type FC, useEffect, useMemo, useRef, useState } from 'react';
 
-import { type GuiOptions, type GuiSchema, useGui } from '../../lib/gui-utils';
 import { type ComponentProps } from '../../type';
 import { Matrix4 } from '../lib/cuon-matrix';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
@@ -9,9 +8,9 @@ import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 拉近控制观察
+ * 透视观察
  */
-const Demo38: FC<ComponentProps> = () => {
+const Demo41: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const positionAttributeRef = useRef(-1);
@@ -23,28 +22,41 @@ const Demo38: FC<ComponentProps> = () => {
     [number, number, number, number, number, number][][]
   >([
     [
-      [0, 0.5, -0.4, 0.4, 1, 0.4],
-      [-0.5, -0.5, -0.4, 0.4, 1, 0.4],
-      [0.5, -0.5, -0.4, 1, 0.4, 0.4],
+      [0.75, 1.0, -4.0, 0.4, 1.0, 0.4],
+      [0.25, -1.0, -4.0, 0.4, 1.0, 0.4],
+      [1.25, -1.0, -4.0, 1.0, 0.4, 0.4],
     ],
     [
-      [0.5, 0.4, -0.2, 1, 0.4, 0.4],
-      [-0.5, 0.4, -0.2, 1, 1, 0.4],
-      [0, -0.6, -0.2, 1, 1, 0.4],
+      [0.75, 1.0, -2.0, 1.0, 1.0, 0.4],
+      [0.25, -1.0, -2.0, 1.0, 1.0, 0.4],
+      [1.25, -1.0, -2.0, 1.0, 0.4, 0.4],
     ],
     [
-      [0, 0.5, 0, 0.4, 0.4, 1],
-      [-0.5, -0.5, 0, 0.4, 0.4, 1],
-      [0.5, -0.5, 0, 1, 0.4, 0.4],
+      [0.75, 1.0, 0.0, 0.4, 0.4, 1.0],
+      [0.25, -1.0, 0.0, 0.4, 0.4, 1.0],
+      [1.25, -1.0, 0.0, 1.0, 0.4, 0.4],
+    ],
+    [
+      [-0.75, 1.0, -4.0, 0.4, 1.0, 0.4],
+      [-1.25, -1.0, -4.0, 0.4, 1.0, 0.4],
+      [-0.25, -1.0, -4.0, 1.0, 0.4, 0.4],
+    ],
+    [
+      [-0.75, 1.0, -2.0, 1.0, 1.0, 0.4],
+      [-1.25, -1.0, -2.0, 1.0, 1.0, 0.4],
+      [-0.25, -1.0, -2.0, 1.0, 0.4, 0.4],
+    ],
+    [
+      [-0.75, 1.0, 0.0, 0.4, 0.4, 1.0],
+      [-1.25, -1.0, 0.0, 0.4, 0.4, 1.0],
+      [-0.25, -1.0, 0.0, 1.0, 0.4, 0.4],
     ],
   ]);
   const positionsColors = useFloat32Array(points);
-  const [
-    [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ],
-    setLookAt,
-  ] = useState<
-    [number, number, number, number, number, number, number, number, number]
-  >([0.2, 0.25, 0.25, 0, 0, 0, 0, 1, 0]);
+  const [[eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]] =
+    useState<
+      [number, number, number, number, number, number, number, number, number]
+    >([0, 0, 5, 0, 0, -100, 0, 1, 0]);
   const viewMatrix = useMemo(() => {
     const viewMatrix = new Matrix4();
     viewMatrix.setLookAt(
@@ -60,74 +72,29 @@ const Demo38: FC<ComponentProps> = () => {
     );
     return viewMatrix;
   }, [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]);
-  const [[left, right, bottom, top, near, far]] = useState<
-    [number, number, number, number, number, number]
-  >([-1, 1, -1, 1, 0, 2]);
+  const [[fovy, aspect, near, far], setPerspective] = useState<
+    [number, number, number, number]
+  >([30, 1, 1, 100]);
   const projMatrix = useMemo(() => {
     const projMatrix = new Matrix4();
-    projMatrix.setOrtho(left, right, bottom, top, near, far);
+    projMatrix.setPerspective(fovy, aspect, near, far);
     return projMatrix;
-  }, [left, right, bottom, top, near, far]);
+  }, [fovy, aspect, near, far]);
   const [deps, setDeps] = useState<
     [Float32Array | null, Matrix4 | null, Matrix4 | null]
   >([null, null, null]);
-  const schemas = useMemo<GuiSchema[]>(() => {
-    return [
-      {
-        type: 'function',
-        name: 'LEFT',
-        initialValue: () => {
-          setLookAt(
-            ([eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]) => [
-              eyeX - 0.01,
-              eyeY,
-              eyeZ,
-              centerX,
-              centerY,
-              centerZ,
-              upX,
-              upY,
-              upZ,
-            ],
-          );
-        },
-      },
-      {
-        type: 'function',
-        name: 'RIGHT',
-        initialValue: () => {
-          setLookAt(
-            ([eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]) => [
-              eyeX + 0.01,
-              eyeY,
-              eyeZ,
-              centerX,
-              centerY,
-              centerZ,
-              upX,
-              upY,
-              upZ,
-            ],
-          );
-        },
-      },
-    ];
-  }, []);
-  const options = useMemo<GuiOptions>(
-    () => ({
-      container: '#gui-demo',
-      title: '视点控件',
-    }),
-    [],
-  );
-
-  useGui(schemas, options);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
+    setPerspective((perspective) => [
+      perspective[0],
+      canvas.width / canvas.height,
+      perspective[2],
+      perspective[3],
+    ]);
   }, []);
 
   useEffect(() => {
@@ -221,7 +188,7 @@ const Demo38: FC<ComponentProps> = () => {
      * 数据直接分配到变量
      */
     gl.uniformMatrix4fv(projMatrixUniform, false, projMatrix.elements);
-    setDeps((deps) => [deps[0], viewMatrix, projMatrix]);
+    setDeps((deps) => [deps[0], deps[1], projMatrix]);
   }, [projMatrix]);
 
   useEffect(() => {
@@ -232,6 +199,7 @@ const Demo38: FC<ComponentProps> = () => {
      * 清空并绘制
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
+    console.log(1);
     gl.drawArrays(gl.TRIANGLES, 0, Math.floor(deps[0]!.length / 6));
   }, [deps]);
 
@@ -242,4 +210,4 @@ const Demo38: FC<ComponentProps> = () => {
   );
 };
 
-export default Demo38;
+export default Demo41;

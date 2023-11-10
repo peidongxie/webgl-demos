@@ -9,7 +9,7 @@ import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 缩小视野
+ * 缩小正视视野
  */
 const Demo39: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);

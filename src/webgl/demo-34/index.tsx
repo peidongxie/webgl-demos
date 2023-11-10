@@ -8,7 +8,7 @@ import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 观察旋转三角
+ * 观察旋转
  */
 const Demo34: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
