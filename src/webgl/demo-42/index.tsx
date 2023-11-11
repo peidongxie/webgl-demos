@@ -8,13 +8,14 @@ import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 透视三角
+ * 透视平移
  */
-const Demo41: FC<ComponentProps> = () => {
+const Demo42: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const positionAttributeRef = useRef(-1);
   const colorAttributeRef = useRef(-1);
+  const modelMatrixUniformRef = useRef<WebGLUniformLocation | null>(null);
   const viewMatrixUniformRef = useRef<WebGLUniformLocation | null>(null);
   const projMatrixUniformRef = useRef<WebGLUniformLocation | null>(null);
   const positionColorBufferRef = useRef<WebGLBuffer | null>(null);
@@ -22,37 +23,25 @@ const Demo41: FC<ComponentProps> = () => {
     [number, number, number, number, number, number][][]
   >([
     [
-      [0.75, 1, -4, 0.4, 1, 0.4],
-      [0.25, -1, -4, 0.4, 1, 0.4],
-      [1.25, -1, -4, 1, 0.4, 0.4],
+      [0, 1, -4, 0.4, 1, 0.4],
+      [-0.5, -1, -4, 0.4, 1, 0.4],
+      [0.5, -1, -4, 1, 0.4, 0.4],
     ],
     [
-      [0.75, 1, -2, 1, 1, 0.4],
-      [0.25, -1, -2, 1, 1, 0.4],
-      [1.25, -1, -2, 1, 0.4, 0.4],
+      [0, 1, -2, 1, 1, 0.4],
+      [-0.5, -1, -2, 1, 1, 0.4],
+      [0.5, -1, -2, 1, 0.4, 0.4],
     ],
     [
-      [0.75, 1, 0, 0.4, 0.4, 1.0],
-      [0.25, -1, 0, 0.4, 0.4, 1.0],
-      [1.25, -1, 0, 1, 0.4, 0.4],
-    ],
-    [
-      [-0.75, 1, -4, 0.4, 1, 0.4],
-      [-1.25, -1, -4, 0.4, 1, 0.4],
-      [-0.25, -1, -4, 1, 0.4, 0.4],
-    ],
-    [
-      [-0.75, 1, -2, 1, 1, 0.4],
-      [-1.25, -1, -2, 1, 1, 0.4],
-      [-0.25, -1, -2, 1, 0.4, 0.4],
-    ],
-    [
-      [-0.75, 1, 0, 0.4, 0.4, 1.0],
-      [-1.25, -1, 0, 0.4, 0.4, 1.0],
-      [-0.25, -1, 0, 1, 0.4, 0.4],
+      [0, 1, 0, 0.4, 0.4, 1.0],
+      [-0.5, -1, 0, 0.4, 0.4, 1.0],
+      [0.5, -1, 0, 1, 0.4, 0.4],
     ],
   ]);
   const positionsColors = useFloat32Array(points);
+  const [[translationX, translationY, translationZ]] = useState<
+    [number, number, number]
+  >([0.75, 0, 0]);
   const [[eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]] =
     useState<
       [number, number, number, number, number, number, number, number, number]
@@ -115,10 +104,15 @@ const Demo41: FC<ComponentProps> = () => {
      */
     const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
     const colorAttribute = gl.getAttribLocation(gl.program, 'a_Color');
+    const modelMatrixUniform = gl.getUniformLocation(
+      gl.program,
+      'u_ModelMatrix',
+    );
     const viewMatrixUniform = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
     const projMatrixUniform = gl.getUniformLocation(gl.program, 'u_ProjMatrix');
     positionAttributeRef.current = positionAttribute;
     colorAttributeRef.current = colorAttribute;
+    modelMatrixUniformRef.current = modelMatrixUniform;
     viewMatrixUniformRef.current = viewMatrixUniform;
     projMatrixUniformRef.current = projMatrixUniform;
     /**
@@ -194,13 +188,30 @@ const Demo41: FC<ComponentProps> = () => {
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
+    const modelMatrixUniform = modelMatrixUniformRef.current;
+    if (!modelMatrixUniform) return;
     if (deps.some((dep) => dep === null)) return;
     /**
-     * 清空并绘制
+     * 清空
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(deps[0]!.length / 6));
-  }, [deps]);
+    for (const group of [1, -1]) {
+      /**
+       * 数据直接分配到变量
+       */
+      const modelMatrix = new Matrix4();
+      modelMatrix.setTranslate(
+        translationX * group,
+        translationY,
+        translationZ,
+      );
+      gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
+      /**
+       * 绘制
+       */
+      gl.drawArrays(gl.TRIANGLES, 0, Math.floor(deps[0]!.length / 6));
+    }
+  }, [translationX, translationY, translationZ, deps]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>
@@ -209,4 +220,4 @@ const Demo41: FC<ComponentProps> = () => {
   );
 };
 
-export default Demo41;
+export default Demo42;

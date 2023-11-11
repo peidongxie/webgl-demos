@@ -52,6 +52,7 @@ const WebglDemo38 = lazy(() => import('./webgl/demo-38'));
 const WebglDemo39 = lazy(() => import('./webgl/demo-39'));
 const WebglDemo40 = lazy(() => import('./webgl/demo-40'));
 const WebglDemo41 = lazy(() => import('./webgl/demo-41'));
+const WebglDemo42 = lazy(() => import('./webgl/demo-42'));
 const MarsDemo01 = lazy(() => import('./mars/demo-01'));
 const GalaceanDemo01 = lazy(() => import('./galacean/demo-01'));
 const GalaceanDemo02 = lazy(() => import('./galacean/demo-02'));
@@ -354,7 +355,7 @@ const webglChildren: RouteObject[] = [
     path: 'demo-37',
     element: <WebglDemo37 />,
     loader: (): MatchData => ({
-      value: ['37 控制正视纵深', '/demo-37'],
+      value: ['37 控制纵深', '/demo-37'],
       children: [],
     }),
   },
@@ -370,7 +371,7 @@ const webglChildren: RouteObject[] = [
     path: 'demo-39',
     element: <WebglDemo39 />,
     loader: (): MatchData => ({
-      value: ['39 缩小正视视野', '/demo-39'],
+      value: ['39 缩小视野', '/demo-39'],
       children: [],
     }),
   },
@@ -378,7 +379,7 @@ const webglChildren: RouteObject[] = [
     path: 'demo-40',
     element: <WebglDemo40 />,
     loader: (): MatchData => ({
-      value: ['40 收窄正视视野', '/demo-40'],
+      value: ['40 收窄视野', '/demo-40'],
       children: [],
     }),
   },
@@ -386,7 +387,15 @@ const webglChildren: RouteObject[] = [
     path: 'demo-41',
     element: <WebglDemo41 />,
     loader: (): MatchData => ({
-      value: ['41 透视观察', '/demo-41'],
+      value: ['41 透视三角', '/demo-41'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-42',
+    element: <WebglDemo42 />,
+    loader: (): MatchData => ({
+      value: ['42 透视平移', '/demo-42'],
       children: [],
     }),
   },
