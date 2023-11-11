@@ -54,7 +54,7 @@ const useFrameRequest = (frameRequest: FrameRequestCallback | null): void => {
     return () => {
       frameRequestRef.current = null;
     };
-  }, [frameRequest]);
+  }, [frameRequest, nextFrame]);
 };
 
 export { useFloat32Array, useFrameRequest, useImage };

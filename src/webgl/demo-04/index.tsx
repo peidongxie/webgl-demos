@@ -13,6 +13,7 @@ const Demo04: FC<ComponentProps> = () => {
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const positionAttributeRef = useRef(-1);
   const [point] = useState<[number, number]>([0, 0]);
+  const [deps, setDeps] = useState<[[number, number] | null]>([null]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -55,17 +56,19 @@ const Demo04: FC<ComponentProps> = () => {
      */
     const [x, y] = point;
     gl.vertexAttrib3f(positionAttribute, x, y, 0);
+    setDeps(() => [point]);
   }, [point]);
 
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
+    if (deps.some((dep) => dep === null)) return;
     /**
      * 清空并绘制
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.POINTS, 0, 1);
-  }, [point]);
+  }, [deps]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>

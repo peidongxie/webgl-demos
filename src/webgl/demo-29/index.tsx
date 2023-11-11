@@ -28,6 +28,9 @@ const Demo29: FC<ComponentProps> = () => {
   const positionsTexCoords = useFloat32Array(points);
   const [src] = useState<string>(SKY_IMAGE);
   const image = useImage(src);
+  const [deps, setDeps] = useState<
+    [Float32Array | null, number | null, HTMLImageElement | null]
+  >([null, null, null]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -106,6 +109,7 @@ const Demo29: FC<ComponentProps> = () => {
       positionsTexCoords.BYTES_PER_ELEMENT * 2,
     );
     gl.enableVertexAttribArray(texCoordAttribute);
+    setDeps((deps) => [positionsTexCoords, deps[1], deps[2]]);
   }, [positionsTexCoords]);
 
   useEffect(() => {
@@ -117,6 +121,7 @@ const Demo29: FC<ComponentProps> = () => {
      * 数据直接分配到变量
      */
     gl.uniform1i(samplerUniform, 0);
+    setDeps((deps) => [deps[0], 0, deps[2]]);
   }, []);
 
   useEffect(() => {
@@ -133,21 +138,19 @@ const Demo29: FC<ComponentProps> = () => {
     gl.bindTexture(gl.TEXTURE_2D, imageTexture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+    setDeps((deps) => [deps[0], deps[1], image]);
   }, [image]);
 
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
+    if (deps.some((dep) => dep === null)) return;
     /**
      * 清空并绘制
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(
-      gl.TRIANGLE_STRIP,
-      0,
-      Math.floor(positionsTexCoords.length / 4),
-    );
-  }, [positionsTexCoords, image]);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, Math.floor(deps[0]!.length / 4));
+  }, [deps]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>

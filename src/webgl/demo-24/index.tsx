@@ -25,6 +25,10 @@ const Demo24: FC<ComponentProps> = () => {
   const [sizesMask] = useState([0, 0, 1]);
   const positions = useFloat32Array(points, positionsMask);
   const sizes = useFloat32Array(points, sizesMask);
+  const [deps, setDeps] = useState<[Float32Array | null, Float32Array | null]>([
+    null,
+    null,
+  ]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -80,6 +84,7 @@ const Demo24: FC<ComponentProps> = () => {
     gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
     gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(positionAttribute);
+    setDeps((deps) => [positions, deps[1]]);
   }, [positions]);
 
   useEffect(() => {
@@ -96,17 +101,19 @@ const Demo24: FC<ComponentProps> = () => {
     gl.bufferData(gl.ARRAY_BUFFER, sizes, gl.STATIC_DRAW);
     gl.vertexAttribPointer(pointSizeAttribute, 1, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(pointSizeAttribute);
+    setDeps((deps) => [deps[0], sizes]);
   }, [sizes]);
 
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
+    if (deps.some((dep) => dep === null)) return;
     /**
      * 清空并绘制
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.POINTS, 0, Math.floor(positions.length / 2));
-  }, [positions, sizes]);
+    gl.drawArrays(gl.POINTS, 0, Math.floor(deps[0]!.length / 2));
+  }, [deps]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>

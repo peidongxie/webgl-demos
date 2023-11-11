@@ -33,6 +33,15 @@ const Demo32: FC<ComponentProps> = () => {
   const [src1] = useState<string>(CIRCLE_IMAGE);
   const image0 = useImage(src0);
   const image1 = useImage(src1);
+  const [deps, setDeps] = useState<
+    [
+      Float32Array | null,
+      number | null,
+      number | null,
+      HTMLImageElement | null,
+      HTMLImageElement | null,
+    ]
+  >([null, null, null, null, null]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -115,6 +124,7 @@ const Demo32: FC<ComponentProps> = () => {
       positionsTexCoords.BYTES_PER_ELEMENT * 2,
     );
     gl.enableVertexAttribArray(texCoordAttribute);
+    setDeps((deps) => [positionsTexCoords, deps[1], deps[2], deps[3], deps[4]]);
   }, [positionsTexCoords]);
 
   useEffect(() => {
@@ -126,6 +136,7 @@ const Demo32: FC<ComponentProps> = () => {
      * 数据直接分配到变量
      */
     gl.uniform1i(sampler0Uniform, 0);
+    setDeps((deps) => [deps[0], 0, deps[2], deps[3], deps[4]]);
   }, []);
 
   useEffect(() => {
@@ -137,6 +148,7 @@ const Demo32: FC<ComponentProps> = () => {
      * 数据直接分配到变量
      */
     gl.uniform1i(sampler1Uniform, 1);
+    setDeps((deps) => [deps[0], deps[1], 1, deps[3], deps[4]]);
   }, []);
 
   useEffect(() => {
@@ -153,6 +165,7 @@ const Demo32: FC<ComponentProps> = () => {
     gl.bindTexture(gl.TEXTURE_2D, imageTexture0);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image0);
+    setDeps((deps) => [deps[0], deps[1], deps[2], image0, deps[4]]);
   }, [image0]);
 
   useEffect(() => {
@@ -169,21 +182,19 @@ const Demo32: FC<ComponentProps> = () => {
     gl.bindTexture(gl.TEXTURE_2D, imageTexture1);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image1);
+    setDeps((deps) => [deps[0], deps[1], deps[2], deps[3], image1]);
   }, [image1]);
 
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
+    if (deps.some((dep) => dep === null)) return;
     /**
      * 清空并绘制
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(
-      gl.TRIANGLE_STRIP,
-      0,
-      Math.floor(positionsTexCoords.length / 4),
-    );
-  }, [positionsTexCoords, image0, image1]);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, Math.floor(deps[0]!.length / 4));
+  }, [deps]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>

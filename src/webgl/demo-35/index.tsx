@@ -1,4 +1,4 @@
-import { type FC, useEffect, useRef, useState } from 'react';
+import { type FC, useEffect, useMemo, useRef, useState } from 'react';
 
 import { type ComponentProps } from '../../type';
 import { Matrix4 } from '../lib/cuon-matrix';
@@ -21,22 +21,65 @@ const Demo35: FC<ComponentProps> = () => {
     [number, number, number, number, number, number][][]
   >([
     [
-      [0.0, 0.5, -0.4, 0.4, 1, 0.4],
+      [0, 0.5, -0.4, 0.4, 1, 0.4],
       [-0.5, -0.5, -0.4, 0.4, 1, 0.4],
       [0.5, -0.5, -0.4, 1, 0.4, 0.4],
     ],
     [
       [0.5, 0.4, -0.2, 1, 0.4, 0.4],
       [-0.5, 0.4, -0.2, 1, 1, 0.4],
-      [0.0, -0.6, -0.2, 1, 1, 0.4],
+      [0, -0.6, -0.2, 1, 1, 0.4],
     ],
     [
-      [0.0, 0.5, 0.0, 0.4, 0.4, 1],
-      [-0.5, -0.5, 0.0, 0.4, 0.4, 1],
-      [0.5, -0.5, 0.0, 1, 0.4, 0.4],
+      [0, 0.5, 0, 0.4, 0.4, 1],
+      [-0.5, -0.5, 0, 0.4, 0.4, 1],
+      [0.5, -0.5, 0, 1, 0.4, 0.4],
     ],
   ]);
   const positionsColors = useFloat32Array(points);
+  const [[eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]] =
+    useState<
+      [number, number, number, number, number, number, number, number, number]
+    >([0.2, 0.25, 0.25, 0, 0, 0, 0, 1, 0]);
+  const [[angle, rotationX, rotationY, rotationZ]] = useState<
+    [number, number, number, number]
+  >([-10, 0, 0, 1]);
+  const modelViewMatrix = useMemo(() => {
+    const viewMatrix = new Matrix4();
+    viewMatrix.setLookAt(
+      eyeX,
+      eyeY,
+      eyeZ,
+      centerX,
+      centerY,
+      centerZ,
+      upX,
+      upY,
+      upZ,
+    );
+    const modelMatrix = new Matrix4();
+    modelMatrix.setRotate(angle, rotationX, rotationY, rotationZ);
+    const modelViewMatrix = viewMatrix.multiply(modelMatrix);
+    return modelViewMatrix;
+  }, [
+    eyeX,
+    eyeY,
+    eyeZ,
+    centerX,
+    centerY,
+    centerZ,
+    upX,
+    upY,
+    upZ,
+    angle,
+    rotationX,
+    rotationY,
+    rotationZ,
+  ]);
+  const [deps, setDeps] = useState<[Float32Array | null, Matrix4 | null]>([
+    null,
+    null,
+  ]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -113,6 +156,7 @@ const Demo35: FC<ComponentProps> = () => {
       positionsColors.BYTES_PER_ELEMENT * 3,
     );
     gl.enableVertexAttribArray(colorAttribute);
+    setDeps((deps) => [positionsColors, deps[1]]);
   }, [positionsColors]);
 
   useEffect(() => {
@@ -123,27 +167,24 @@ const Demo35: FC<ComponentProps> = () => {
     /**
      * 数据直接分配到变量
      */
-    const viewMatrix = new Matrix4();
-    viewMatrix.setLookAt(0.2, 0.25, 0.25, 0, 0, 0, 0, 1, 0);
-    const modelMatrix = new Matrix4();
-    modelMatrix.setRotate(-10, 0, 0, 1);
-    const modelViewMatrix = viewMatrix.multiply(modelMatrix);
     gl.uniformMatrix4fv(
       modelViewMatrixUniform,
       false,
       modelViewMatrix.elements,
     );
-  }, []);
+    setDeps((deps) => [deps[0], modelViewMatrix]);
+  }, [modelViewMatrix]);
 
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
+    if (deps.some((dep) => dep === null)) return;
     /**
      * 清空并绘制
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positionsColors.length / 6));
-  }, [positionsColors]);
+    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(deps[0]!.length / 6));
+  }, [deps]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>

@@ -27,14 +27,16 @@ const Demo21: FC<ComponentProps> = () => {
   const stepRef = useRef(45);
   const modelMatrixRef = useRef<Matrix4 | null>(null);
   if (!modelMatrixRef.current) modelMatrixRef.current = new Matrix4();
+  const [deps, setDeps] = useState<[Float32Array | null]>([null]);
 
-  const animate = useCallback(() => {
+  const tick = useCallback(() => {
     const gl = glRef.current;
     if (!gl) return;
     const modelMatrixUniform = modelMatrixUniformRef.current;
     if (!modelMatrixUniform) return;
     const modelMatrix = modelMatrixRef.current;
     if (!modelMatrix) return;
+    if (deps.some((dep) => dep === null)) return;
     /**
      * 数据直接分配到变量
      */
@@ -46,22 +48,12 @@ const Demo21: FC<ComponentProps> = () => {
     const angleEnd = angleStart + angleSpan;
     modelMatrix.setRotate(angleEnd, 0, 0, 1);
     gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
-  }, []);
-
-  const draw = useCallback(() => {
-    const gl = glRef.current;
-    if (!gl) return;
     /**
      * 清空并绘制
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(positions.length / 2));
-  }, [positions]);
-
-  const tick = useCallback(() => {
-    animate();
-    draw();
-  }, [animate, draw]);
+    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(deps[0]!.length / 2));
+  }, [deps]);
 
   useFrameRequest(tick);
 
@@ -120,6 +112,7 @@ const Demo21: FC<ComponentProps> = () => {
     gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
     gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(positionAttribute);
+    setDeps([positions]);
   }, [positions]);
 
   useEffect(() => {
