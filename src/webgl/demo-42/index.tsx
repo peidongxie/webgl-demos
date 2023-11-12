@@ -39,9 +39,37 @@ const Demo42: FC<ComponentProps> = () => {
     ],
   ]);
   const positionsColors = useFloat32Array(points);
-  const [[translationX, translationY, translationZ]] = useState<
-    [number, number, number]
-  >([0.75, 0, 0]);
+  const [
+    [
+      [leftTranslationX, leftTranslationY, leftTranslationZ],
+      [rightTranslationX, rightTranslationY, rightTranslationZ],
+    ],
+  ] = useState<[[number, number, number], [number, number, number]]>([
+    [0.75, 0, 0],
+    [-0.75, 0, 0],
+  ]);
+  const [leftModelMatrix, rightModelMatrix] = useMemo(() => {
+    const leftModelMatrix = new Matrix4();
+    leftModelMatrix.setTranslate(
+      leftTranslationX,
+      leftTranslationY,
+      leftTranslationZ,
+    );
+    const rightModelMatrix = new Matrix4();
+    rightModelMatrix.setTranslate(
+      rightTranslationX,
+      rightTranslationY,
+      rightTranslationZ,
+    );
+    return [leftModelMatrix, rightModelMatrix];
+  }, [
+    leftTranslationX,
+    leftTranslationY,
+    leftTranslationZ,
+    rightTranslationX,
+    rightTranslationY,
+    rightTranslationZ,
+  ]);
   const [[eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]] =
     useState<
       [number, number, number, number, number, number, number, number, number]
@@ -195,23 +223,17 @@ const Demo42: FC<ComponentProps> = () => {
      * 清空
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
-    for (const group of [1, -1]) {
+    for (const modelMatrix of [leftModelMatrix, rightModelMatrix]) {
       /**
        * 数据直接分配到变量
        */
-      const modelMatrix = new Matrix4();
-      modelMatrix.setTranslate(
-        translationX * group,
-        translationY,
-        translationZ,
-      );
       gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
       /**
        * 绘制
        */
       gl.drawArrays(gl.TRIANGLES, 0, Math.floor(deps[0]!.length / 6));
     }
-  }, [translationX, translationY, translationZ, deps]);
+  }, [leftModelMatrix, rightModelMatrix, deps]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>
