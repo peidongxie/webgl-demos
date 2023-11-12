@@ -47,6 +47,12 @@ const WebglDemo33 = lazy(() => import('./webgl/demo-33'));
 const WebglDemo34 = lazy(() => import('./webgl/demo-34'));
 const WebglDemo35 = lazy(() => import('./webgl/demo-35'));
 const WebglDemo36 = lazy(() => import('./webgl/demo-36'));
+const WebglDemo37 = lazy(() => import('./webgl/demo-37'));
+const WebglDemo38 = lazy(() => import('./webgl/demo-38'));
+const WebglDemo39 = lazy(() => import('./webgl/demo-39'));
+const WebglDemo40 = lazy(() => import('./webgl/demo-40'));
+const WebglDemo41 = lazy(() => import('./webgl/demo-41'));
+const WebglDemo42 = lazy(() => import('./webgl/demo-42'));
 const MarsDemo01 = lazy(() => import('./mars/demo-01'));
 const GalaceanDemo01 = lazy(() => import('./galacean/demo-01'));
 const GalaceanDemo02 = lazy(() => import('./galacean/demo-02'));
@@ -325,7 +331,7 @@ const webglChildren: RouteObject[] = [
     path: 'demo-34',
     element: <WebglDemo34 />,
     loader: (): MatchData => ({
-      value: ['34 观察旋转三角', '/demo-34'],
+      value: ['34 观察旋转', '/demo-34'],
       children: [],
     }),
   },
@@ -342,6 +348,54 @@ const webglChildren: RouteObject[] = [
     element: <WebglDemo36 />,
     loader: (): MatchData => ({
       value: ['36 控制观察', '/demo-36'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-37',
+    element: <WebglDemo37 />,
+    loader: (): MatchData => ({
+      value: ['37 控制纵深', '/demo-37'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-38',
+    element: <WebglDemo38 />,
+    loader: (): MatchData => ({
+      value: ['38 拉近控制观察', '/demo-38'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-39',
+    element: <WebglDemo39 />,
+    loader: (): MatchData => ({
+      value: ['39 缩小视野', '/demo-39'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-40',
+    element: <WebglDemo40 />,
+    loader: (): MatchData => ({
+      value: ['40 收窄视野', '/demo-40'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-41',
+    element: <WebglDemo41 />,
+    loader: (): MatchData => ({
+      value: ['41 透视三角', '/demo-41'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-42',
+    element: <WebglDemo42 />,
+    loader: (): MatchData => ({
+      value: ['42 透视平移', '/demo-42'],
       children: [],
     }),
   },

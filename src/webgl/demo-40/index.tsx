@@ -1,5 +1,6 @@
 import { type FC, useEffect, useMemo, useRef, useState } from 'react';
 
+import { type GuiOptions, type GuiSchema, useGui } from '../../lib/gui-utils';
 import { type ComponentProps } from '../../type';
 import { Matrix4 } from '../lib/cuon-matrix';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
@@ -8,23 +9,22 @@ import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 观察旋转
+ * 收窄视野
  */
-const Demo34: FC<ComponentProps> = () => {
+const Demo40: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const positionAttributeRef = useRef(-1);
   const colorAttributeRef = useRef(-1);
-  const viewMatrixUniformRef = useRef<WebGLUniformLocation | null>(null);
-  const modelMatrixUniformRef = useRef<WebGLUniformLocation | null>(null);
+  const projMatrixUniformRef = useRef<WebGLUniformLocation | null>(null);
   const positionColorBufferRef = useRef<WebGLBuffer | null>(null);
   const [points] = useState<
     [number, number, number, number, number, number][][]
   >([
     [
-      [0, 0.5, -0.4, 0.4, 1, 0.4],
-      [-0.5, -0.5, -0.4, 0.4, 1, 0.4],
-      [0.5, -0.5, -0.4, 1, 0.4, 0.4],
+      [0, 0.6, -0.4, 0.4, 1, 0.4],
+      [-0.5, -0.4, -0.4, 0.4, 1, 0.4],
+      [0.5, -0.4, -0.4, 1, 0.4, 0.4],
     ],
     [
       [0.5, 0.4, -0.2, 1, 0.4, 0.4],
@@ -38,36 +38,75 @@ const Demo34: FC<ComponentProps> = () => {
     ],
   ]);
   const positionsColors = useFloat32Array(points);
-  const [[eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]] =
-    useState<
-      [number, number, number, number, number, number, number, number, number]
-    >([0.2, 0.25, 0.25, 0, 0, 0, 0, 1, 0]);
-  const viewMatrix = useMemo(() => {
-    const viewMatrix = new Matrix4();
-    viewMatrix.setLookAt(
-      eyeX,
-      eyeY,
-      eyeZ,
-      centerX,
-      centerY,
-      centerZ,
-      upX,
-      upY,
-      upZ,
-    );
-    return viewMatrix;
-  }, [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]);
-  const [[angle, rotationX, rotationY, rotationZ]] = useState<
-    [number, number, number, number]
-  >([-10, 0, 0, 1]);
-  const modelMatrix = useMemo(() => {
-    const modelMatrix = new Matrix4();
-    modelMatrix.setRotate(angle, rotationX, rotationY, rotationZ);
-    return modelMatrix;
-  }, [angle, rotationX, rotationY, rotationZ]);
-  const [deps, setDeps] = useState<
-    [Float32Array | null, Matrix4 | null, Matrix4 | null]
-  >([null, null, null]);
+  const [[left, right, bottom, top, near, far], setOrtho] = useState<
+    [number, number, number, number, number, number]
+  >([-0.3, 0.3, -1, 1, 0, 0.5]);
+  const projMatrix = useMemo(() => {
+    const projMatrix = new Matrix4();
+    projMatrix.setOrtho(left, right, bottom, top, near, far);
+    return projMatrix;
+  }, [left, right, bottom, top, near, far]);
+  const [deps, setDeps] = useState<[Float32Array | null, Matrix4 | null]>([
+    null,
+    null,
+  ]);
+  const schemas = useMemo<GuiSchema[]>(() => {
+    return [
+      {
+        type: 'number',
+        name: 'NEAR',
+        initialValue: 0,
+        min: -1,
+        max: 1,
+        step: 0.01,
+        onChange: (value) => {
+          setOrtho((ortho) => {
+            const [left, right, bottom, top] = ortho;
+            const far = ortho[5];
+            return [
+              left,
+              right,
+              bottom,
+              top,
+              value - 1 / Number.MAX_SAFE_INTEGER,
+              far,
+            ];
+          });
+        },
+      },
+      {
+        type: 'number',
+        name: 'FAR',
+        initialValue: 0.5,
+        min: -1,
+        max: 1,
+        step: 0.01,
+        onChange: (value) => {
+          setOrtho((ortho) => {
+            const [left, right, bottom, top] = ortho;
+            const near = ortho[4];
+            return [
+              left,
+              right,
+              bottom,
+              top,
+              near,
+              value + 1 / Number.MAX_SAFE_INTEGER,
+            ];
+          });
+        },
+      },
+    ];
+  }, []);
+  const options = useMemo<GuiOptions>(
+    () => ({
+      container: '#gui-demo',
+      title: '可视空间控件',
+    }),
+    [],
+  );
+
+  useGui(schemas, options);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -94,15 +133,10 @@ const Demo34: FC<ComponentProps> = () => {
      */
     const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
     const colorAttribute = gl.getAttribLocation(gl.program, 'a_Color');
-    const viewMatrixUniform = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
-    const modelMatrixUniform = gl.getUniformLocation(
-      gl.program,
-      'u_ModelMatrix',
-    );
+    const projMatrixUniform = gl.getUniformLocation(gl.program, 'u_ProjMatrix');
     positionAttributeRef.current = positionAttribute;
     colorAttributeRef.current = colorAttribute;
-    viewMatrixUniformRef.current = viewMatrixUniform;
-    modelMatrixUniformRef.current = modelMatrixUniform;
+    projMatrixUniformRef.current = projMatrixUniform;
     /**
      * 缓冲区
      */
@@ -146,32 +180,20 @@ const Demo34: FC<ComponentProps> = () => {
       positionsColors.BYTES_PER_ELEMENT * 3,
     );
     gl.enableVertexAttribArray(colorAttribute);
-    setDeps((deps) => [positionsColors, deps[1], deps[2]]);
+    setDeps((deps) => [positionsColors, deps[1]]);
   }, [positionsColors]);
 
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
-    const viewMatrixUniform = viewMatrixUniformRef.current;
-    if (!viewMatrixUniform) return;
+    const projMatrixUniform = projMatrixUniformRef.current;
+    if (!projMatrixUniform) return;
     /**
      * 数据直接分配到变量
      */
-    gl.uniformMatrix4fv(viewMatrixUniform, false, viewMatrix.elements);
-    setDeps((deps) => [deps[0], viewMatrix, deps[2]]);
-  }, [viewMatrix]);
-
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const modelMatrixUniform = modelMatrixUniformRef.current;
-    if (!modelMatrixUniform) return;
-    /**
-     * 数据直接分配到变量
-     */
-    gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
-    setDeps((deps) => [deps[0], deps[1], modelMatrix]);
-  }, [modelMatrix]);
+    gl.uniformMatrix4fv(projMatrixUniform, false, projMatrix.elements);
+    setDeps((deps) => [deps[0], projMatrix]);
+  }, [projMatrix]);
 
   useEffect(() => {
     const gl = glRef.current;
@@ -191,4 +213,4 @@ const Demo34: FC<ComponentProps> = () => {
   );
 };
 
-export default Demo34;
+export default Demo40;
