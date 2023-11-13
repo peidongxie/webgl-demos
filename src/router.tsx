@@ -53,6 +53,7 @@ const WebglDemo39 = lazy(() => import('./webgl/demo-39'));
 const WebglDemo40 = lazy(() => import('./webgl/demo-40'));
 const WebglDemo41 = lazy(() => import('./webgl/demo-41'));
 const WebglDemo42 = lazy(() => import('./webgl/demo-42'));
+const WebglDemo43 = lazy(() => import('./webgl/demo-43'));
 const MarsDemo01 = lazy(() => import('./mars/demo-01'));
 const GalaceanDemo01 = lazy(() => import('./galacean/demo-01'));
 const GalaceanDemo02 = lazy(() => import('./galacean/demo-02'));
@@ -396,6 +397,14 @@ const webglChildren: RouteObject[] = [
     element: <WebglDemo42 />,
     loader: (): MatchData => ({
       value: ['42 透视平移', '/demo-42'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-43',
+    element: <WebglDemo43 />,
+    loader: (): MatchData => ({
+      value: ['43 组合透视平移', '/demo-43'],
       children: [],
     }),
   },
