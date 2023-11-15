@@ -193,8 +193,9 @@ const Demo44: FC<ComponentProps> = () => {
       /**
        * 数据直接分配到变量
        */
-      const mvpMatrix = new Matrix4();
-      mvpMatrix.set(projMatrix).multiply(viewMatrix).multiply(modelMatrix);
+      const mvpMatrix = new Matrix4(projMatrix)
+        .multiply(viewMatrix)
+        .multiply(modelMatrix);
       gl.uniformMatrix4fv(mvpMatrixUniform, false, mvpMatrix.elements);
       /**
        * 绘制
