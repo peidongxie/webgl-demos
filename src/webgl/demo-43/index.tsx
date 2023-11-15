@@ -31,8 +31,8 @@ const Demo43: FC<ComponentProps> = () => {
       [0.5, -1, -2, 1, 0.4, 0.4],
     ],
     [
-      [0, 1, 0, 0.4, 0.4, 1.0],
-      [-0.5, -1, 0, 0.4, 0.4, 1.0],
+      [0, 1, 0, 0.4, 0.4, 1],
+      [-0.5, -1, 0, 0.4, 0.4, 1],
       [0.5, -1, 0, 1, 0.4, 0.4],
     ],
   ]);
@@ -192,8 +192,9 @@ const Demo43: FC<ComponentProps> = () => {
       /**
        * 数据直接分配到变量
        */
-      const mvpMatrix = new Matrix4();
-      mvpMatrix.set(projMatrix).multiply(viewMatrix).multiply(modelMatrix);
+      const mvpMatrix = new Matrix4(projMatrix)
+        .multiply(viewMatrix)
+        .multiply(modelMatrix);
       gl.uniformMatrix4fv(mvpMatrixUniform, false, mvpMatrix.elements);
       /**
        * 绘制
