@@ -37,37 +37,17 @@ const Demo43: FC<ComponentProps> = () => {
     ],
   ]);
   const positionsColors = useFloat32Array(points);
-  const [
-    [
-      [leftTranslationX, leftTranslationY, leftTranslationZ],
-      [rightTranslationX, rightTranslationY, rightTranslationZ],
-    ],
-  ] = useState<[[number, number, number], [number, number, number]]>([
+  const [translations] = useState<[number, number, number][]>([
     [0.75, 0, 0],
     [-0.75, 0, 0],
   ]);
-  const [leftModelMatrix, rightModelMatrix] = useMemo(() => {
-    const leftModelMatrix = new Matrix4();
-    leftModelMatrix.setTranslate(
-      leftTranslationX,
-      leftTranslationY,
-      leftTranslationZ,
-    );
-    const rightModelMatrix = new Matrix4();
-    rightModelMatrix.setTranslate(
-      rightTranslationX,
-      rightTranslationY,
-      rightTranslationZ,
-    );
-    return [leftModelMatrix, rightModelMatrix];
-  }, [
-    leftTranslationX,
-    leftTranslationY,
-    leftTranslationZ,
-    rightTranslationX,
-    rightTranslationY,
-    rightTranslationZ,
-  ]);
+  const modelMatrices = useMemo(() => {
+    return translations.map(([translationX, translationY, translationZ]) => {
+      const leftModelMatrix = new Matrix4();
+      leftModelMatrix.setTranslate(translationX, translationY, translationZ);
+      return leftModelMatrix;
+    });
+  }, translations);
   const [[eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]] =
     useState<
       [number, number, number, number, number, number, number, number, number]
@@ -95,6 +75,11 @@ const Demo43: FC<ComponentProps> = () => {
     projMatrix.setPerspective(fovy, aspect, near, far);
     return projMatrix;
   }, [fovy, aspect, near, far]);
+  const mvpMatrices = useMemo(() => {
+    return modelMatrices.map((modelMatrix) =>
+      new Matrix4(projMatrix).multiply(viewMatrix).multiply(modelMatrix),
+    );
+  }, [modelMatrices, viewMatrix, projMatrix]);
   const [deps, setDeps] = useState<[Float32Array | null]>([null]);
 
   useEffect(() => {
@@ -188,20 +173,17 @@ const Demo43: FC<ComponentProps> = () => {
      * 清空
      */
     gl.clear(gl.COLOR_BUFFER_BIT);
-    for (const modelMatrix of [leftModelMatrix, rightModelMatrix]) {
+    for (const mvpMatrix of mvpMatrices) {
       /**
        * 数据直接分配到变量
        */
-      const mvpMatrix = new Matrix4(projMatrix)
-        .multiply(viewMatrix)
-        .multiply(modelMatrix);
       gl.uniformMatrix4fv(mvpMatrixUniform, false, mvpMatrix.elements);
       /**
        * 绘制
        */
       gl.drawArrays(gl.TRIANGLES, 0, Math.floor(deps[0]!.length / 6));
     }
-  }, [leftModelMatrix, rightModelMatrix, viewMatrix, projMatrix, deps]);
+  }, [mvpMatrices, deps]);
 
   return (
     <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>
