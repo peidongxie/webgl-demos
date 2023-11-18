@@ -43,9 +43,9 @@ const Demo43: FC<ComponentProps> = () => {
   ]);
   const modelMatrices = useMemo(() => {
     return translations.map(([translationX, translationY, translationZ]) => {
-      const leftModelMatrix = new Matrix4();
-      leftModelMatrix.setTranslate(translationX, translationY, translationZ);
-      return leftModelMatrix;
+      const modelMatrix = new Matrix4();
+      modelMatrix.setTranslate(translationX, translationY, translationZ);
+      return modelMatrix;
     });
   }, translations);
   const [[eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]] =
