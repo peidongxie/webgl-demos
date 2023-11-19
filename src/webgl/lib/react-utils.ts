@@ -12,6 +12,10 @@ const flatArray = (data: number | NumberArray, mask?: number[]): number[] => {
   return data.map((value) => flatArray(value, mask)).flat();
 };
 
+const useUint8Array = (data: NumberArray, mask?: number[]) => {
+  return useMemo(() => new Uint8Array(flatArray(data, mask)), [data, mask]);
+};
+
 const useFloat32Array = (data: NumberArray, mask?: number[]) => {
   return useMemo(() => new Float32Array(flatArray(data, mask)), [data, mask]);
 };
@@ -57,4 +61,4 @@ const useFrameRequest = (frameRequest: FrameRequestCallback | null): void => {
   }, [frameRequest, nextFrame]);
 };
 
-export { useFloat32Array, useFrameRequest, useImage };
+export { useFloat32Array, useFrameRequest, useImage, useUint8Array };
