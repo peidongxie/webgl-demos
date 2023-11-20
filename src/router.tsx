@@ -56,6 +56,7 @@ const WebglDemo42 = lazy(() => import('./webgl/demo-42'));
 const WebglDemo43 = lazy(() => import('./webgl/demo-43'));
 const WebglDemo44 = lazy(() => import('./webgl/demo-44'));
 const WebglDemo45 = lazy(() => import('./webgl/demo-45'));
+const WebglDemo46 = lazy(() => import('./webgl/demo-46'));
 const MarsDemo01 = lazy(() => import('./mars/demo-01'));
 const GalaceanDemo01 = lazy(() => import('./galacean/demo-01'));
 const GalaceanDemo02 = lazy(() => import('./galacean/demo-02'));
@@ -423,6 +424,14 @@ const webglChildren: RouteObject[] = [
     element: <WebglDemo45 />,
     loader: (): MatchData => ({
       value: ['45 消除隐藏面', '/demo-45'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-46',
+    element: <WebglDemo46 />,
+    loader: (): MatchData => ({
+      value: ['46 绘制立方', '/demo-46'],
       children: [],
     }),
   },
