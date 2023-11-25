@@ -207,8 +207,6 @@ const Demo48: FC<ComponentProps> = () => {
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
-    const positionAttribute = positionAttributeRef.current;
-    if (positionAttribute < 0) return;
     const indexBuffer = indexBufferRef.current;
     if (!indexBuffer) return;
     /**

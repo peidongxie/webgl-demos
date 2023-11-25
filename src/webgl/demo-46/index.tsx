@@ -31,7 +31,7 @@ const Demo46: FC<ComponentProps> = () => {
     ],
   );
   const positionsColors = useFloat32Array(points);
-  const [surfaces] = useState([
+  const [surfaces] = useState<[number, number, number][][]>([
     [
       [0, 1, 2],
       [0, 2, 3],
@@ -179,8 +179,6 @@ const Demo46: FC<ComponentProps> = () => {
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
-    const positionAttribute = positionAttributeRef.current;
-    if (positionAttribute < 0) return;
     const indexBuffer = indexBufferRef.current;
     if (!indexBuffer) return;
     /**

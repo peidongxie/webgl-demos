@@ -47,7 +47,7 @@ const Demo43: FC<ComponentProps> = () => {
       modelMatrix.setTranslate(translationX, translationY, translationZ);
       return modelMatrix;
     });
-  }, translations);
+  }, [translations]);
   const [[eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]] =
     useState<
       [number, number, number, number, number, number, number, number, number]
