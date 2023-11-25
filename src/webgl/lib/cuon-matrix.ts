@@ -1,8 +1,14 @@
 class Vector3 {
   elements: Float32Array;
 
-  constructor(source?: Vector3) {
-    this.elements = source?.elements.slice() || new Float32Array(3);
+  constructor(source?: Vector3 | [number, number, number]) {
+    if (source instanceof Vector3) {
+      this.elements = Float32Array.from(source.elements);
+    } else if (Array.isArray(source) && source.length === 3) {
+      this.elements = Float32Array.from(source);
+    } else {
+      this.elements = new Float32Array(3);
+    }
   }
 
   normalize(): this {
@@ -24,24 +30,57 @@ class Vector3 {
 class Vector4 {
   elements: Float32Array;
 
-  constructor(source?: Vector4) {
-    this.elements = source?.elements.slice() || new Float32Array(4);
+  constructor(source?: Vector4 | [number, number, number, number]) {
+    if (source instanceof Vector4) {
+      this.elements = Float32Array.from(source.elements);
+    } else if (Array.isArray(source) && source.length === 4) {
+      this.elements = Float32Array.from(source);
+    } else {
+      this.elements = new Float32Array(4);
+    }
   }
 }
 
-const MATRIX4_IDENTITY = new Float32Array([
+const IDENTITY_MATRIX$_ELEMENTS = new Float32Array([
   1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
 ]);
 
 class Matrix4 {
   elements: Float32Array;
 
-  constructor(source?: Matrix4) {
-    this.elements = source?.elements.slice() || MATRIX4_IDENTITY.slice();
+  constructor(
+    source?:
+      | Matrix4
+      | [
+          number,
+          number,
+          number,
+          number,
+          number,
+          number,
+          number,
+          number,
+          number,
+          number,
+          number,
+          number,
+          number,
+          number,
+          number,
+          number,
+        ],
+  ) {
+    if (source instanceof Matrix4) {
+      this.elements = Float32Array.from(source.elements);
+    } else if (Array.isArray(source) && source.length === 16) {
+      this.elements = Float32Array.from(source);
+    } else {
+      this.elements = Float32Array.from(IDENTITY_MATRIX$_ELEMENTS);
+    }
   }
 
   setIdentity(): this {
-    this.elements.set(MATRIX4_IDENTITY);
+    this.elements.set(IDENTITY_MATRIX$_ELEMENTS);
     return this;
   }
 
