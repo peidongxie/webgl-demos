@@ -58,6 +58,14 @@ const Demo47: FC<ComponentProps> = () => {
     ],
   ]);
   const indices = useUint8Array(surfaces);
+  const [[fovy, aspect, near, far], setPerspective] = useState<
+    [number, number, number, number]
+  >([30, 1, 1, 100]);
+  const projMatrix = useMemo(() => {
+    const projMatrix = new Matrix4();
+    projMatrix.setPerspective(fovy, aspect, near, far);
+    return projMatrix;
+  }, [fovy, aspect, near, far]);
   const [[eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]] =
     useState<
       [number, number, number, number, number, number, number, number, number]
@@ -77,17 +85,9 @@ const Demo47: FC<ComponentProps> = () => {
     );
     return viewMatrix;
   }, [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]);
-  const [[fovy, aspect, near, far], setPerspective] = useState<
-    [number, number, number, number]
-  >([30, 1, 1, 100]);
-  const projMatrix = useMemo(() => {
-    const projMatrix = new Matrix4();
-    projMatrix.setPerspective(fovy, aspect, near, far);
-    return projMatrix;
-  }, [fovy, aspect, near, far]);
   const mvpMatrix = useMemo(() => {
     return new Matrix4(projMatrix).multiply(viewMatrix);
-  }, [viewMatrix, projMatrix]);
+  }, [projMatrix, viewMatrix]);
   const [deps, setDeps] = useState<
     [Float32Array | null, Uint8Array | null, Matrix4 | null]
   >([null, null, null]);

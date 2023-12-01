@@ -37,17 +37,14 @@ const Demo44: FC<ComponentProps> = () => {
     ],
   ]);
   const positionsColors = useFloat32Array(points);
-  const [translations] = useState<[number, number, number][]>([
-    [0.75, 0, 0],
-    [-0.75, 0, 0],
-  ]);
-  const modelMatrices = useMemo(() => {
-    return translations.map(([translationX, translationY, translationZ]) => {
-      const modelMatrix = new Matrix4();
-      modelMatrix.setTranslate(translationX, translationY, translationZ);
-      return modelMatrix;
-    });
-  }, [translations]);
+  const [[fovy, aspect, near, far], setPerspective] = useState<
+    [number, number, number, number]
+  >([30, 1, 1, 100]);
+  const projMatrix = useMemo(() => {
+    const projMatrix = new Matrix4();
+    projMatrix.setPerspective(fovy, aspect, near, far);
+    return projMatrix;
+  }, [fovy, aspect, near, far]);
   const [[eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]] =
     useState<
       [number, number, number, number, number, number, number, number, number]
@@ -67,19 +64,22 @@ const Demo44: FC<ComponentProps> = () => {
     );
     return viewMatrix;
   }, [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]);
-  const [[fovy, aspect, near, far], setPerspective] = useState<
-    [number, number, number, number]
-  >([30, 1, 1, 100]);
-  const projMatrix = useMemo(() => {
-    const projMatrix = new Matrix4();
-    projMatrix.setPerspective(fovy, aspect, near, far);
-    return projMatrix;
-  }, [fovy, aspect, near, far]);
+  const [translations] = useState<[number, number, number][]>([
+    [0.75, 0, 0],
+    [-0.75, 0, 0],
+  ]);
+  const modelMatrices = useMemo(() => {
+    return translations.map(([translationX, translationY, translationZ]) => {
+      const modelMatrix = new Matrix4();
+      modelMatrix.setTranslate(translationX, translationY, translationZ);
+      return modelMatrix;
+    });
+  }, [translations]);
   const mvpMatrices = useMemo(() => {
     return modelMatrices.map((modelMatrix) =>
       new Matrix4(projMatrix).multiply(viewMatrix).multiply(modelMatrix),
     );
-  }, [modelMatrices, viewMatrix, projMatrix]);
+  }, [projMatrix, viewMatrix, modelMatrices]);
   const [deps, setDeps] = useState<[Float32Array | null]>([null]);
 
   useEffect(() => {
