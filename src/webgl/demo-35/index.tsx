@@ -37,36 +37,17 @@ const Demo35: FC<ComponentProps> = () => {
     ],
   ]);
   const positionsColors = useFloat32Array(points);
-  const [[eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]] =
-    useState<
-      [number, number, number, number, number, number, number, number, number]
-    >([0.2, 0.25, 0.25, 0, 0, 0, 0, 1, 0]);
-  const viewMatrix = useMemo(() => {
-    const viewMatrix = new Matrix4();
-    viewMatrix.setLookAt(
-      eyeX,
-      eyeY,
-      eyeZ,
-      centerX,
-      centerY,
-      centerZ,
-      upX,
-      upY,
-      upZ,
-    );
-    return viewMatrix;
-  }, [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]);
-  const [[angle, rotationX, rotationY, rotationZ]] = useState<
-    [number, number, number, number]
-  >([-10, 0, 0, 1]);
-  const modelMatrix = useMemo(() => {
-    const modelMatrix = new Matrix4();
-    modelMatrix.setRotate(angle, rotationX, rotationY, rotationZ);
-    return modelMatrix;
-  }, [angle, rotationX, rotationY, rotationZ]);
+  const [camera] = useState<
+    [number, number, number, number, number, number, number, number, number]
+  >([0.2, 0.25, 0.25, 0, 0, 0, 0, 1, 0]);
+  const [rotation] = useState<[number, number, number, number]>([-10, 0, 0, 1]);
   const modelViewMatrix = useMemo(() => {
-    return new Matrix4(viewMatrix).multiply(modelMatrix);
-  }, [viewMatrix, modelMatrix]);
+    const [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ] = camera;
+    const [angle, rotationX, rotationY, rotationZ] = rotation;
+    return new Matrix4()
+      .setLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ)
+      .setRotate(angle, rotationX, rotationY, rotationZ);
+  }, []);
   const [deps, setDeps] = useState<[Float32Array | null, Matrix4 | null]>([
     null,
     null,

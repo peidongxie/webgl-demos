@@ -21,8 +21,9 @@ const Demo17: FC<ComponentProps> = () => {
     [0.5, -0.5],
   ]);
   const positions = useFloat32Array(points);
-  const [[scaleX, scaleY, scaleZ]] = useState([1, 1.5, 1]);
+  const [scale] = useState([1, 1.5, 1]);
   const xformMatrix = useMemo(() => {
+    const [scaleX, scaleY, scaleZ] = scale;
     return new Float32Array([
       scaleX,
       0,
@@ -41,7 +42,7 @@ const Demo17: FC<ComponentProps> = () => {
       0,
       1,
     ]);
-  }, [scaleX, scaleY, scaleZ]);
+  }, [scale]);
   const [deps, setDeps] = useState<[Float32Array | null, Float32Array | null]>([
     null,
     null,

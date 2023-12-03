@@ -58,36 +58,19 @@ const Demo46: FC<ComponentProps> = () => {
     ],
   ]);
   const indices = useUint8Array(surfaces);
-  const [[fovy, aspect, near, far], setPerspective] = useState<
+  const [perspective, setPerspective] = useState<
     [number, number, number, number]
   >([30, 1, 1, 100]);
-  const projMatrix = useMemo(() => {
-    const projMatrix = new Matrix4();
-    projMatrix.setPerspective(fovy, aspect, near, far);
-    return projMatrix;
-  }, [fovy, aspect, near, far]);
-  const [[eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]] =
-    useState<
-      [number, number, number, number, number, number, number, number, number]
-    >([3, 3, 7, 0, 0, 0, 0, 1, 0]);
-  const viewMatrix = useMemo(() => {
-    const viewMatrix = new Matrix4();
-    viewMatrix.setLookAt(
-      eyeX,
-      eyeY,
-      eyeZ,
-      centerX,
-      centerY,
-      centerZ,
-      upX,
-      upY,
-      upZ,
-    );
-    return viewMatrix;
-  }, [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]);
+  const [camera] = useState<
+    [number, number, number, number, number, number, number, number, number]
+  >([3, 3, 7, 0, 0, 0, 0, 1, 0]);
   const mvpMatrix = useMemo(() => {
-    return new Matrix4(projMatrix).multiply(viewMatrix);
-  }, [projMatrix, viewMatrix]);
+    const [fovy, aspect, perspectiveNear, perspectiveFar] = perspective;
+    const [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ] = camera;
+    return new Matrix4()
+      .setPerspective(fovy, aspect, perspectiveNear, perspectiveFar)
+      .lookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
+  }, [perspective, camera]);
   const [deps, setDeps] = useState<
     [Float32Array | null, Uint8Array | null, Matrix4 | null]
   >([null, null, null]);

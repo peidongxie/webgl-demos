@@ -30,8 +30,8 @@ const Demo32: FC<ComponentProps> = () => {
   ]);
   const positionsTexCoords = useFloat32Array(points);
   const [src0] = useState<string>(SKY_IMAGE);
-  const [src1] = useState<string>(CIRCLE_IMAGE);
   const image0 = useImage(src0);
+  const [src1] = useState<string>(CIRCLE_IMAGE);
   const image1 = useImage(src1);
   const [deps, setDeps] = useState<
     [
