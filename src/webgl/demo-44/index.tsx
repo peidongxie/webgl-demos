@@ -37,49 +37,28 @@ const Demo44: FC<ComponentProps> = () => {
     ],
   ]);
   const positionsColors = useFloat32Array(points);
-  const [[fovy, aspect, near, far], setPerspective] = useState<
+  const [perspective, setPerspective] = useState<
     [number, number, number, number]
   >([30, 1, 1, 100]);
-  const projMatrix = useMemo(() => {
-    const projMatrix = new Matrix4();
-    projMatrix.setPerspective(fovy, aspect, near, far);
-    return projMatrix;
-  }, [fovy, aspect, near, far]);
-  const [[eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]] =
-    useState<
-      [number, number, number, number, number, number, number, number, number]
-    >([0, 0, 5, 0, 0, -100, 0, 1, 0]);
-  const viewMatrix = useMemo(() => {
-    const viewMatrix = new Matrix4();
-    viewMatrix.setLookAt(
-      eyeX,
-      eyeY,
-      eyeZ,
-      centerX,
-      centerY,
-      centerZ,
-      upX,
-      upY,
-      upZ,
-    );
-    return viewMatrix;
-  }, [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]);
+  const [camera] = useState<
+    [number, number, number, number, number, number, number, number, number]
+  >([0, 0, 5, 0, 0, -100, 0, 1, 0]);
   const [translations] = useState<[number, number, number][]>([
     [0.75, 0, 0],
     [-0.75, 0, 0],
   ]);
-  const modelMatrices = useMemo(() => {
-    return translations.map(([translationX, translationY, translationZ]) => {
-      const modelMatrix = new Matrix4();
-      modelMatrix.setTranslate(translationX, translationY, translationZ);
-      return modelMatrix;
-    });
-  }, [translations]);
   const mvpMatrices = useMemo(() => {
-    return modelMatrices.map((modelMatrix) =>
-      new Matrix4(projMatrix).multiply(viewMatrix).multiply(modelMatrix),
-    );
-  }, [projMatrix, viewMatrix, modelMatrices]);
+    return translations.map((translation) => {
+      const [fovy, aspect, perspectiveNear, perspectiveFar] = perspective;
+      const [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ] =
+        camera;
+      const [translationX, translationY, translationZ] = translation;
+      return new Matrix4()
+        .setPerspective(fovy, aspect, perspectiveNear, perspectiveFar)
+        .lookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ)
+        .translate(translationX, translationY, translationZ);
+    });
+  }, [perspective, camera, translations]);
   const [deps, setDeps] = useState<[Float32Array | null]>([null]);
 
   useEffect(() => {

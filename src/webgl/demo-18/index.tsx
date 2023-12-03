@@ -22,14 +22,11 @@ const Demo18: FC<ComponentProps> = () => {
     [0.5, -0.5],
   ]);
   const positions = useFloat32Array(points);
-  const [[angle, rotationX, rotationY, rotationZ]] = useState<
-    [number, number, number, number]
-  >([90, 0, 0, 1]);
+  const [rotation] = useState<[number, number, number, number]>([90, 0, 0, 1]);
   const xformMatrix = useMemo(() => {
-    const xformMatrix = new Matrix4();
-    xformMatrix.setRotate(angle, rotationX, rotationY, rotationZ);
-    return xformMatrix;
-  }, [angle, rotationX, rotationY, rotationZ]);
+    const [angle, rotationX, rotationY, rotationZ] = rotation;
+    return new Matrix4().setRotate(angle, rotationX, rotationY, rotationZ);
+  }, [rotation]);
   const [deps, setDeps] = useState<[Float32Array | null, Matrix4 | null]>([
     null,
     null,

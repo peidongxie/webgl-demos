@@ -38,14 +38,21 @@ const Demo39: FC<ComponentProps> = () => {
     ],
   ]);
   const positionsColors = useFloat32Array(points);
-  const [[left, right, bottom, top, near, far], setOrtho] = useState<
+  const [orthographic, setOrthographic] = useState<
     [number, number, number, number, number, number]
   >([-0.5, 0.5, -0.5, 0.5, 0, 0.5]);
   const projMatrix = useMemo(() => {
-    const projMatrix = new Matrix4();
-    projMatrix.setOrtho(left, right, bottom, top, near, far);
-    return projMatrix;
-  }, [left, right, bottom, top, near, far]);
+    const [left, right, bottom, top, orthographicNear, orthographicFar] =
+      orthographic;
+    return new Matrix4().setOrtho(
+      left,
+      right,
+      bottom,
+      top,
+      orthographicNear,
+      orthographicFar,
+    );
+  }, [orthographic]);
   const [deps, setDeps] = useState<[Float32Array | null, Matrix4 | null]>([
     null,
     null,
@@ -60,16 +67,16 @@ const Demo39: FC<ComponentProps> = () => {
         max: 1,
         step: 0.01,
         onChange: (value) => {
-          setOrtho((ortho) => {
-            const [left, right, bottom, top] = ortho;
-            const far = ortho[5];
+          setOrthographic((orthographic) => {
+            const [left, right, bottom, top] = orthographic;
+            const orthographicFar = orthographic[5];
             return [
               left,
               right,
               bottom,
               top,
               value - 1 / Number.MAX_SAFE_INTEGER,
-              far,
+              orthographicFar,
             ];
           });
         },
@@ -82,15 +89,15 @@ const Demo39: FC<ComponentProps> = () => {
         max: 1,
         step: 0.01,
         onChange: (value) => {
-          setOrtho((ortho) => {
-            const [left, right, bottom, top] = ortho;
-            const near = ortho[4];
+          setOrthographic((orthographic) => {
+            const [left, right, bottom, top] = orthographic;
+            const orthographicNear = orthographic[4];
             return [
               left,
               right,
               bottom,
               top,
-              near,
+              orthographicNear,
               value + 1 / Number.MAX_SAFE_INTEGER,
             ];
           });

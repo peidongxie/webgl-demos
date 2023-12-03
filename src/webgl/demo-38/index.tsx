@@ -39,15 +39,12 @@ const Demo38: FC<ComponentProps> = () => {
     ],
   ]);
   const positionsColors = useFloat32Array(points);
-  const [
-    [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ],
-    setLookAt,
-  ] = useState<
+  const [camera, setCamera] = useState<
     [number, number, number, number, number, number, number, number, number]
   >([0.2, 0.25, 0.25, 0, 0, 0, 0, 1, 0]);
   const viewMatrix = useMemo(() => {
-    const viewMatrix = new Matrix4();
-    viewMatrix.setLookAt(
+    const [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ] = camera;
+    return new Matrix4().setLookAt(
       eyeX,
       eyeY,
       eyeZ,
@@ -58,16 +55,22 @@ const Demo38: FC<ComponentProps> = () => {
       upY,
       upZ,
     );
-    return viewMatrix;
-  }, [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]);
-  const [[left, right, bottom, top, near, far]] = useState<
+  }, [camera]);
+  const [orthographic] = useState<
     [number, number, number, number, number, number]
   >([-1, 1, -1, 1, 0, 2]);
   const projMatrix = useMemo(() => {
-    const projMatrix = new Matrix4();
-    projMatrix.setOrtho(left, right, bottom, top, near, far);
-    return projMatrix;
-  }, [left, right, bottom, top, near, far]);
+    const [left, right, bottom, top, orthographicNear, orthographicFar] =
+      orthographic;
+    return new Matrix4().setOrtho(
+      left,
+      right,
+      bottom,
+      top,
+      orthographicNear,
+      orthographicFar,
+    );
+  }, [orthographic]);
   const [deps, setDeps] = useState<
     [Float32Array | null, Matrix4 | null, Matrix4 | null]
   >([null, null, null]);
@@ -77,8 +80,10 @@ const Demo38: FC<ComponentProps> = () => {
         type: 'function',
         name: 'LEFT',
         initialValue: () => {
-          setLookAt(
-            ([eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]) => [
+          setCamera((camera) => {
+            const [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ] =
+              camera;
+            return [
               eyeX - 0.01,
               eyeY,
               eyeZ,
@@ -88,16 +93,18 @@ const Demo38: FC<ComponentProps> = () => {
               upX,
               upY,
               upZ,
-            ],
-          );
+            ];
+          });
         },
       },
       {
         type: 'function',
         name: 'RIGHT',
         initialValue: () => {
-          setLookAt(
-            ([eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ]) => [
+          setCamera((camera) => {
+            const [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ] =
+              camera;
+            return [
               eyeX + 0.01,
               eyeY,
               eyeZ,
@@ -107,8 +114,8 @@ const Demo38: FC<ComponentProps> = () => {
               upX,
               upY,
               upZ,
-            ],
-          );
+            ];
+          });
         },
       },
     ];

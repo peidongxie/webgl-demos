@@ -21,9 +21,7 @@ const Demo14: FC<ComponentProps> = () => {
     [0.5, -0.5],
   ]);
   const positions = useFloat32Array(points);
-  const [[translationX, translationY, translationZ]] = useState<
-    [number, number, number]
-  >([0.5, 0.5, 0]);
+  const [translation] = useState<[number, number, number]>([0.5, 0.5, 0]);
   const [deps, setDeps] = useState<
     [Float32Array | null, [number, number, number] | null]
   >([null, null]);
@@ -95,6 +93,7 @@ const Demo14: FC<ComponentProps> = () => {
     /**
      * 数据直接分配到变量
      */
+    const [translationX, translationY, translationZ] = translation;
     gl.uniform4f(
       translationUniform,
       translationX,
@@ -102,8 +101,8 @@ const Demo14: FC<ComponentProps> = () => {
       translationZ,
       0,
     );
-    setDeps((deps) => [deps[0], [translationX, translationY, translationZ]]);
-  }, [translationX, translationY, translationZ]);
+    setDeps((deps) => [deps[0], translation]);
+  }, [translation]);
 
   useEffect(() => {
     const gl = glRef.current;

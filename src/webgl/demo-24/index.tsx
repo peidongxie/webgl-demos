@@ -22,8 +22,8 @@ const Demo24: FC<ComponentProps> = () => {
     [0.5, -0.5, 30],
   ]);
   const [positionsMask] = useState([1, 1, 0]);
-  const [sizesMask] = useState([0, 0, 1]);
   const positions = useFloat32Array(points, positionsMask);
+  const [sizesMask] = useState([0, 0, 1]);
   const sizes = useFloat32Array(points, sizesMask);
   const [deps, setDeps] = useState<[Float32Array | null, Float32Array | null]>([
     null,

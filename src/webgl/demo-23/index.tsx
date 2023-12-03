@@ -34,8 +34,8 @@ const Demo23: FC<ComponentProps> = () => {
   const angleRef = useRef(0);
   const stepRef = useRef(45);
   const modelMatrixRef = useRef<Matrix4 | null>(null);
-  const [deps, setDeps] = useState<[Float32Array | null]>([null]);
   if (!modelMatrixRef.current) modelMatrixRef.current = new Matrix4();
+  const [deps, setDeps] = useState<[Float32Array | null]>([null]);
   const schemas = useMemo<GuiSchema[]>(() => {
     return [
       {

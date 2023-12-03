@@ -46,8 +46,7 @@ const Demo22: FC<ComponentProps> = () => {
     const angleStart = angleRef.current;
     const angleSpan = (stepRef.current * timeSpan) / 1000;
     const angleEnd = angleStart + angleSpan;
-    modelMatrix.setRotate(angleEnd, 0, 0, 1);
-    modelMatrix.translate(0.35, 0, 0);
+    modelMatrix.setRotate(angleEnd, 0, 0, 1).translate(0.35, 0, 0);
     gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
     /**
      * 清空并绘制

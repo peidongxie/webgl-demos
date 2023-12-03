@@ -23,11 +23,11 @@ const Demo15: FC<ComponentProps> = () => {
   ]);
   const positions = useFloat32Array(points);
   const [angle] = useState(90);
-  const [cos, sin] = useMemo(() => {
+  const [cos, sin] = useMemo<[number, number]>(() => {
     const radian = (Math.PI * angle) / 180;
     const cos = Math.cos(radian);
     const sin = Math.sin(radian);
-    return [cos, sin] as const;
+    return [cos, sin];
   }, [angle]);
   const [deps, setDeps] = useState<
     [Float32Array | null, number | null, number | null]
