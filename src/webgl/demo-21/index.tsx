@@ -22,9 +22,9 @@ const Demo21: FC<ComponentProps> = () => {
     [0.5, -0.5],
   ]);
   const positions = useFloat32Array(points);
+  const rotationRef = useRef<[number, number, number, number]>([0, 0, 0, 1]);
+  const velocityRef = useRef(45);
   const timeRef = useRef(Date.now());
-  const angleRef = useRef(0);
-  const stepRef = useRef(45);
   const modelMatrixRef = useRef<Matrix4 | null>(null);
   if (!modelMatrixRef.current) modelMatrixRef.current = new Matrix4();
   const [deps, setDeps] = useState<[Float32Array | null]>([null]);
@@ -40,13 +40,14 @@ const Demo21: FC<ComponentProps> = () => {
     /**
      * 数据直接分配到变量
      */
+    const [angle, rotationX, rotationY, rotationZ] = rotationRef.current;
     const timeEnd = Date.now();
     const timeStart = timeRef.current;
     const timeSpan = timeEnd - timeStart;
-    const angleStart = angleRef.current;
-    const angleSpan = (stepRef.current * timeSpan) / 1000;
+    const angleStart = angle;
+    const angleSpan = (velocityRef.current * timeSpan) / 1000;
     const angleEnd = angleStart + angleSpan;
-    modelMatrix.setRotate(angleEnd, 0, 0, 1);
+    modelMatrix.setRotate(angleEnd, rotationX, rotationY, rotationZ);
     gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
     /**
      * 清空并绘制
