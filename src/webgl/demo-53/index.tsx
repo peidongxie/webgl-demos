@@ -111,7 +111,7 @@ const Demo51: FC<ComponentProps> = () => {
   const modelMatrix = useMemo(() => {
     const [angle, rotationX, rotationY, rotationZ] = rotation;
     return new Matrix4().setRotate(angle, rotationX, rotationY, rotationZ);
-  }, [perspective, camera, rotation]);
+  }, [rotation]);
   const normalMatrix = useMemo(() => {
     const [angle, rotationX, rotationY, rotationZ] = rotation;
     return new Matrix4()

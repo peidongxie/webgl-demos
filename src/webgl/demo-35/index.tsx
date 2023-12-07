@@ -47,7 +47,7 @@ const Demo35: FC<ComponentProps> = () => {
     return new Matrix4()
       .setLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ)
       .setRotate(angle, rotationX, rotationY, rotationZ);
-  }, []);
+  }, [camera, rotation]);
   const [deps, setDeps] = useState<[Float32Array | null, Matrix4 | null]>([
     null,
     null,
