@@ -8,9 +8,9 @@ import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 绘制环境光
+ * 绘制点光源
  */
-const Demo51: FC<ComponentProps> = () => {
+const Demo53: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const positionAttributeRef = useRef(-1);
@@ -115,7 +115,7 @@ const Demo51: FC<ComponentProps> = () => {
   const normalMatrix = useMemo(() => {
     const [angle, rotationX, rotationY, rotationZ] = rotation;
     return new Matrix4()
-      .rotate(angle, rotationX, rotationY, rotationZ)
+      .setRotate(angle, rotationX, rotationY, rotationZ)
       .invert()
       .transpose();
   }, [rotation]);
@@ -446,4 +446,4 @@ const Demo51: FC<ComponentProps> = () => {
   );
 };
 
-export default Demo51;
+export default Demo53;
