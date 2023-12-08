@@ -100,14 +100,14 @@ const Demo54: FC<ComponentProps> = () => {
     ],
   ]);
   const indices = useUint8Array(surfaces);
-  const rotationRef = useRef<[number, number, number, number]>([0, 0, 1, 0]);
   const perspectiveRef = useRef<[number, number, number, number]>([
     30, 1, 1, 100,
   ]);
   const cameraRef = useRef<
     [number, number, number, number, number, number, number, number, number]
   >([3, 3, 7, 0, 0, 0, 0, 1, 0]);
-  const velocityRef = useRef(45);
+  const rotationRef = useRef<[number, number, number, number]>([0, 0, 1, 0]);
+  const velocityRef = useRef(30);
   const timeRef = useRef(Date.now());
   const mvpMatrixRef = useRef<Matrix4 | null>(null);
   if (!mvpMatrixRef.current) mvpMatrixRef.current = new Matrix4();
@@ -136,11 +136,11 @@ const Demo54: FC<ComponentProps> = () => {
     /**
      * 数据直接分配到变量
      */
-    const [angle, rotationX, rotationY, rotationZ] = rotationRef.current;
     const [fovy, aspect, perspectiveNear, perspectiveFar] =
       perspectiveRef.current;
     const [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ] =
       cameraRef.current;
+    const [angle, rotationX, rotationY, rotationZ] = rotationRef.current;
     const timeEnd = Date.now();
     const timeStart = timeRef.current;
     const timeSpan = timeEnd - timeStart;
