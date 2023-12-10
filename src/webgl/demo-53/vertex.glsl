@@ -12,7 +12,7 @@ void main() {
   gl_Position = u_MvpMatrix * a_Position;
   vec3 normal = normalize(vec3(u_NormalMatrix * a_Normal));
   vec4 vertexPosition = u_ModelMatrix * a_Position;
-  vec3 lightDirection = normalize(u_LightPosition - vec3(vertexPosition));
+  vec3 lightDirection = normalize(u_LightPosition - vertexPosition.xyz);
   float nDotL = max(dot(lightDirection, normal), 0.0);
   vec3 diffuse = u_LightColor * a_Color.rgb * nDotL;
   vec3 ambient = u_AmbientLight * a_Color.rgb;
