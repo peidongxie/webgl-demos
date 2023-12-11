@@ -29,6 +29,7 @@ const Demo54: FC<ComponentProps> = () => {
   const normalAttributeRef = useRef(-1);
   const mvpMatrixUniformRef = useRef<WebGLUniformLocation | null>(null);
   const normalMatrixUniformRef = useRef<WebGLUniformLocation | null>(null);
+  const lightColorUniformRef = useRef<WebGLUniformLocation | null>(null);
   const lightDirectionUniformRef = useRef<WebGLUniformLocation | null>(null);
   const positionColorNormalBufferRef = useRef<WebGLBuffer | null>(null);
   const indexBufferRef = useRef<WebGLBuffer | null>(null);
@@ -113,13 +114,23 @@ const Demo54: FC<ComponentProps> = () => {
   if (!mvpMatrixRef.current) mvpMatrixRef.current = new Matrix4();
   const normalMatrixRef = useRef<Matrix4 | null>(null);
   if (!normalMatrixRef.current) normalMatrixRef.current = new Matrix4();
-  const [light] = useState<[number, number, number]>([0.5, 3, 4]);
+  const [light] = useState<[number, number, number, number, number, number]>([
+    1, 1, 1, 0.5, 3, 4,
+  ]);
+  const lightColor = useMemo<[number, number, number]>(() => {
+    return [light[0], light[1], light[2]];
+  }, [light]);
   const lightDirection = useMemo(() => {
-    return new Vector3(light).normalize();
+    return new Vector3([light[3], light[4], light[5]]).normalize();
   }, [light]);
   const [deps, setDeps] = useState<
-    [Float32Array | null, Uint8Array | null, Vector3 | null]
-  >([null, null, null]);
+    [
+      Float32Array | null,
+      Uint8Array | null,
+      [number, number, number] | null,
+      Vector3 | null,
+    ]
+  >([null, null, null, null]);
 
   const tick = useCallback(() => {
     const gl = glRef.current;
@@ -205,6 +216,7 @@ const Demo54: FC<ComponentProps> = () => {
       gl.program,
       'u_NormalMatrix',
     );
+    const lightColorUniform = gl.getUniformLocation(gl.program, 'u_LightColor');
     const lightDirectionUniform = gl.getUniformLocation(
       gl.program,
       'u_LightDirection',
@@ -214,6 +226,7 @@ const Demo54: FC<ComponentProps> = () => {
     normalAttributeRef.current = normalAttribute;
     mvpMatrixUniformRef.current = mvpMatrixUniform;
     normalMatrixUniformRef.current = normalMatrixUniform;
+    lightColorUniformRef.current = lightColorUniform;
     lightDirectionUniformRef.current = lightDirectionUniform;
     /**
      * 缓冲区
@@ -272,7 +285,7 @@ const Demo54: FC<ComponentProps> = () => {
       positionsColorNormals.BYTES_PER_ELEMENT * 6,
     );
     gl.enableVertexAttribArray(normalAttribute);
-    setDeps((deps) => [positionsColorNormals, deps[1], deps[2]]);
+    setDeps((deps) => [positionsColorNormals, deps[1], deps[2], deps[3]]);
   }, [positionsColorNormals]);
 
   useEffect(() => {
@@ -285,8 +298,21 @@ const Demo54: FC<ComponentProps> = () => {
      */
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-    setDeps((deps) => [deps[0], indices, deps[2]]);
+    setDeps((deps) => [deps[0], indices, deps[2], deps[3]]);
   }, [indices]);
+
+  useEffect(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    const lightColorUniform = lightColorUniformRef.current;
+    if (!lightColorUniform) return;
+    /**
+     * 数据直接分配到变量
+     */
+    const [red, green, blue] = lightColor;
+    gl.uniform3f(lightColorUniform, red, green, blue);
+    setDeps((deps) => [deps[0], deps[1], lightColor, deps[3]]);
+  }, [lightColor]);
 
   useEffect(() => {
     const gl = glRef.current;
@@ -297,7 +323,7 @@ const Demo54: FC<ComponentProps> = () => {
      * 数据直接分配到变量
      */
     gl.uniform3fv(lightDirectionUniform, lightDirection.elements);
-    setDeps((deps) => [deps[0], deps[1], lightDirection]);
+    setDeps((deps) => [deps[0], deps[1], deps[2], lightDirection]);
   }, [lightDirection]);
 
   useEffect(() => {

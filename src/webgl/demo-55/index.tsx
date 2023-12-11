@@ -1,16 +1,27 @@
-import { type FC, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  type FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { type ComponentProps } from '../../type';
 import { Matrix4 } from '../lib/cuon-matrix';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
-import { useFloat32Array, useUint8Array } from '../lib/react-utils';
+import {
+  useFloat32Array,
+  useFrameRequest,
+  useUint8Array,
+} from '../lib/react-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 /**
- * 绘制点光源
+ * 绘制多光动画
  */
-const Demo53: FC<ComponentProps> = () => {
+const Demo55: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const positionAttributeRef = useRef(-1);
@@ -92,33 +103,21 @@ const Demo53: FC<ComponentProps> = () => {
     ],
   ]);
   const indices = useUint8Array(surfaces);
-  const [perspective, setPerspective] = useState<
-    [number, number, number, number]
-  >([30, 1, 1, 100]);
-  const [camera] = useState<
+  const perspectiveRef = useRef<[number, number, number, number]>([
+    30, 1, 1, 100,
+  ]);
+  const cameraRef = useRef<
     [number, number, number, number, number, number, number, number, number]
   >([3, 3, 7, 0, 0, 0, 0, 1, 0]);
-  const [rotation] = useState<[number, number, number, number]>([90, 0, 1, 0]);
-  const mvpMatrix = useMemo(() => {
-    const [fovy, aspect, perspectiveNear, perspectiveFar] = perspective;
-    const [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ] = camera;
-    const [angle, rotationX, rotationY, rotationZ] = rotation;
-    return new Matrix4()
-      .setPerspective(fovy, aspect, perspectiveNear, perspectiveFar)
-      .lookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ)
-      .rotate(angle, rotationX, rotationY, rotationZ);
-  }, [perspective, camera, rotation]);
-  const modelMatrix = useMemo(() => {
-    const [angle, rotationX, rotationY, rotationZ] = rotation;
-    return new Matrix4().setRotate(angle, rotationX, rotationY, rotationZ);
-  }, [rotation]);
-  const normalMatrix = useMemo(() => {
-    const [angle, rotationX, rotationY, rotationZ] = rotation;
-    return new Matrix4()
-      .setRotate(angle, rotationX, rotationY, rotationZ)
-      .invert()
-      .transpose();
-  }, [rotation]);
+  const rotationRef = useRef<[number, number, number, number]>([0, 0, 1, 0]);
+  const velocityRef = useRef(30);
+  const timeRef = useRef(Date.now());
+  const mvpMatrixRef = useRef<Matrix4 | null>(null);
+  if (!mvpMatrixRef.current) mvpMatrixRef.current = new Matrix4();
+  const modelMatrixRef = useRef<Matrix4 | null>(null);
+  if (!modelMatrixRef.current) modelMatrixRef.current = new Matrix4();
+  const normalMatrixRef = useRef<Matrix4 | null>(null);
+  if (!normalMatrixRef.current) normalMatrixRef.current = new Matrix4();
   const [lights] = useState<[number, number, number, number, number, number][]>(
     [
       [1, 1, 1, 1.15, 2, 1.75],
@@ -138,26 +137,76 @@ const Demo53: FC<ComponentProps> = () => {
     [
       Float32Array | null,
       Uint8Array | null,
-      Matrix4 | null,
-      Matrix4 | null,
-      Matrix4 | null,
       [number, number, number] | null,
       [number, number, number] | null,
       [number, number, number] | null,
     ]
-  >([null, null, null, null, null, null, null, null]);
+  >([null, null, null, null, null]);
+
+  const tick = useCallback(() => {
+    const gl = glRef.current;
+    if (!gl) return;
+    const mvpMatrixUniform = mvpMatrixUniformRef.current;
+    if (!mvpMatrixUniform) return;
+    const modelMatrixUniform = modelMatrixUniformRef.current;
+    if (!modelMatrixUniform) return;
+    const normalMatrixUniform = normalMatrixUniformRef.current;
+    if (!normalMatrixUniform) return;
+    const mvpMatrix = mvpMatrixRef.current;
+    if (!mvpMatrix) return;
+    const modelMatrix = modelMatrixRef.current;
+    if (!modelMatrix) return;
+    const normalMatrix = normalMatrixRef.current;
+    if (!normalMatrix) return;
+    if (deps.some((dep) => dep === null)) return;
+    /**
+     * 数据直接分配到变量
+     */
+    const [fovy, aspect, perspectiveNear, perspectiveFar] =
+      perspectiveRef.current;
+    const [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ] =
+      cameraRef.current;
+    const [angle, rotationX, rotationY, rotationZ] = rotationRef.current;
+    const timeEnd = Date.now();
+    const timeStart = timeRef.current;
+    const timeSpan = timeEnd - timeStart;
+    const angleStart = angle;
+    const angleSpan = (velocityRef.current * timeSpan) / 1000;
+    const angleEnd = angleStart + angleSpan;
+    mvpMatrix
+      .setPerspective(fovy, aspect, perspectiveNear, perspectiveFar)
+      .lookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ)
+      .rotate(angleEnd, rotationX, rotationY, rotationZ);
+    gl.uniformMatrix4fv(mvpMatrixUniform, false, mvpMatrix.elements);
+    modelMatrix.setRotate(angleEnd, rotationX, rotationY, rotationZ);
+    gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
+    normalMatrix
+      .setRotate(angleEnd, rotationX, rotationY, rotationZ)
+      .invert()
+      .transpose();
+    gl.uniformMatrix4fv(normalMatrixUniform, false, normalMatrix.elements);
+    timeRef.current = timeEnd;
+    rotationRef.current[0] = angleEnd;
+    /**
+     * 清空并绘制
+     */
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.drawElements(gl.TRIANGLES, deps[1]!.length, gl.UNSIGNED_BYTE, 0);
+  }, [deps]);
+
+  useFrameRequest(tick);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
-    setPerspective((perspective) => [
-      perspective[0],
+    perspectiveRef.current = [
+      perspectiveRef.current[0],
       canvas.width / canvas.height,
-      perspective[2],
-      perspective[3],
-    ]);
+      perspectiveRef.current[2],
+      perspectiveRef.current[3],
+    ];
   }, []);
 
   useEffect(() => {
@@ -269,9 +318,6 @@ const Demo53: FC<ComponentProps> = () => {
       deps[2],
       deps[3],
       deps[4],
-      deps[5],
-      deps[6],
-      deps[7],
     ]);
   }, [positionsColorNormals]);
 
@@ -285,80 +331,8 @@ const Demo53: FC<ComponentProps> = () => {
      */
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-    setDeps((deps) => [
-      deps[0],
-      indices,
-      deps[2],
-      deps[3],
-      deps[4],
-      deps[5],
-      deps[6],
-      deps[7],
-    ]);
+    setDeps((deps) => [deps[0], indices, deps[2], deps[3], deps[4]]);
   }, [indices]);
-
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const mvpMatrixUniform = mvpMatrixUniformRef.current;
-    if (!mvpMatrixUniform) return;
-    /**
-     * 数据直接分配到变量
-     */
-    gl.uniformMatrix4fv(mvpMatrixUniform, false, mvpMatrix.elements);
-    setDeps((deps) => [
-      deps[0],
-      deps[1],
-      mvpMatrix,
-      deps[3],
-      deps[4],
-      deps[5],
-      deps[6],
-      deps[7],
-    ]);
-  }, [mvpMatrix]);
-
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const modelMatrixUniform = modelMatrixUniformRef.current;
-    if (!modelMatrixUniform) return;
-    /**
-     * 数据直接分配到变量
-     */
-    gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
-    setDeps((deps) => [
-      deps[0],
-      deps[1],
-      deps[2],
-      modelMatrix,
-      deps[4],
-      deps[5],
-      deps[6],
-      deps[7],
-    ]);
-  }, [modelMatrix]);
-
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const normalMatrixUniform = normalMatrixUniformRef.current;
-    if (!normalMatrixUniform) return;
-    /**
-     * 数据直接分配到变量
-     */
-    gl.uniformMatrix4fv(normalMatrixUniform, false, normalMatrix.elements);
-    setDeps((deps) => [
-      deps[0],
-      deps[1],
-      deps[2],
-      deps[3],
-      normalMatrix,
-      deps[5],
-      deps[6],
-      deps[7],
-    ]);
-  }, [normalMatrix]);
 
   useEffect(() => {
     const gl = glRef.current;
@@ -370,16 +344,7 @@ const Demo53: FC<ComponentProps> = () => {
      */
     const [red, green, blue] = lightColor;
     gl.uniform3f(lightColorUniform, red, green, blue);
-    setDeps((deps) => [
-      deps[0],
-      deps[1],
-      deps[2],
-      deps[3],
-      deps[4],
-      lightColor,
-      deps[6],
-      deps[7],
-    ]);
+    setDeps((deps) => [deps[0], deps[1], lightColor, deps[3], deps[4]]);
   }, [lightColor]);
 
   useEffect(() => {
@@ -392,16 +357,7 @@ const Demo53: FC<ComponentProps> = () => {
      */
     const [x, y, z] = lightPosition;
     gl.uniform3f(lightPositionUniform, x, y, z);
-    setDeps((deps) => [
-      deps[0],
-      deps[1],
-      deps[2],
-      deps[3],
-      deps[4],
-      deps[5],
-      lightPosition,
-      deps[7],
-    ]);
+    setDeps((deps) => [deps[0], deps[1], deps[2], lightPosition, deps[4]]);
   }, [lightPosition]);
 
   useEffect(() => {
@@ -414,16 +370,7 @@ const Demo53: FC<ComponentProps> = () => {
      */
     const [red, green, blue] = ambientLight;
     gl.uniform3f(ambientLightUniform, red, green, blue);
-    setDeps((deps) => [
-      deps[0],
-      deps[1],
-      deps[2],
-      deps[3],
-      deps[4],
-      deps[5],
-      deps[6],
-      ambientLight,
-    ]);
+    setDeps((deps) => [deps[0], deps[1], deps[2], deps[3], ambientLight]);
   }, [ambientLight]);
 
   useEffect(() => {
@@ -446,4 +393,4 @@ const Demo53: FC<ComponentProps> = () => {
   );
 };
 
-export default Demo53;
+export default Demo55;
