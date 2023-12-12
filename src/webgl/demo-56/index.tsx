@@ -7,8 +7,6 @@ import { useFloat32Array, useUint16Array } from '../lib/react-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
-const division = 13;
-
 /**
  * 逐顶点绘制
  */
@@ -26,7 +24,8 @@ const Demo56: FC<ComponentProps> = () => {
   const ambientLightUniformRef = useRef<WebGLUniformLocation | null>(null);
   const positionColorNormalBufferRef = useRef<WebGLBuffer | null>(null);
   const indexBufferRef = useRef<WebGLBuffer | null>(null);
-  const [points] = useState<
+  const [division] = useState(13);
+  const points = useMemo<
     [number, number, number, number, number, number, number, number, number][]
   >(() => {
     const points: [
@@ -55,9 +54,9 @@ const Demo56: FC<ComponentProps> = () => {
       }
     }
     return points;
-  });
+  }, [division]);
   const positionsColorNormals = useFloat32Array(points);
-  const [surfaces] = useState<
+  const surfaces = useMemo<
     [[number, number, number], [number, number, number]][]
   >(() => {
     const surfaces: [[number, number, number], [number, number, number]][] = [];
@@ -71,7 +70,7 @@ const Demo56: FC<ComponentProps> = () => {
       }
     }
     return surfaces;
-  });
+  }, []);
   const indices = useUint16Array(surfaces);
   const [perspective, setPerspective] = useState<
     [number, number, number, number]

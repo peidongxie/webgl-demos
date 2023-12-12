@@ -65,6 +65,9 @@ const WebglDemo51 = lazy(() => import('./webgl/demo-51'));
 const WebglDemo52 = lazy(() => import('./webgl/demo-52'));
 const WebglDemo53 = lazy(() => import('./webgl/demo-53'));
 const WebglDemo54 = lazy(() => import('./webgl/demo-54'));
+const WebglDemo55 = lazy(() => import('./webgl/demo-55'));
+const WebglDemo56 = lazy(() => import('./webgl/demo-56'));
+const WebglDemo57 = lazy(() => import('./webgl/demo-57'));
 const MarsDemo01 = lazy(() => import('./mars/demo-01'));
 const GalaceanDemo01 = lazy(() => import('./galacean/demo-01'));
 const GalaceanDemo02 = lazy(() => import('./galacean/demo-02'));
@@ -504,6 +507,30 @@ const webglChildren: RouteObject[] = [
     element: <WebglDemo54 />,
     loader: (): MatchData => ({
       value: ['54 绘制光照动画', '/demo-54'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-55',
+    element: <WebglDemo55 />,
+    loader: (): MatchData => ({
+      value: ['55 绘制多光动画', '/demo-55'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-56',
+    element: <WebglDemo56 />,
+    loader: (): MatchData => ({
+      value: ['56 逐顶点绘制', '/demo-56'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-57',
+    element: <WebglDemo57 />,
+    loader: (): MatchData => ({
+      value: ['57 逐片元绘制', '/demo-57'],
       children: [],
     }),
   },
