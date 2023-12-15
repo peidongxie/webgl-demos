@@ -69,6 +69,7 @@ const WebglDemo55 = lazy(() => import('./webgl/demo-55'));
 const WebglDemo56 = lazy(() => import('./webgl/demo-56'));
 const WebglDemo57 = lazy(() => import('./webgl/demo-57'));
 const WebglDemo58 = lazy(() => import('./webgl/demo-58'));
+const WebglDemo59 = lazy(() => import('./webgl/demo-59'));
 const MarsDemo01 = lazy(() => import('./mars/demo-01'));
 const GalaceanDemo01 = lazy(() => import('./galacean/demo-01'));
 const GalaceanDemo02 = lazy(() => import('./galacean/demo-02'));
@@ -540,6 +541,14 @@ const webglChildren: RouteObject[] = [
     element: <WebglDemo58 />,
     loader: (): MatchData => ({
       value: ['58 逐片元平行光', '/demo-58'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-59',
+    element: <WebglDemo59 />,
+    loader: (): MatchData => ({
+      value: ['59 逐片元点光源', '/demo-59'],
       children: [],
     }),
   },
