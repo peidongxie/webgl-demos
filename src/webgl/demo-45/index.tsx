@@ -151,8 +151,6 @@ const Demo45: FC<ComponentProps> = () => {
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
-    const viewProjMatrixUniform = viewProjMatrixUniformRef.current;
-    if (!viewProjMatrixUniform) return;
     if (deps.some((dep) => dep === null)) return;
     /**
      * 清空

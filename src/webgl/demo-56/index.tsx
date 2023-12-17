@@ -70,7 +70,7 @@ const Demo56: FC<ComponentProps> = () => {
       }
     }
     return surfaces;
-  }, []);
+  }, [division]);
   const indices = useUint16Array(surfaces);
   const [perspective, setPerspective] = useState<
     [number, number, number, number]
@@ -409,8 +409,6 @@ const Demo56: FC<ComponentProps> = () => {
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
-    const mvpMatrixUniform = mvpMatrixUniformRef.current;
-    if (!mvpMatrixUniform) return;
     if (deps.some((dep) => dep === null)) return;
     /**
      * 清空并绘制
