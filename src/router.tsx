@@ -70,6 +70,7 @@ const WebglDemo56 = lazy(() => import('./webgl/demo-56'));
 const WebglDemo57 = lazy(() => import('./webgl/demo-57'));
 const WebglDemo58 = lazy(() => import('./webgl/demo-58'));
 const WebglDemo59 = lazy(() => import('./webgl/demo-59'));
+const WebglDemo60 = lazy(() => import('./webgl/demo-60'));
 const MarsDemo01 = lazy(() => import('./mars/demo-01'));
 const GalaceanDemo01 = lazy(() => import('./galacean/demo-01'));
 const GalaceanDemo02 = lazy(() => import('./galacean/demo-02'));
@@ -549,6 +550,14 @@ const webglChildren: RouteObject[] = [
     element: <WebglDemo59 />,
     loader: (): MatchData => ({
       value: ['59 逐片元点光源', '/demo-59'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-60',
+    element: <WebglDemo60 />,
+    loader: (): MatchData => ({
+      value: ['60 绘制单关节', '/demo-60'],
       children: [],
     }),
   },
