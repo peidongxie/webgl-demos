@@ -376,8 +376,6 @@ const Demo55: FC<ComponentProps> = () => {
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
-    const mvpMatrixUniform = mvpMatrixUniformRef.current;
-    if (!mvpMatrixUniform) return;
     if (deps.some((dep) => dep === null)) return;
     /**
      * 清空并绘制
