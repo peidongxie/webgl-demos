@@ -41,14 +41,14 @@ const Demo23: FC<ComponentProps> = () => {
     return [
       {
         type: 'function',
-        name: 'UP',
+        name: '逆时针转速增大',
         initialValue: () => {
           velocityRef.current += 10;
         },
       },
       {
         type: 'function',
-        name: 'DOWN',
+        name: '顺时针转速增加',
         initialValue: () => {
           velocityRef.current -= 10;
         },

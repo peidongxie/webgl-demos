@@ -61,7 +61,7 @@ const Demo39: FC<ComponentProps> = () => {
     return [
       {
         type: 'number',
-        name: 'NEAR',
+        name: '可视范围近处',
         initialValue: 0,
         min: -1,
         max: 1,
@@ -83,7 +83,7 @@ const Demo39: FC<ComponentProps> = () => {
       },
       {
         type: 'number',
-        name: 'FAR',
+        name: '可视范围远处',
         initialValue: 0.5,
         min: -1,
         max: 1,

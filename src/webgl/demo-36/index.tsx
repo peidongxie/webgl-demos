@@ -63,7 +63,7 @@ const Demo36: FC<ComponentProps> = () => {
     return [
       {
         type: 'function',
-        name: 'LEFT',
+        name: '相机左移',
         initialValue: () => {
           setCamera((camera) => {
             const [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ] =
@@ -84,7 +84,7 @@ const Demo36: FC<ComponentProps> = () => {
       },
       {
         type: 'function',
-        name: 'RIGHT',
+        name: '相机右移',
         initialValue: () => {
           setCamera((camera) => {
             const [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ] =
