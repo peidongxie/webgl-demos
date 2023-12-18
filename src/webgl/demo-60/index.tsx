@@ -187,7 +187,7 @@ const Demo60: FC<ComponentProps> = () => {
     return [
       {
         type: 'function',
-        name: 'LEFT',
+        name: '模型1顺时针旋转',
         initialValue: () => {
           setRotation1((rotation1) => {
             const [angle1, rotation1X, rotation1Y, rotation1Z] = rotation1;
@@ -197,7 +197,7 @@ const Demo60: FC<ComponentProps> = () => {
       },
       {
         type: 'function',
-        name: 'RIGHT',
+        name: '模型1逆时针旋转',
         initialValue: () => {
           setRotation1((rotation1) => {
             const [angle1, rotation1X, rotation1Y, rotation1Z] = rotation1;
@@ -207,7 +207,7 @@ const Demo60: FC<ComponentProps> = () => {
       },
       {
         type: 'function',
-        name: 'UP',
+        name: '模型2逆时针旋转',
         initialValue: () => {
           setRotation2((rotation2) => {
             const [angle2, rotation2X, rotation2Y, rotation2Z] = rotation2;
@@ -218,7 +218,7 @@ const Demo60: FC<ComponentProps> = () => {
       },
       {
         type: 'function',
-        name: 'DOWN',
+        name: '模型2顺时针旋转',
         initialValue: () => {
           setRotation2((rotation2) => {
             const [angle2, rotation2X, rotation2Y, rotation2Z] = rotation2;
