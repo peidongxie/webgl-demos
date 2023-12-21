@@ -1,10 +1,10 @@
 import { type FC, useEffect, useRef, useState } from 'react';
 
+import { useFloat32Array } from '../../lib/react-utils';
+import { useImage } from '../../lib/react-utils';
 import { type ComponentProps } from '../../type';
 import SKY_IMAGE from '../assets/sky.jpg';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
-import { useFloat32Array } from '../lib/react-utils';
-import { useImage } from '../lib/react-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
