@@ -8,10 +8,10 @@ import {
 } from 'react';
 
 import { type GuiOptions, type GuiSchema, useGui } from '../../lib/gui-utils';
+import { useFloat32Array, useFrameRequest } from '../../lib/react-utils';
 import { type ComponentProps } from '../../type';
 import { Matrix4 } from '../lib/cuon-matrix';
 import { getWebGLContext, initShaders } from '../lib/cuon-utils';
-import { useFloat32Array, useFrameRequest } from '../lib/react-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
