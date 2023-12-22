@@ -143,7 +143,15 @@ const Demo60: FC<ComponentProps> = () => {
       .translate(translation2X, translation2Y, translation2Z)
       .rotate(angle2, rotation2X, rotation2Y, rotation2Z)
       .scale(scale2X, scale2Y, scale2Z);
-  }, [perspective, camera, translation1, rotation1, translation2, rotation2]);
+  }, [
+    perspective,
+    camera,
+    translation1,
+    rotation1,
+    translation2,
+    rotation2,
+    scale2,
+  ]);
   const normalMatrix2 = useMemo(() => {
     const [translation1X, translation1Y, translation1Z] = translation1;
     const [angle1, rotation1X, rotation1Y, rotation1Z] = rotation1;
@@ -158,7 +166,7 @@ const Demo60: FC<ComponentProps> = () => {
       .scale(scale2X, scale2Y, scale2Z)
       .invert()
       .transpose();
-  }, [translation1, rotation1, translation2, rotation2]);
+  }, [translation1, rotation1, translation2, rotation2, scale2]);
   const [lights] = useState<[number, number, number, number, number, number][]>(
     [
       [1, 1, 1, 0, 0.5, 0.7],
@@ -187,21 +195,21 @@ const Demo60: FC<ComponentProps> = () => {
     return [
       {
         type: 'function',
-        name: '模型1顺时针旋转',
-        initialValue: () => {
-          setRotation1((rotation1) => {
-            const [angle1, rotation1X, rotation1Y, rotation1Z] = rotation1;
-            return [angle1 - 3, rotation1X, rotation1Y, rotation1Z];
-          });
-        },
-      },
-      {
-        type: 'function',
         name: '模型1逆时针旋转',
         initialValue: () => {
           setRotation1((rotation1) => {
             const [angle1, rotation1X, rotation1Y, rotation1Z] = rotation1;
             return [angle1 + 3, rotation1X, rotation1Y, rotation1Z];
+          });
+        },
+      },
+      {
+        type: 'function',
+        name: '模型1顺时针旋转',
+        initialValue: () => {
+          setRotation1((rotation1) => {
+            const [angle1, rotation1X, rotation1Y, rotation1Z] = rotation1;
+            return [angle1 - 3, rotation1X, rotation1Y, rotation1Z];
           });
         },
       },

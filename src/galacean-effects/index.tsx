@@ -3,8 +3,8 @@ import { Outlet } from 'react-router-dom';
 
 import { type ComponentProps } from '../type';
 
-const Mars: FC<ComponentProps> = () => {
+const GalaceanEffects: FC<ComponentProps> = () => {
   return <Outlet />;
 };
 
-export default Mars;
+export default GalaceanEffects;
