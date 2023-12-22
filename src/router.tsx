@@ -6,8 +6,8 @@ import {
 } from 'react-router-dom';
 
 import App from './app';
-import Galacean from './galacean';
-import Mars from './mars';
+import GalaceanEffects from './galacean-effects';
+import GalaceanEngine from './galacean-engine';
 import { type MatchData } from './type';
 import Webgl from './webgl';
 
@@ -71,10 +71,10 @@ const WebglDemo57 = lazy(() => import('./webgl/demo-57'));
 const WebglDemo58 = lazy(() => import('./webgl/demo-58'));
 const WebglDemo59 = lazy(() => import('./webgl/demo-59'));
 const WebglDemo60 = lazy(() => import('./webgl/demo-60'));
-const MarsDemo01 = lazy(() => import('./mars/demo-01'));
-const GalaceanDemo01 = lazy(() => import('./galacean/demo-01'));
-const GalaceanDemo02 = lazy(() => import('./galacean/demo-02'));
-const GalaceanDemo03 = lazy(() => import('./galacean/demo-03'));
+const GalaceanEffectsDemo01 = lazy(() => import('./galacean-effects/demo-01'));
+const GalaceanEngineDemo01 = lazy(() => import('./galacean-engine/demo-01'));
+const GalaceanEngineDemo02 = lazy(() => import('./galacean-engine/demo-02'));
+const GalaceanEngineDemo03 = lazy(() => import('./galacean-engine/demo-03'));
 
 const webglChildren: RouteObject[] = [
   {
@@ -563,14 +563,14 @@ const webglChildren: RouteObject[] = [
   },
 ];
 
-const marsChildren: RouteObject[] = [
+const galaceanEffectsChildren: RouteObject[] = [
   {
     path: '*',
     element: null,
   },
   {
     path: 'demo-01',
-    element: <MarsDemo01 />,
+    element: <GalaceanEffectsDemo01 />,
     loader: (): MatchData => ({
       value: ['01 播放动画', '/demo-01'],
       children: [],
@@ -578,14 +578,14 @@ const marsChildren: RouteObject[] = [
   },
 ];
 
-const galaceanChildren: RouteObject[] = [
+const galaceanEngineChildren: RouteObject[] = [
   {
     path: '*',
     element: null,
   },
   {
     path: 'demo-01',
-    element: <GalaceanDemo01 />,
+    element: <GalaceanEngineDemo01 />,
     loader: (): MatchData => ({
       value: ['01 初始化画布', '/demo-01'],
       children: [],
@@ -593,7 +593,7 @@ const galaceanChildren: RouteObject[] = [
   },
   {
     path: 'demo-02',
-    element: <GalaceanDemo02 />,
+    element: <GalaceanEngineDemo02 />,
     loader: (): MatchData => ({
       value: ['02 绘制立方体', '/demo-02'],
       children: [],
@@ -601,7 +601,7 @@ const galaceanChildren: RouteObject[] = [
   },
   {
     path: 'demo-03',
-    element: <GalaceanDemo03 />,
+    element: <GalaceanEngineDemo03 />,
     loader: (): MatchData => ({
       value: ['03 加载模型', '/demo-03'],
       children: [],
@@ -635,28 +635,11 @@ const appChildren: RouteObject[] = [
     children: webglChildren,
   },
   {
-    path: 'mars',
-    element: <Mars />,
+    path: 'galacean-effects',
+    element: <GalaceanEffects />,
     loader: (args): MatchData => ({
-      value: ['Mars', '/mars'],
-      children: marsChildren
-        .map((child) => child.loader?.(args))
-        .filter<MatchData>((childData): childData is MatchData => {
-          if (!childData) return false;
-          if (!Reflect.has(childData, 'value')) return false;
-          if (!Reflect.has(childData, 'children')) return false;
-          return true;
-        })
-        .map((childData) => [childData.value[0], `/mars${childData.value[1]}`]),
-    }),
-    children: marsChildren,
-  },
-  {
-    path: 'galacean',
-    element: <Galacean />,
-    loader: (args): MatchData => ({
-      value: ['Galacean', '/galacean'],
-      children: galaceanChildren
+      value: ['Galacean Effects', '/galacean-effects'],
+      children: galaceanEffectsChildren
         .map((child) => child.loader?.(args))
         .filter<MatchData>((childData): childData is MatchData => {
           if (!childData) return false;
@@ -666,10 +649,30 @@ const appChildren: RouteObject[] = [
         })
         .map((childData) => [
           childData.value[0],
-          `/galacean${childData.value[1]}`,
+          `/galacean-effects${childData.value[1]}`,
         ]),
     }),
-    children: galaceanChildren,
+    children: galaceanEffectsChildren,
+  },
+  {
+    path: 'galacean-engine',
+    element: <GalaceanEngine />,
+    loader: (args): MatchData => ({
+      value: ['Galacean Engine', '/galacean-engine'],
+      children: galaceanEngineChildren
+        .map((child) => child.loader?.(args))
+        .filter<MatchData>((childData): childData is MatchData => {
+          if (!childData) return false;
+          if (!Reflect.has(childData, 'value')) return false;
+          if (!Reflect.has(childData, 'children')) return false;
+          return true;
+        })
+        .map((childData) => [
+          childData.value[0],
+          `/galacean-engine${childData.value[1]}`,
+        ]),
+    }),
+    children: galaceanEngineChildren,
   },
 ];
 
