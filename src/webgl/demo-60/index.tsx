@@ -195,7 +195,7 @@ const Demo60: FC<ComponentProps> = () => {
     return [
       {
         type: 'function',
-        name: '模型1逆时针旋转',
+        name: '手臂逆时针旋转',
         initialValue: () => {
           setRotation1((rotation1) => {
             const [angle1, rotation1X, rotation1Y, rotation1Z] = rotation1;
@@ -205,7 +205,7 @@ const Demo60: FC<ComponentProps> = () => {
       },
       {
         type: 'function',
-        name: '模型1顺时针旋转',
+        name: '手臂顺时针旋转',
         initialValue: () => {
           setRotation1((rotation1) => {
             const [angle1, rotation1X, rotation1Y, rotation1Z] = rotation1;
@@ -215,7 +215,7 @@ const Demo60: FC<ComponentProps> = () => {
       },
       {
         type: 'function',
-        name: '模型2逆时针旋转',
+        name: '前臂逆时针旋转',
         initialValue: () => {
           setRotation2((rotation2) => {
             const [angle2, rotation2X, rotation2Y, rotation2Z] = rotation2;
@@ -226,12 +226,23 @@ const Demo60: FC<ComponentProps> = () => {
       },
       {
         type: 'function',
-        name: '模型2顺时针旋转',
+        name: '前臂顺时针旋转',
         initialValue: () => {
           setRotation2((rotation2) => {
             const [angle2, rotation2X, rotation2Y, rotation2Z] = rotation2;
             if (angle2 <= -135) return rotation2;
             return [angle2 - 3, rotation2X, rotation2Y, rotation2Z];
+          });
+        },
+      },
+      {
+        type: 'function',
+        name: '前臂逆时针旋转',
+        initialValue: () => {
+          setRotation2((rotation2) => {
+            const [angle2, rotation2X, rotation2Y, rotation2Z] = rotation2;
+            if (angle2 >= 135) return rotation2;
+            return [angle2 + 3, rotation2X, rotation2Y, rotation2Z];
           });
         },
       },
