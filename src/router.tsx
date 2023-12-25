@@ -71,6 +71,7 @@ const WebglDemo57 = lazy(() => import('./webgl/demo-57'));
 const WebglDemo58 = lazy(() => import('./webgl/demo-58'));
 const WebglDemo59 = lazy(() => import('./webgl/demo-59'));
 const WebglDemo60 = lazy(() => import('./webgl/demo-60'));
+const WebglDemo61 = lazy(() => import('./webgl/demo-61'));
 const GalaceanEffectsDemo01 = lazy(() => import('./galacean-effects/demo-01'));
 const GalaceanEngineDemo01 = lazy(() => import('./galacean-engine/demo-01'));
 const GalaceanEngineDemo02 = lazy(() => import('./galacean-engine/demo-02'));
@@ -558,6 +559,14 @@ const webglChildren: RouteObject[] = [
     element: <WebglDemo60 />,
     loader: (): MatchData => ({
       value: ['60 绘制单关节', '/demo-60'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-61',
+    element: <WebglDemo61 />,
+    loader: (): MatchData => ({
+      value: ['61 绘制多关节', '/demo-61'],
       children: [],
     }),
   },
