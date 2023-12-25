@@ -5,8 +5,8 @@
   "description": "A collection of WebGL demos",
   "keywords": [
     "WebGL",
-    "Mars",
-    "Galacean"
+    "Galacean Effects",
+    "Galacean Engine"
   ],
   "homepage": "https://github.com/peidongxie/webgl-demos#readme",
   "bugs": {
