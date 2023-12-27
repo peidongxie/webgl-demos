@@ -33,6 +33,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@galacean/effects": "^1.1.3",
+    "@galacean/effects-plugin-model": "^1.1.3",
+    "@galacean/effects-plugin-orientation-transformer": "^1.1.3",
+    "@galacean/effects-plugin-spine": "^1.1.3",
     "@galacean/engine": "1.1.0-beta.1",
     "@galacean/engine-toolkit-controls": "1.1.0-beta.1",
     "@galacean/mars-player": "^2.7.2",
