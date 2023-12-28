@@ -56,9 +56,11 @@ const Demo26: FC<ComponentProps> = () => {
     const positionColorBuffer = gl.createBuffer();
     positionColorBufferRef.current = positionColorBuffer;
     /**
-     * 清空设置
+     * 清空和变量设置
      */
     gl.clearColor(0, 0, 0, 1);
+    positionAttribute >= 0 && gl.enableVertexAttribArray(positionAttribute);
+    colorAttribute >= 0 && gl.enableVertexAttribArray(colorAttribute);
   }, []);
 
   useEffect(() => {
@@ -83,7 +85,6 @@ const Demo26: FC<ComponentProps> = () => {
       positionsColors.BYTES_PER_ELEMENT * 5,
       0,
     );
-    gl.enableVertexAttribArray(positionAttribute);
     gl.vertexAttribPointer(
       colorAttribute,
       3,
@@ -92,7 +93,6 @@ const Demo26: FC<ComponentProps> = () => {
       positionsColors.BYTES_PER_ELEMENT * 5,
       positionsColors.BYTES_PER_ELEMENT * 2,
     );
-    gl.enableVertexAttribArray(colorAttribute);
     setDeps([positionsColors]);
   }, [positionsColors]);
 

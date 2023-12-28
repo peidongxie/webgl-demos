@@ -56,9 +56,11 @@ const Demo25: FC<ComponentProps> = () => {
     const positionSizeBuffer = gl.createBuffer();
     positionSizeBufferRef.current = positionSizeBuffer;
     /**
-     * 清空设置
+     * 清空和变量设置
      */
     gl.clearColor(0, 0, 0, 1);
+    positionAttribute >= 0 && gl.enableVertexAttribArray(positionAttribute);
+    pointSizeAttribute >= 0 && gl.enableVertexAttribArray(pointSizeAttribute);
   }, []);
 
   useEffect(() => {
@@ -83,7 +85,6 @@ const Demo25: FC<ComponentProps> = () => {
       positionsSizes.BYTES_PER_ELEMENT * 3,
       0,
     );
-    gl.enableVertexAttribArray(positionAttribute);
     gl.vertexAttribPointer(
       pointSizeAttribute,
       1,
@@ -92,7 +93,6 @@ const Demo25: FC<ComponentProps> = () => {
       positionsSizes.BYTES_PER_ELEMENT * 3,
       positionsSizes.BYTES_PER_ELEMENT * 2,
     );
-    gl.enableVertexAttribArray(pointSizeAttribute);
     setDeps([positionsSizes]);
   }, [positionsSizes]);
 

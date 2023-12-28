@@ -72,9 +72,11 @@ const Demo29: FC<ComponentProps> = () => {
     const imageTexture = gl.createTexture();
     imageTextureRef.current = imageTexture;
     /**
-     * 清空设置
+     * 清空和变量设置
      */
     gl.clearColor(0, 0, 0, 1);
+    positionAttribute >= 0 && gl.enableVertexAttribArray(positionAttribute);
+    texCoordAttribute >= 0 && gl.enableVertexAttribArray(texCoordAttribute);
   }, []);
 
   useEffect(() => {
@@ -99,7 +101,6 @@ const Demo29: FC<ComponentProps> = () => {
       positionsTexCoords.BYTES_PER_ELEMENT * 4,
       0,
     );
-    gl.enableVertexAttribArray(positionAttribute);
     gl.vertexAttribPointer(
       texCoordAttribute,
       2,
@@ -108,7 +109,6 @@ const Demo29: FC<ComponentProps> = () => {
       positionsTexCoords.BYTES_PER_ELEMENT * 4,
       positionsTexCoords.BYTES_PER_ELEMENT * 2,
     );
-    gl.enableVertexAttribArray(texCoordAttribute);
     setDeps((deps) => [positionsTexCoords, deps[1], deps[2]]);
   }, [positionsTexCoords]);
 
