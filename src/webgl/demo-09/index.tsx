@@ -53,9 +53,10 @@ const Demo09: FC<ComponentProps> = () => {
     const positionBuffer = gl.createBuffer();
     positionBufferRef.current = positionBuffer;
     /**
-     * 清空设置
+     * 清空和变量设置
      */
     gl.clearColor(0, 0, 0, 1);
+    positionAttribute >= 0 && gl.enableVertexAttribArray(positionAttribute);
   }, []);
 
   useEffect(() => {
@@ -71,7 +72,6 @@ const Demo09: FC<ComponentProps> = () => {
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
     gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(positionAttribute);
     setDeps([positions]);
   }, [positions]);
 

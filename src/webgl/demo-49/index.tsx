@@ -146,10 +146,12 @@ const Demo49: FC<ComponentProps> = () => {
     const indexBuffer = gl.createBuffer();
     indexBufferRef.current = indexBuffer;
     /**
-     * 清空和深度设置
+     * 清空、深度和变量设置
      */
     gl.clearColor(0, 0, 0, 1);
     gl.enable(gl.DEPTH_TEST);
+    positionAttribute >= 0 && gl.enableVertexAttribArray(positionAttribute);
+    colorAttribute >= 0 && gl.enableVertexAttribArray(colorAttribute);
   }, []);
 
   useEffect(() => {
@@ -174,7 +176,6 @@ const Demo49: FC<ComponentProps> = () => {
       positionsColors.BYTES_PER_ELEMENT * 6,
       0,
     );
-    gl.enableVertexAttribArray(positionAttribute);
     gl.vertexAttribPointer(
       colorAttribute,
       3,
@@ -183,7 +184,6 @@ const Demo49: FC<ComponentProps> = () => {
       positionsColors.BYTES_PER_ELEMENT * 6,
       positionsColors.BYTES_PER_ELEMENT * 3,
     );
-    gl.enableVertexAttribArray(colorAttribute);
     setDeps((deps) => [positionsColors, deps[1], deps[2]]);
   }, [positionsColors]);
 
