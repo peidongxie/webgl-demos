@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  type MutableRefObject,
+  type RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 type NumberArray = number[] | NumberArray[];
 
@@ -24,18 +32,33 @@ const useFloat32Array = (data: NumberArray, mask?: number[]) => {
   return useMemo(() => new Float32Array(flatArray(data, mask)), [data, mask]);
 };
 
-const useImage = (src: string): HTMLImageElement | null => {
-  const [image, setImage] = useState<HTMLImageElement | null>(null);
+const useWebGLCanvas = (
+  canvasRef: RefObject<HTMLCanvasElement>,
+  glRef: MutableRefObject<WebGLRenderingContext | null>,
+) => {
+  const [aspect, setAspect] = useState(() => {
+    const canvas = canvasRef.current;
+    return canvas ? canvas.width / canvas.height : NaN;
+  });
 
   useEffect(() => {
-    const loader = new Image();
-    const listener = () => setImage(loader);
-    loader.addEventListener('load', listener);
-    loader.src = src;
-    return () => loader.removeEventListener('load', listener);
-  }, [src]);
+    const listener = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) {
+        setAspect(NaN);
+      } else {
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+        glRef.current?.viewport(0, 0, canvas.width, canvas.height);
+        setAspect(canvas.width / canvas.height);
+      }
+    };
+    window.addEventListener('resize', listener);
+    listener();
+    return () => window.removeEventListener('resize', listener);
+  }, []);
 
-  return image;
+  return aspect;
 };
 
 const useFrameRequest = (frameRequest: FrameRequestCallback | null): void => {
@@ -65,10 +88,25 @@ const useFrameRequest = (frameRequest: FrameRequestCallback | null): void => {
   }, [frameRequest, nextFrame]);
 };
 
+const useImage = (src: string): HTMLImageElement | null => {
+  const [image, setImage] = useState<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    const loader = new Image();
+    const listener = () => setImage(loader);
+    loader.addEventListener('load', listener);
+    loader.src = src;
+    return () => loader.removeEventListener('load', listener);
+  }, [src]);
+
+  return image;
+};
+
 export {
   useFloat32Array,
   useFrameRequest,
   useImage,
   useUint8Array,
   useUint16Array,
+  useWebGLCanvas,
 };
