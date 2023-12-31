@@ -18,6 +18,7 @@ const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const glRef = useRef<WebGLRenderingContext | null>(null);
+    const timeoutIdRef = useRef(0);
     const resizeRef = useRef<
       ((canvas: HTMLCanvasElement | null) => void) | null
     >(null);
@@ -32,7 +33,7 @@ const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
     }, []);
 
     useEffect(() => {
-      const listener = () => {
+      const callback = () => {
         const canvas = canvasRef.current;
         if (canvas) {
           canvas.width = canvas.clientWidth;
@@ -41,9 +42,13 @@ const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
         }
         resizeRef.current?.(canvas);
       };
-      window.addEventListener('resize', listener);
-      listener();
-      return () => window.removeEventListener('resize', listener);
+      const listener = () => {
+        window.clearTimeout(timeoutIdRef.current);
+        timeoutIdRef.current = window.setTimeout(callback, 100);
+      };
+      globalThis.addEventListener('resize', listener);
+      callback();
+      return () => globalThis.removeEventListener('resize', listener);
     }, []);
 
     useImperativeHandle<
