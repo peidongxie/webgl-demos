@@ -1,12 +1,4 @@
-import {
-  type MutableRefObject,
-  type RefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type NumberArray = number[] | NumberArray[];
 
@@ -30,35 +22,6 @@ const useUint16Array = (data: NumberArray, mask?: number[]) => {
 
 const useFloat32Array = (data: NumberArray, mask?: number[]) => {
   return useMemo(() => new Float32Array(flatArray(data, mask)), [data, mask]);
-};
-
-const useWebGLCanvas = (
-  canvasRef: RefObject<HTMLCanvasElement>,
-  glRef: MutableRefObject<WebGLRenderingContext | null>,
-) => {
-  const [aspect, setAspect] = useState(() => {
-    const canvas = canvasRef.current;
-    return canvas ? canvas.width / canvas.height : NaN;
-  });
-
-  useEffect(() => {
-    const listener = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) {
-        setAspect(NaN);
-      } else {
-        canvas.width = canvas.clientWidth;
-        canvas.height = canvas.clientHeight;
-        glRef.current?.viewport(0, 0, canvas.width, canvas.height);
-        setAspect(canvas.width / canvas.height);
-      }
-    };
-    window.addEventListener('resize', listener);
-    listener();
-    return () => window.removeEventListener('resize', listener);
-  }, []);
-
-  return aspect;
 };
 
 const useFrameRequest = (frameRequest: FrameRequestCallback | null): void => {
@@ -108,5 +71,4 @@ export {
   useImage,
   useUint8Array,
   useUint16Array,
-  useWebGLCanvas,
 };
