@@ -9,13 +9,19 @@ import {
 import { getWebGLContext } from './cuon-utils';
 
 interface CanvasProps extends HTMLAttributes<HTMLCanvasElement> {
-  onResize?: () => void;
+  onWindowResize?: (canvas: HTMLCanvasElement | null) => void;
 }
 
 const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
   (props, ref) => {
+    const { onWindowResize, ...canvasProps } = props;
+
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const glRef = useRef<WebGLRenderingContext | null>(null);
+    const resizeRef = useRef<
+      ((canvas: HTMLCanvasElement | null) => void) | null
+    >(null);
+    resizeRef.current = onWindowResize || null;
 
     useEffect(() => {
       const canvas = canvasRef.current;
@@ -32,8 +38,8 @@ const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
           canvas.width = canvas.clientWidth;
           canvas.height = canvas.clientHeight;
           glRef.current?.viewport(0, 0, canvas.width, canvas.height);
-          console.log('redraw');
         }
+        resizeRef.current?.(canvas);
       };
       window.addEventListener('resize', listener);
       listener();
@@ -49,7 +55,7 @@ const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
       <canvas
         children={'Please use a browser that supports "canvas"'}
         ref={canvasRef}
-        {...props}
+        {...canvasProps}
       />
     );
   },
