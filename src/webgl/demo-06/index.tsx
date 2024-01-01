@@ -8,7 +8,8 @@ import {
 } from 'react';
 
 import { type ComponentProps } from '../../type';
-import { getWebGLContext, initShaders } from '../lib/cuon-utils';
+import Canvas from '../lib/canvas-component';
+import { initShaders } from '../lib/cuon-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
@@ -16,8 +17,7 @@ import VSHADER_SOURCE from './vertex.glsl?raw';
  * 绘制彩点
  */
 const Demo06: FC<ComponentProps> = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const glRef = useRef<WebGLRenderingContext | null>(null);
+  const glRef = useRef<WebGLRenderingContext>(null);
   const positionAttributeRef = useRef(-1);
   const fragColorUniformRef = useRef<WebGLUniformLocation | null>(null);
   const [points, setPoints] = useState<
@@ -27,7 +27,7 @@ const Demo06: FC<ComponentProps> = () => {
   const handleCanvasMouseDown = useCallback<
     MouseEventHandler<HTMLCanvasElement>
   >((event) => {
-    const canvas = canvasRef.current;
+    const canvas = event.target as HTMLCanvasElement;
     if (!canvas) return;
     const gl = glRef.current;
     if (!gl) return;
@@ -54,21 +54,6 @@ const Demo06: FC<ComponentProps> = () => {
       alpha,
     ];
     setPoints((points) => [...points, point]);
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const gl = glRef.current;
-    if (gl) return;
-    glRef.current = getWebGLContext(canvasRef.current);
   }, []);
 
   useEffect(() => {
@@ -115,13 +100,11 @@ const Demo06: FC<ComponentProps> = () => {
   }, [points]);
 
   return (
-    <canvas
+    <Canvas
       onMouseDown={handleCanvasMouseDown}
-      ref={canvasRef}
+      ref={glRef}
       style={{ width: '100vw', height: '100vh' }}
-    >
-      {'Please use a browser that supports "canvas"'}
-    </canvas>
+    />
   );
 };
 

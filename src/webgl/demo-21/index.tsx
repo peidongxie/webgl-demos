@@ -2,8 +2,9 @@ import { type FC, useCallback, useEffect, useRef, useState } from 'react';
 
 import { useFloat32Array, useFrameRequest } from '../../lib/react-utils';
 import { type ComponentProps } from '../../type';
+import Canvas from '../lib/canvas-component';
 import { Matrix4 } from '../lib/cuon-matrix';
-import { getWebGLContext, initShaders } from '../lib/cuon-utils';
+import { initShaders } from '../lib/cuon-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
@@ -11,8 +12,7 @@ import VSHADER_SOURCE from './vertex.glsl?raw';
  * 绘制动画
  */
 const Demo21: FC<ComponentProps> = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const glRef = useRef<WebGLRenderingContext | null>(null);
+  const glRef = useRef<WebGLRenderingContext>(null);
   const positionAttributeRef = useRef(-1);
   const modelMatrixUniformRef = useRef<WebGLUniformLocation | null>(null);
   const positionBufferRef = useRef<WebGLBuffer | null>(null);
@@ -57,21 +57,6 @@ const Demo21: FC<ComponentProps> = () => {
   }, [deps]);
 
   useFrameRequest(tick);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const gl = glRef.current;
-    if (gl) return;
-    glRef.current = getWebGLContext(canvasRef.current);
-  }, []);
 
   useEffect(() => {
     const gl = glRef.current;
@@ -125,11 +110,7 @@ const Demo21: FC<ComponentProps> = () => {
     tick();
   }, [tick]);
 
-  return (
-    <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>
-      {'Please use a browser that supports "canvas"'}
-    </canvas>
-  );
+  return <Canvas ref={glRef} style={{ width: '100vw', height: '100vh' }} />;
 };
 
 export default Demo21;

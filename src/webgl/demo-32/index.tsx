@@ -5,7 +5,8 @@ import { useImage } from '../../lib/react-utils';
 import { type ComponentProps } from '../../type';
 import CIRCLE_IMAGE from '../assets/circle.gif';
 import SKY_IMAGE from '../assets/sky.jpg';
-import { getWebGLContext, initShaders } from '../lib/cuon-utils';
+import Canvas from '../lib/canvas-component';
+import { initShaders } from '../lib/cuon-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
@@ -13,8 +14,7 @@ import VSHADER_SOURCE from './vertex.glsl?raw';
  * 绘制多纹理
  */
 const Demo32: FC<ComponentProps> = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const glRef = useRef<WebGLRenderingContext | null>(null);
+  const glRef = useRef<WebGLRenderingContext>(null);
   const positionAttributeRef = useRef(-1);
   const texCoordAttributeRef = useRef(-1);
   const sampler0UniformRef = useRef<WebGLUniformLocation | null>(null);
@@ -42,21 +42,6 @@ const Demo32: FC<ComponentProps> = () => {
       HTMLImageElement | null,
     ]
   >([null, null, null, null, null]);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const gl = glRef.current;
-    if (gl) return;
-    glRef.current = getWebGLContext(canvasRef.current);
-  }, []);
 
   useEffect(() => {
     const gl = glRef.current;
@@ -196,11 +181,7 @@ const Demo32: FC<ComponentProps> = () => {
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, Math.floor(deps[0]!.length / 4));
   }, [deps]);
 
-  return (
-    <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>
-      {'Please use a browser that supports "canvas"'}
-    </canvas>
-  );
+  return <Canvas ref={glRef} style={{ width: '100vw', height: '100vh' }} />;
 };
 
 export default Demo32;
