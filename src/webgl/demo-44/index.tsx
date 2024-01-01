@@ -1,9 +1,17 @@
-import { type FC, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  type FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { useFloat32Array } from '../../lib/react-utils';
 import { type ComponentProps } from '../../type';
+import Canvas from '../lib/canvas-component';
 import { Matrix4 } from '../lib/cuon-matrix';
-import { getWebGLContext, initShaders } from '../lib/cuon-utils';
+import { initShaders } from '../lib/cuon-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
@@ -11,8 +19,7 @@ import VSHADER_SOURCE from './vertex.glsl?raw';
  * 消除隐藏面
  */
 const Demo44: FC<ComponentProps> = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const glRef = useRef<WebGLRenderingContext | null>(null);
+  const glRef = useRef<WebGLRenderingContext>(null);
   const positionAttributeRef = useRef(-1);
   const colorAttributeRef = useRef(-1);
   const mvpMatrixUniformRef = useRef<WebGLUniformLocation | null>(null);
@@ -61,25 +68,14 @@ const Demo44: FC<ComponentProps> = () => {
   }, [perspective, camera, translations]);
   const [deps, setDeps] = useState<[Float32Array | null]>([null]);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
+  const handleWindowResize = useCallback((canvas: HTMLCanvasElement | null) => {
     if (!canvas) return;
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
     setPerspective((perspective) => [
       perspective[0],
       canvas.width / canvas.height,
       perspective[2],
       perspective[3],
     ]);
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const gl = glRef.current;
-    if (gl) return;
-    glRef.current = getWebGLContext(canvasRef.current);
   }, []);
 
   useEffect(() => {
@@ -166,9 +162,11 @@ const Demo44: FC<ComponentProps> = () => {
   }, [mvpMatrices, deps]);
 
   return (
-    <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh' }}>
-      {'Please use a browser that supports "canvas"'}
-    </canvas>
+    <Canvas
+      onWindowResize={handleWindowResize}
+      ref={glRef}
+      style={{ width: '100vw', height: '100vh' }}
+    />
   );
 };
 
