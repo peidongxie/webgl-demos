@@ -151,7 +151,12 @@ const Demo23: FC<ComponentProps> = () => {
     tick();
   }, [tick]);
 
-  return <Canvas ref={glRef} style={{ width: '100vw', height: '100vh' }} />;
+  return (
+    <Canvas
+      ref={glRef}
+      style={{ width: '100vw', height: '100vh', backgroundColor: '#000000' }}
+    />
+  );
 };
 
 export default Demo23;

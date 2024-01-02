@@ -33,7 +33,12 @@ const Demo03: FC<ComponentProps> = () => {
     gl.drawArrays(gl.POINTS, 0, 1);
   }, []);
 
-  return <Canvas ref={glRef} style={{ width: '100vw', height: '100vh' }} />;
+  return (
+    <Canvas
+      ref={glRef}
+      style={{ width: '100vw', height: '100vh', backgroundColor: '#000000' }}
+    />
+  );
 };
 
 export default Demo03;

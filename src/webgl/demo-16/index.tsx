@@ -116,7 +116,12 @@ const Demo16: FC<ComponentProps> = () => {
     gl.drawArrays(gl.TRIANGLES, 0, Math.floor(deps[0]!.length / 2));
   }, [deps]);
 
-  return <Canvas ref={glRef} style={{ width: '100vw', height: '100vh' }} />;
+  return (
+    <Canvas
+      ref={glRef}
+      style={{ width: '100vw', height: '100vh', backgroundColor: '#000000' }}
+    />
+  );
 };
 
 export default Demo16;

@@ -84,7 +84,7 @@ const Demo05: FC<ComponentProps> = () => {
     <Canvas
       onMouseDown={handleCanvasMouseDown}
       ref={glRef}
-      style={{ width: '100vw', height: '100vh' }}
+      style={{ width: '100vw', height: '100vh', backgroundColor: '#000000' }}
     />
   );
 };
