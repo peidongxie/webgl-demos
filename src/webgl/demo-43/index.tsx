@@ -164,7 +164,7 @@ const Demo43: FC<ComponentProps> = () => {
     <Canvas
       onWindowResize={handleWindowResize}
       ref={glRef}
-      style={{ width: '100vw', height: '100vh' }}
+      style={{ width: '100vw', height: '100vh', backgroundColor: '#000000' }}
     />
   );
 };
