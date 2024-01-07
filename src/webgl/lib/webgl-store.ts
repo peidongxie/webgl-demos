@@ -37,7 +37,7 @@ const parseStateTree = <S extends { root: unknown }>(
   const callbacks = tree.children
     .map((child) => parseStateTree(child, scope))
     .filter((callback) => callback);
-  if (!callbacks.length) return null;
+  if (tree.key !== 'root' && !callbacks.length) return null;
   return (state: S) => {
     for (const callback of callbacks) callback?.(state);
     tree.value.setValue?.(state);
@@ -46,11 +46,11 @@ const parseStateTree = <S extends { root: unknown }>(
 
 const parseStateStore = <S extends { root: unknown }>(
   store: StateStore<S>,
-): ((newState: Partial<S>) => void) => {
+): ((newState?: Partial<S>) => void) => {
   const tree = buildStateTree<S>(store);
   return (newState) => {
-    const callback = parseStateTree<S>(tree, Reflect.ownKeys(newState));
-    for (const [key, value] of Object.entries(newState)) {
+    const callback = parseStateTree<S>(tree, Reflect.ownKeys(newState || {}));
+    for (const [key, value] of Object.entries(newState || {})) {
       store[key as keyof S].value = value;
     }
     const entries = Object.entries(store).map((entry) => [
