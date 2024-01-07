@@ -28,11 +28,6 @@ const checkInit = (): void => {
   if (glEnums === null) throw 'WebGLDebugUtils.init(ctx) not called';
 };
 
-const mightBeEnum = (value: number): boolean => {
-  checkInit();
-  return !!glEnums?.[value];
-};
-
 const glEnumToString = (value: number): string => {
   checkInit();
   return (
@@ -189,10 +184,4 @@ const makeDebugContext = (
   });
 };
 
-export {
-  glEnumToString,
-  glFunctionArgToString,
-  init,
-  makeDebugContext,
-  mightBeEnum,
-};
+export { makeDebugContext };
