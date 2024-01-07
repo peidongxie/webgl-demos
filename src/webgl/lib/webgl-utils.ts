@@ -18,22 +18,6 @@ const showErrorMsg = (msg: string): void => {
   }
 };
 
-const setupWebGL = (
-  canvas: HTMLCanvasElement,
-  options?: WebGLContextAttributes,
-  onError?: (msg: string) => void,
-): WebGLRenderingContext | null => {
-  const handleCreationError = onError || showErrorMsg;
-  canvas.addEventListener?.(
-    'webglcontextcreationerror',
-    (event) => handleCreationError(event.statusMessage),
-    false,
-  );
-  const context = create3DContext(canvas, options);
-  if (!context) handleCreationError('');
-  return context;
-};
-
 const create3DContext = (
   canvas: HTMLCanvasElement,
   options?: WebGLContextAttributes,
@@ -48,6 +32,22 @@ const create3DContext = (
     }
   }
   return null;
+};
+
+const setupWebGL = (
+  canvas: HTMLCanvasElement,
+  options?: WebGLContextAttributes,
+  onError?: (msg: string) => void,
+): WebGLRenderingContext | null => {
+  const handleCreationError = onError || showErrorMsg;
+  canvas.addEventListener?.(
+    'webglcontextcreationerror',
+    (event) => handleCreationError(event.statusMessage),
+    false,
+  );
+  const context = create3DContext(canvas, options);
+  if (!context) handleCreationError('');
+  return context;
 };
 
 if (!window.requestAnimationFrame) {
@@ -74,4 +74,4 @@ if (!window.cancelAnimationFrame) {
     window.clearTimeout;
 }
 
-export { create3DContext, setupWebGL };
+export { setupWebGL };

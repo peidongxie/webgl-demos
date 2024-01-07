@@ -70,4 +70,4 @@ const getWebGLContext = (
   return debug ? makeDebugContext(gl) : gl;
 };
 
-export { createProgram, getWebGLContext, initShaders };
+export { getWebGLContext, initShaders };
