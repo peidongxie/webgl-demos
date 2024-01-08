@@ -15,7 +15,7 @@ const main = (
   gl: WebGLRenderingContext,
 ): ((newState?: Partial<GlobalState>) => void) => {
   const draw = parseStateStore<GlobalState>({
-    // WebGL 系统
+    // 着色器程序
     root: {
       deps: [],
       value: null,

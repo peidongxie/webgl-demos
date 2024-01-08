@@ -1,5 +1,5 @@
 interface StateItem<S extends { root: unknown }, K extends keyof S> {
-  deps: string[];
+  deps: Exclude<keyof S, K>[];
   value: S[K];
   setValue?: (state: S) => void;
 }
@@ -9,14 +9,14 @@ type StateStore<S extends { root: unknown }> = {
 };
 
 interface StateTree<S extends { root: unknown }> {
-  key: string;
+  key: keyof S;
   value: StateItem<S, keyof S>;
   children: StateTree<S>[];
 }
 
 const buildStateTree = <S extends { root: unknown }>(
   store: StateStore<S>,
-  key = 'root',
+  key: keyof S = 'root',
 ): StateTree<S> => {
   const value = store[key as keyof StateStore<S>];
   const children = (value?.deps || []).map((dep) => buildStateTree(store, dep));
@@ -29,9 +29,9 @@ const buildStateTree = <S extends { root: unknown }>(
 
 const parseStateTree = <S extends { root: unknown }>(
   tree: StateTree<S>,
-  scope: (string | symbol)[],
+  scope: (keyof S)[],
 ): ((state: S) => void) | null => {
-  if (scope.includes(tree.key)) {
+  if (scope.includes(tree.key as keyof S)) {
     return (state: S) => tree.value.setValue?.(state);
   }
   const callbacks = tree.children
@@ -49,7 +49,10 @@ const parseStateStore = <S extends { root: unknown }>(
 ): ((newState?: Partial<S>) => void) => {
   const tree = buildStateTree<S>(store);
   return (newState) => {
-    const callback = parseStateTree<S>(tree, Reflect.ownKeys(newState || {}));
+    const callback = parseStateTree<S>(
+      tree,
+      Reflect.ownKeys(newState || {}) as (keyof S)[],
+    );
     for (const [key, value] of Object.entries(newState || {})) {
       store[key as keyof S].value = value;
     }

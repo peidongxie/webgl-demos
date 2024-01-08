@@ -27,18 +27,7 @@ const Demo01: FC<ComponentProps> = () => {
   useEffect(() => {
     const ctx = ctxRef.current;
     if (!ctx) return;
-    /**
-     * 绘制设置
-     */
     ctx.fillStyle = 'rgba(0, 0, 255, 1)';
-  }, []);
-
-  useEffect(() => {
-    const ctx = ctxRef.current;
-    if (!ctx) return;
-    /**
-     * 绘制
-     */
     ctx.fillRect(120, 10, 150, 150);
   }, []);
 
