@@ -3,26 +3,47 @@ import {
   type HTMLAttributes,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
   useRef,
 } from 'react';
 
 import { getWebGLContext } from './cuon-utils';
 
 interface CanvasProps extends HTMLAttributes<HTMLCanvasElement> {
-  onWindowResize?: (canvas: HTMLCanvasElement | null) => void;
+  onWindowResize?: (canvas?: HTMLCanvasElement) => void;
 }
 
 const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
   (props, ref) => {
     const { onWindowResize, ...canvasProps } = props;
+    useImperativeHandle<
+      WebGLRenderingContext | null,
+      WebGLRenderingContext | null
+    >(ref, () => glRef.current, []);
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const glRef = useRef<WebGLRenderingContext | null>(null);
-    const timeoutIdRef = useRef(0);
-    const resizeRef = useRef<
-      ((canvas: HTMLCanvasElement | null) => void) | null
-    >(null);
-    resizeRef.current = onWindowResize || null;
+    const resizerRef = useRef(() => {});
+    resizerRef.current = () => {
+      const canvas = canvasRef.current;
+      const gl = glRef.current;
+      const callback = onWindowResize;
+      if (!canvas) return callback?.();
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+      gl?.viewport(0, 0, canvas.width, canvas.height);
+      return callback?.(canvas);
+    };
+
+    useLayoutEffect(() => {
+      let timeoutId = 0;
+      const listener = () => {
+        window.clearTimeout(timeoutId);
+        timeoutId = window.setTimeout(resizerRef.current, 1000 / 60);
+      };
+      globalThis.addEventListener('resize', listener);
+      return () => globalThis.removeEventListener('resize', listener);
+    }, []);
 
     useEffect(() => {
       const canvas = canvasRef.current;
@@ -30,31 +51,8 @@ const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
       const gl = glRef.current;
       if (gl) return;
       glRef.current = getWebGLContext(canvasRef.current);
+      resizerRef.current();
     }, []);
-
-    useEffect(() => {
-      const callback = () => {
-        const canvas = canvasRef.current;
-        if (canvas) {
-          canvas.width = canvas.clientWidth;
-          canvas.height = canvas.clientHeight;
-          glRef.current?.viewport(0, 0, canvas.width, canvas.height);
-        }
-        resizeRef.current?.(canvas);
-      };
-      const listener = () => {
-        window.clearTimeout(timeoutIdRef.current);
-        timeoutIdRef.current = window.setTimeout(callback, 100);
-      };
-      globalThis.addEventListener('resize', listener);
-      callback();
-      return () => globalThis.removeEventListener('resize', listener);
-    }, []);
-
-    useImperativeHandle<
-      WebGLRenderingContext | null,
-      WebGLRenderingContext | null
-    >(ref, () => glRef.current, []);
 
     return (
       <canvas
