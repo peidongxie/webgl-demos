@@ -179,7 +179,7 @@ const Demo54: FC<ComponentProps> = () => {
 
   useFrameRequest(tick);
 
-  const handleWindowResize = useCallback((canvas: HTMLCanvasElement | null) => {
+  const handleWindowResize = useCallback((canvas?: HTMLCanvasElement) => {
     if (!canvas) return;
     perspectiveRef.current = [
       perspectiveRef.current[0],

@@ -110,7 +110,7 @@ const Demo49: FC<ComponentProps> = () => {
     [Float32Array | null, Uint8Array | null, Matrix4 | null]
   >([null, null, null]);
 
-  const handleWindowResize = useCallback((canvas: HTMLCanvasElement | null) => {
+  const handleWindowResize = useCallback((canvas?: HTMLCanvasElement) => {
     if (!canvas) return;
     setPerspective((perspective) => [
       perspective[0],

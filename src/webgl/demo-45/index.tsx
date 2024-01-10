@@ -57,7 +57,7 @@ const Demo45: FC<ComponentProps> = () => {
     null,
   ]);
 
-  const handleWindowResize = useCallback((canvas: HTMLCanvasElement | null) => {
+  const handleWindowResize = useCallback((canvas?: HTMLCanvasElement) => {
     if (!canvas) return;
     setPerspective((perspective) => [
       perspective[0],
