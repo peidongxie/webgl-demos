@@ -68,7 +68,7 @@ const Demo43: FC<ComponentProps> = () => {
   }, [perspective, camera, translations]);
   const [deps, setDeps] = useState<[Float32Array | null]>([null]);
 
-  const handleWindowResize = useCallback((canvas: HTMLCanvasElement | null) => {
+  const handleWindowResize = useCallback((canvas?: HTMLCanvasElement) => {
     if (!canvas) return;
     setPerspective((perspective) => [
       perspective[0],

@@ -265,7 +265,7 @@ const Demo60: FC<ComponentProps> = () => {
 
   useGui(schemas, options);
 
-  const handleWindowResize = useCallback((canvas: HTMLCanvasElement | null) => {
+  const handleWindowResize = useCallback((canvas?: HTMLCanvasElement) => {
     if (!canvas) return;
     setPerspective((perspective) => [
       perspective[0],
