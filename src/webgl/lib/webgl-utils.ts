@@ -11,7 +11,7 @@ const showErrorMsg = (msg: string): void => {
   if (container) {
     container.innerHTML = `
       <div style="margin:auto;width:500px;z-index:10000;margin-top:20em;text-align:center;">
-      ${window.WebGLRenderingContext ? OTHER_PROBLEM : GET_A_WEBGL_BROWSER}
+      ${globalThis.WebGLRenderingContext ? OTHER_PROBLEM : GET_A_WEBGL_BROWSER}
       ${msg ? '<br/><br/>Status: ' + msg : ''}
       </div>
     `;
