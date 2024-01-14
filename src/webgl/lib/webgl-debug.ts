@@ -139,7 +139,7 @@ const logErrorMsg = <FuncName extends WebGLRenderingContextFuncName>(
       glFunctionArgToString(funcName, argIndex, argValue),
     )
     .join(', ');
-  window.console?.log?.(
+  globalThis.console?.log?.(
     `WebGL error ${glEnumToString(errValue)} in ${funcName}(${argStr})`,
   );
 };

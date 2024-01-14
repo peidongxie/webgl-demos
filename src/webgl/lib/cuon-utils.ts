@@ -8,14 +8,16 @@ const loadShader = (
 ): WebGLShader | null => {
   const shader = gl.createShader(type);
   if (!shader) {
-    console.log('unable to create shader');
+    globalThis.console.log('unable to create shader');
     return null;
   }
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
   const compiled = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
   if (!compiled) {
-    console.log('Failed to compile shader: ' + gl.getShaderInfoLog(shader));
+    globalThis.console.log(
+      'Failed to compile shader: ' + gl.getShaderInfoLog(shader),
+    );
     gl.deleteShader(shader);
     return null;
   }
@@ -37,7 +39,9 @@ const createProgram = (
   gl.linkProgram(program);
   const linked = gl.getProgramParameter(program, gl.LINK_STATUS);
   if (!linked) {
-    console.log('Failed to link program: ' + gl.getProgramInfoLog(program));
+    globalThis.console.log(
+      'Failed to link program: ' + gl.getProgramInfoLog(program),
+    );
     gl.deleteProgram(program);
     gl.deleteShader(fragmentShader);
     gl.deleteShader(vertexShader);
@@ -53,7 +57,7 @@ const initShaders = (
 ): boolean => {
   const program = createProgram(gl, vshader, fshader);
   if (!program) {
-    console.log('Failed to create program');
+    globalThis.console.log('Failed to create program');
     return false;
   }
   gl.useProgram(program);
