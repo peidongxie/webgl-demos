@@ -55,10 +55,8 @@ const parseStateTree = <S extends BaseState, K extends keyof S>(
           const next = callback?.(state, index);
           if (!next) nextCallbacks.delete(callback);
         }
-        if (typeof tree.value.onChange === 'function') {
-          tree.value.onChange(state, index);
-        }
-        return nextCallbacks.size > 0;
+        if (typeof tree.value.onChange !== 'function') return false;
+        return tree.value.onChange(state, index);
       }
     : null;
 };
@@ -69,7 +67,7 @@ const parseStateStore = <S extends BaseState>(
   const tree = buildStateTree(store, 'root');
   return (action) => {
     const oldState = Object.fromEntries(
-      Object.entries(store).map((entry) => [entry[0], entry[1].value]),
+      Object.entries(store).map((entry) => [entry[0], entry[1].data]),
     ) as S;
     const partialState: Partial<S> =
       typeof action === 'function' ? action(oldState) : action || {};
