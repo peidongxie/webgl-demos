@@ -66,6 +66,7 @@ const useImage = (src: string): HTMLImageElement | null => {
 };
 
 export {
+  flatArray,
   useFloat32Array,
   useFrameRequest,
   useImage,
