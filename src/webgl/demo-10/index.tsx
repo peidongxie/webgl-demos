@@ -13,7 +13,7 @@ import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 interface DemoState extends BaseState {
-  a_Position: number;
+  a_Position: GLint;
   positionBuffer: WebGLBuffer | null;
   positionArray: Float32Array;
   points: [number, number][];
