@@ -18,7 +18,7 @@ import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
 interface DemoState extends BaseState {
-  a_Position: number;
+  a_Position: GLint;
   u_FragColor: WebGLUniformLocation | null;
   points: [number, number, number, number, number, number][];
 }
