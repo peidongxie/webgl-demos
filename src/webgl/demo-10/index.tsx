@@ -41,7 +41,7 @@ const main = (gl: WebGLRenderingContext): StateChangeAction<DemoState> => {
         gl.enableVertexAttribArray(a_Position);
       },
     },
-    // 派生数据：顶点缓冲区
+    // 派生数据：顶点位置缓冲区
     positionBuffer: {
       deps: ['positionArray'],
       data: gl.createBuffer(),
@@ -50,7 +50,7 @@ const main = (gl: WebGLRenderingContext): StateChangeAction<DemoState> => {
         gl.bufferData(gl.ARRAY_BUFFER, positionArray, gl.STATIC_DRAW);
       },
     },
-    // 派生数据：顶点数组
+    // 派生数据：顶点位置数组
     positionArray: {
       deps: ['points'],
       data: new Float32Array(6),
