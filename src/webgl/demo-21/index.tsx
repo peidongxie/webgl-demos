@@ -1,114 +1,155 @@
-import { type FC, useCallback, useEffect, useRef, useState } from 'react';
+import { type FC, useEffect, useRef } from 'react';
 
-import { useFloat32Array, useFrameRequest } from '../../lib/react-utils';
+import { flatArray, useFrameRequest } from '../../lib/react-utils';
 import { type ComponentProps } from '../../type';
 import Canvas from '../lib/canvas-component';
 import { Matrix4 } from '../lib/cuon-matrix';
 import { initShaders } from '../lib/cuon-utils';
+import {
+  type BaseState,
+  parseStateStore,
+  type StateChangeAction,
+} from '../lib/webgl-store';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
+
+interface DemoState extends BaseState {
+  a_Position: GLint;
+  u_ModelMatrix: WebGLUniformLocation | null;
+  positionBuffer: WebGLBuffer | null;
+  positionArray: Float32Array;
+  modelMatrix: Matrix4;
+  points: [number, number][];
+  rotation: [number, number, number, number];
+  velocity: number;
+  time: number;
+}
+
+const main = (gl: WebGLRenderingContext): StateChangeAction<DemoState> => {
+  const draw = parseStateStore<DemoState>({
+    // 着色器程序
+    root: {
+      deps: ['a_Position', 'u_ModelMatrix'],
+      data: () => {
+        gl.clearColor(0, 0, 0, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+      },
+      onChange: ({ points }) => {
+        gl.drawArrays(gl.TRIANGLES, 0, points.length);
+      },
+    },
+    // 着色器变量：a_Position
+    a_Position: {
+      deps: ['positionBuffer'],
+      data: gl.getAttribLocation(gl.program, 'a_Position'),
+      onChange: ({ a_Position }) => {
+        gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(a_Position);
+      },
+    },
+    // 着色器变量：u_ModelMatrix
+    u_ModelMatrix: {
+      deps: ['modelMatrix'],
+      data: gl.getUniformLocation(gl.program, 'u_ModelMatrix'),
+      onChange: ({ u_ModelMatrix, modelMatrix }) => {
+        gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+      },
+    },
+    // 派生数据：顶点位置缓冲区
+    positionBuffer: {
+      deps: ['positionArray'],
+      data: gl.createBuffer(),
+      onChange: ({ positionBuffer, positionArray }) => {
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, positionArray, gl.STATIC_DRAW);
+      },
+    },
+    // 派生数据：顶点位置数组
+    positionArray: {
+      deps: ['points'],
+      data: new Float32Array(6),
+      onChange: ({ positionArray, points }) => {
+        positionArray.set(flatArray(points));
+      },
+    },
+    // 派生数据：变换矩阵
+    modelMatrix: {
+      deps: ['rotation', 'velocity', 'time'],
+      data: new Matrix4(),
+      onChange: ({ modelMatrix, rotation }) => {
+        const [angle, rotationX, rotationY, rotationZ] = rotation;
+        modelMatrix.setRotate(angle, rotationX, rotationY, rotationZ);
+      },
+    },
+    // 原子数据：顶点
+    points: {
+      deps: [],
+      data: [],
+    },
+    // 原子数据：旋转
+    rotation: {
+      deps: [],
+      data: [0, 0, 0, 0],
+    },
+    // 原子数据：速度
+    velocity: {
+      deps: [],
+      data: 0,
+    },
+    // 原子数据：时间
+    time: {
+      deps: [],
+      data: 0,
+    },
+  });
+  return draw;
+};
 
 /**
  * 绘制动画
  */
 const Demo21: FC<ComponentProps> = () => {
   const glRef = useRef<WebGLRenderingContext>(null);
-  const positionAttributeRef = useRef(-1);
-  const modelMatrixUniformRef = useRef<WebGLUniformLocation | null>(null);
-  const positionBufferRef = useRef<WebGLBuffer | null>(null);
-  const [points] = useState<[number, number][]>([
-    [0, 0.5],
-    [-0.5, -0.5],
-    [0.5, -0.5],
-  ]);
-  const positions = useFloat32Array(points);
-  const rotationRef = useRef<[number, number, number, number]>([0, 0, 0, 1]);
-  const velocityRef = useRef(45);
-  const timeRef = useRef(Date.now());
-  const modelMatrixRef = useRef<Matrix4 | null>(null);
-  if (!modelMatrixRef.current) modelMatrixRef.current = new Matrix4();
-  const [deps, setDeps] = useState<[Float32Array | null]>([null]);
-
-  const tick = useCallback(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const modelMatrixUniform = modelMatrixUniformRef.current;
-    if (!modelMatrixUniform) return;
-    const modelMatrix = modelMatrixRef.current;
-    if (!modelMatrix) return;
-    if (deps.some((dep) => dep === null)) return;
-    /**
-     * 数据直接分配到变量
-     */
-    const [angle, rotationX, rotationY, rotationZ] = rotationRef.current;
-    const timeEnd = Date.now();
-    const timeStart = timeRef.current;
-    const timeSpan = timeEnd - timeStart;
-    const angleStart = angle;
-    const angleSpan = (velocityRef.current * timeSpan) / 1000;
-    const angleEnd = angleStart + angleSpan;
-    modelMatrix.setRotate(angleEnd, rotationX, rotationY, rotationZ);
-    gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix.elements);
-    /**
-     * 清空并绘制
-     */
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(deps[0]!.length / 2));
-  }, [deps]);
-
-  useFrameRequest(tick);
+  const drawRef = useRef<StateChangeAction<DemoState> | null>(null);
 
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
     const success = initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE);
     if (!success) return;
-    /**
-     * 变量位置
-     */
-    const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
-    const modelMatrixUniform = gl.getUniformLocation(
-      gl.program,
-      'u_ModelMatrix',
-    );
-    positionAttributeRef.current = positionAttribute;
-    modelMatrixUniformRef.current = modelMatrixUniform;
-    /**
-     * 缓冲区
-     */
-    const positionBuffer = gl.createBuffer();
-    positionBufferRef.current = positionBuffer;
-    /**
-     * 清空和变量设置
-     */
-    gl.clearColor(0, 0, 0, 1);
-    positionAttribute >= 0 && gl.enableVertexAttribArray(positionAttribute);
+    drawRef.current = main(gl);
   }, []);
 
   useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const positionAttribute = positionAttributeRef.current;
-    if (positionAttribute < 0) return;
-    const positionBuffer = positionBufferRef.current;
-    if (!positionBuffer) return;
-    /**
-     * 数据写入缓冲区并分配到变量
-     */
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
-    setDeps([positions]);
-  }, [positions]);
+    const draw = drawRef.current;
+    if (!draw) return;
+    draw({
+      points: [
+        [0, 0.5],
+        [-0.5, -0.5],
+        [0.5, -0.5],
+      ],
+      rotation: [0, 0, 0, 1],
+      velocity: 45,
+      time: Date.now(),
+    });
+  }, []);
 
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    /**
-     * 动画帧
-     */
-    tick();
-  }, [tick]);
+  useFrameRequest(() =>
+    drawRef.current?.(({ rotation, velocity, time }) => {
+      const [angle, rotationX, rotationY, rotationZ] = rotation;
+      const timeEnd = Date.now();
+      const timeStart = time;
+      const timeSpan = timeEnd - timeStart;
+      const angleStart = angle;
+      const angleSpan = (velocity * timeSpan) / 1000;
+      const angleEnd = angleStart + angleSpan;
+      return {
+        rotation: [angleEnd, rotationX, rotationY, rotationZ],
+        time: timeEnd,
+      };
+    }),
+  );
 
   return (
     <Canvas
