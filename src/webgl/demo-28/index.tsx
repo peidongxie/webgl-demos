@@ -1,107 +1,126 @@
-import { type FC, useEffect, useRef, useState } from 'react';
+import { type FC, useEffect, useRef } from 'react';
 
-import { useFloat32Array } from '../../lib/react-utils';
+import { flatArray } from '../../lib/react-utils';
 import { type ComponentProps } from '../../type';
 import Canvas from '../lib/canvas-component';
 import { initShaders } from '../lib/cuon-utils';
+import {
+  type BaseState,
+  parseStateStore,
+  type StateChangeAction,
+} from '../lib/webgl-store';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
+
+interface DemoState extends BaseState {
+  a_Position: GLint;
+  u_Width: WebGLUniformLocation | null;
+  u_Height: WebGLUniformLocation | null;
+  positionBuffer: WebGLBuffer | null;
+  positionArray: Float32Array;
+  points: [number, number][];
+  drawingSize: [number, number];
+}
+
+const main = (gl: WebGLRenderingContext): StateChangeAction<DemoState> => {
+  const draw = parseStateStore<DemoState>({
+    // 着色器程序
+    root: {
+      deps: ['a_Position', 'u_Width', 'u_Height'],
+      data: () => {
+        gl.clearColor(0, 0, 0, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+      },
+      onChange: ({ points }) => {
+        gl.drawArrays(gl.TRIANGLES, 0, points.length);
+      },
+    },
+    // 着色器变量：a_Position
+    a_Position: {
+      deps: ['positionBuffer'],
+      data: gl.getAttribLocation(gl.program, 'a_Position'),
+      onChange: ({ a_Position }) => {
+        gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(a_Position);
+      },
+    },
+    // 着色器变量：u_Width
+    u_Width: {
+      deps: ['drawingSize'],
+      data: gl.getUniformLocation(gl.program, 'u_Width'),
+      onChange: ({ u_Width, drawingSize }) => {
+        gl.uniform1f(u_Width, drawingSize[0]);
+      },
+    },
+    // 着色器变量：u_Height
+    u_Height: {
+      deps: ['drawingSize'],
+      data: gl.getUniformLocation(gl.program, 'u_Height'),
+      onChange: ({ u_Height, drawingSize }) => {
+        gl.uniform1f(u_Height, drawingSize[1]);
+      },
+    },
+    // 派生数据：顶点位置缓冲区
+    positionBuffer: {
+      deps: ['positionArray'],
+      data: gl.createBuffer(),
+      onChange: ({ positionBuffer, positionArray }) => {
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, positionArray, gl.STATIC_DRAW);
+      },
+    },
+    // 派生数据：顶点位置数组
+    positionArray: {
+      deps: ['points'],
+      data: new Float32Array(6),
+      onChange: ({ positionArray, points }) => {
+        positionArray.set(flatArray(points));
+      },
+    },
+    // 原子数据：顶点
+    points: {
+      deps: [],
+      data: [],
+    },
+    // 原子数据：绘制尺寸
+    drawingSize: {
+      deps: [],
+      data: [0, 0],
+    },
+  });
+  return draw;
+};
 
 /**
  * 逐片元渐变
  */
 const Demo28: FC<ComponentProps> = () => {
   const glRef = useRef<WebGLRenderingContext>(null);
-  const positionAttributeRef = useRef(-1);
-  const widthUniformRef = useRef<WebGLUniformLocation | null>(null);
-  const heightUniformRef = useRef<WebGLUniformLocation | null>(null);
-  const positionBufferRef = useRef<WebGLBuffer | null>(null);
-  const [points] = useState<[number, number][]>([
-    [0, 0.5],
-    [-0.5, -0.5],
-    [0.5, -0.5],
-  ]);
-  const positions = useFloat32Array(points);
-  const [deps, setDeps] = useState<
-    [Float32Array | null, number | null, number | null]
-  >([null, null, null]);
+  const drawRef = useRef<StateChangeAction<DemoState> | null>(null);
 
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
     const success = initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE);
     if (!success) return;
-    /**
-     * 变量位置
-     */
-    const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
-    const widthUniform = gl.getUniformLocation(gl.program, 'u_Width');
-    const heightUniform = gl.getUniformLocation(gl.program, 'u_Height');
-    positionAttributeRef.current = positionAttribute;
-    widthUniformRef.current = widthUniform;
-    heightUniformRef.current = heightUniform;
-    /**
-     * 缓冲区
-     */
-    const positionBuffer = gl.createBuffer();
-    positionBufferRef.current = positionBuffer;
-    /**
-     * 清空和变量设置
-     */
-    gl.clearColor(0, 0, 0, 1);
-    positionAttribute >= 0 && gl.enableVertexAttribArray(positionAttribute);
+    drawRef.current = main(gl);
   }, []);
 
   useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const positionAttribute = positionAttributeRef.current;
-    if (positionAttribute < 0) return;
-    const positionBuffer = positionBufferRef.current;
-    if (!positionBuffer) return;
-    /**
-     * 数据写入缓冲区并分配到变量
-     */
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
-    setDeps((deps) => [positions, deps[1], deps[2]]);
-  }, [positions]);
-
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const widthUniform = widthUniformRef.current;
-    if (!widthUniform) return;
-    /**
-     * 数据直接分配到变量
-     */
-    gl.uniform1f(widthUniform, gl.drawingBufferWidth);
-    setDeps((deps) => [deps[0], gl.drawingBufferWidth, deps[2]]);
+    const draw = drawRef.current;
+    if (!draw) return;
+    draw({
+      points: [
+        [0, 0.5],
+        [-0.5, -0.5],
+        [0.5, -0.5],
+      ],
+      drawingSize: [
+        glRef.current!.drawingBufferWidth,
+        glRef.current!.drawingBufferHeight,
+      ],
+    });
   }, []);
-
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const heightUniform = heightUniformRef.current;
-    if (!heightUniform) return;
-    /**
-     * 数据直接分配到变量
-     */
-    gl.uniform1f(heightUniform, gl.drawingBufferHeight);
-    setDeps((deps) => [deps[0], deps[1], gl.drawingBufferHeight]);
-  }, []);
-
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    if (deps.some((dep) => dep === null)) return;
-    /**
-     * 清空并绘制
-     */
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(deps[0]!.length / 2));
-  }, [deps]);
 
   return (
     <Canvas
