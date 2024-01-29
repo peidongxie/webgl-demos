@@ -52,7 +52,6 @@ const main = (gl: WebGLRenderingContext): StateChangeAction<DemoState> => {
         const radian = (Math.PI * angle) / 180;
         const cos = Math.cos(radian);
         gl.uniform1f(u_CosB, cos);
-        gl;
       },
     },
     // 着色器变量：u_SinB
@@ -63,7 +62,6 @@ const main = (gl: WebGLRenderingContext): StateChangeAction<DemoState> => {
         const radian = (Math.PI * angle) / 180;
         const sin = Math.sin(radian);
         gl.uniform1f(u_SinB, sin);
-        gl;
       },
     },
     // 派生数据：顶点位置缓冲区
