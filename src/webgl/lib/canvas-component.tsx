@@ -1,7 +1,6 @@
 import {
   forwardRef,
   type HTMLAttributes,
-  useEffect,
   useImperativeHandle,
   useLayoutEffect,
   useRef,
@@ -16,10 +15,6 @@ interface CanvasProps extends HTMLAttributes<HTMLCanvasElement> {
 const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
   (props, ref) => {
     const { onWindowResize, ...canvasProps } = props;
-    useImperativeHandle<
-      WebGLRenderingContext | null,
-      WebGLRenderingContext | null
-    >(ref, () => glRef.current, []);
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const glRef = useRef<WebGLRenderingContext | null>(null);
@@ -45,7 +40,7 @@ const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
       return () => globalThis.removeEventListener('resize', listener);
     }, []);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       const canvas = canvasRef.current;
       if (!canvas) return;
       const gl = glRef.current;
@@ -53,6 +48,11 @@ const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
       glRef.current = getWebGLContext(canvasRef.current);
       resizerRef.current();
     }, []);
+
+    useImperativeHandle<
+      WebGLRenderingContext | null,
+      WebGLRenderingContext | null
+    >(ref, () => glRef.current, []);
 
     return (
       <canvas
