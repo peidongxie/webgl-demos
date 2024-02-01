@@ -71,7 +71,7 @@ const main = (gl: WebGLRenderingContext): StateChangeAction<DemoState> => {
         positionArray.set(flatArray(points));
       },
     },
-    // 派生数据：变换矩阵
+    // 派生数据：模型矩阵
     modelMatrix: {
       deps: ['rotation', 'translation'],
       data: new Matrix4(),

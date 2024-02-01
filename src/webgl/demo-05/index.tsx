@@ -43,7 +43,7 @@ const main = (gl: WebGLRenderingContext): StateChangeAction<DemoState> => {
       data: gl.getAttribLocation(gl.program, 'a_Position'),
       onChange: ({ a_Position, points }, index) => {
         if (points.length <= index) return false;
-        const [x, y] = points[index];
+        const [x, y] = points[index]!;
         gl.vertexAttrib3f(a_Position, x, y, 0);
         return true;
       },
