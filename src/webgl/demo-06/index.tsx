@@ -44,7 +44,7 @@ const main = (gl: WebGLRenderingContext): StateChangeAction<DemoState> => {
       data: gl.getAttribLocation(gl.program, 'a_Position'),
       onChange: ({ a_Position, points }, index) => {
         if (points.length <= index) return false;
-        const [x, y] = points[index];
+        const [x, y] = points[index]!;
         gl.vertexAttrib3f(a_Position, x, y, 0);
         return true;
       },
@@ -55,8 +55,13 @@ const main = (gl: WebGLRenderingContext): StateChangeAction<DemoState> => {
       data: gl.getUniformLocation(gl.program, 'u_FragColor'),
       onChange: ({ u_FragColor, points }, index) => {
         if (points.length <= index) return false;
-        const [red, green, blue, alpha] = points[index].slice(2);
-        gl.uniform4f(u_FragColor, red, green, blue, alpha);
+        gl.uniform4f(
+          u_FragColor,
+          points[index]![2],
+          points[index]![3],
+          points[index]![4],
+          points[index]![5],
+        );
         return true;
       },
     },

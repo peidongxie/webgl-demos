@@ -571,7 +571,6 @@ const webglChildren: RouteObject[] = [
     }),
   },
 ];
-
 const galaceanEffectsChildren: RouteObject[] = [
   {
     path: '*',
@@ -586,7 +585,6 @@ const galaceanEffectsChildren: RouteObject[] = [
     }),
   },
 ];
-
 const galaceanEngineChildren: RouteObject[] = [
   {
     path: '*',

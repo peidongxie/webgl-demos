@@ -40,7 +40,8 @@ const App: FC<ComponentProps> = () => {
             (entry) => entry[1] === demoValue,
           );
           const nextIndex = index > 0 ? index - 1 : demoEntries.length - 1;
-          navigate(demoEntries[nextIndex][1]);
+          const to = demoEntries[nextIndex]?.[1];
+          to && navigate(to);
         },
       },
       {
@@ -51,7 +52,8 @@ const App: FC<ComponentProps> = () => {
             (entry) => entry[1] === demoValue,
           );
           const nextIndex = (index + 1) % demoEntries.length;
-          navigate(demoEntries[nextIndex][1]);
+          const to = demoEntries[nextIndex]?.[1];
+          to && navigate(to);
         },
       },
     ];
