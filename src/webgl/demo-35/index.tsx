@@ -1,147 +1,182 @@
-import { type FC, useEffect, useMemo, useRef, useState } from 'react';
+import { type FC, useEffect, useRef } from 'react';
 
-import { useFloat32Array } from '../../lib/react-utils';
+import { flatArray } from '../../lib/react-utils';
 import { type ComponentProps } from '../../type';
 import Canvas from '../lib/canvas-component';
 import { Matrix4 } from '../lib/cuon-matrix';
 import { initShaders } from '../lib/cuon-utils';
+import {
+  type BaseState,
+  parseStateStore,
+  type StateChangeAction,
+} from '../lib/webgl-store';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
+
+interface DemoState extends BaseState {
+  a_Position: GLint;
+  a_Color: GLint;
+  u_ModelViewMatrix: WebGLUniformLocation | null;
+  positionColorBuffer: WebGLBuffer | null;
+  positionColorArray: Float32Array;
+  modelViewMatrix: Matrix4;
+  points: [number, number, number, number, number, number][][];
+  camera: [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+  ];
+  rotation: [number, number, number, number];
+}
+
+const main = (gl: WebGLRenderingContext): StateChangeAction<DemoState> => {
+  const draw = parseStateStore<DemoState>({
+    // 着色器程序
+    root: {
+      deps: ['a_Position', 'a_Color', 'u_ModelViewMatrix'],
+      data: () => {
+        gl.clearColor(0, 0, 0, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+      },
+      onChange: ({ points }) => {
+        gl.drawArrays(gl.TRIANGLES, 0, points.flat().length);
+      },
+    },
+    // 着色器变量：a_Position
+    a_Position: {
+      deps: ['positionColorBuffer'],
+      data: gl.getAttribLocation(gl.program, 'a_Position'),
+      onChange: ({ a_Position, positionColorArray }) => {
+        gl.vertexAttribPointer(
+          a_Position,
+          3,
+          gl.FLOAT,
+          false,
+          positionColorArray.BYTES_PER_ELEMENT * 6,
+          0,
+        );
+        gl.enableVertexAttribArray(a_Position);
+      },
+    },
+    // 着色器变量：a_Color
+    a_Color: {
+      deps: ['positionColorBuffer'],
+      data: gl.getAttribLocation(gl.program, 'a_Color'),
+      onChange: ({ a_Color, positionColorArray }) => {
+        gl.vertexAttribPointer(
+          a_Color,
+          3,
+          gl.FLOAT,
+          false,
+          positionColorArray.BYTES_PER_ELEMENT * 6,
+          positionColorArray.BYTES_PER_ELEMENT * 3,
+        );
+        gl.enableVertexAttribArray(a_Color);
+      },
+    },
+    // 着色器变量：u_ModelViewMatrix
+    u_ModelViewMatrix: {
+      deps: ['modelViewMatrix'],
+      data: gl.getUniformLocation(gl.program, 'u_ModelViewMatrix'),
+      onChange: ({ u_ModelViewMatrix, modelViewMatrix }) => {
+        gl.uniformMatrix4fv(u_ModelViewMatrix, false, modelViewMatrix.elements);
+      },
+    },
+    // 派生数据：顶点位置颜色缓冲区
+    positionColorBuffer: {
+      deps: ['positionColorArray'],
+      data: gl.createBuffer(),
+      onChange: ({ positionColorBuffer, positionColorArray }) => {
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionColorBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, positionColorArray, gl.STATIC_DRAW);
+      },
+    },
+    // 派生数据：顶点位置颜色数组
+    positionColorArray: {
+      deps: ['points'],
+      data: new Float32Array(54),
+      onChange: ({ positionColorArray, points }) => {
+        positionColorArray.set(flatArray(points));
+      },
+    },
+    // 派生数据：模型视图矩阵
+    modelViewMatrix: {
+      deps: ['camera', 'rotation'],
+      data: new Matrix4(),
+      onChange: ({ modelViewMatrix, camera, rotation }) => {
+        const [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ] =
+          camera;
+        const [angle, rotationX, rotationY, rotationZ] = rotation;
+        modelViewMatrix
+          .setLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ)
+          .rotate(angle, rotationX, rotationY, rotationZ);
+      },
+    },
+    // 原子数据：顶点
+    points: {
+      deps: [],
+      data: [],
+    },
+    // 原子数据：相机
+    camera: {
+      deps: [],
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    },
+    // 原子数据：旋转
+    rotation: {
+      deps: [],
+      data: [0, 0, 0, 0],
+    },
+  });
+  return draw;
+};
 
 /**
  * 组合观察旋转
  */
 const Demo35: FC<ComponentProps> = () => {
   const glRef = useRef<WebGLRenderingContext>(null);
-  const positionAttributeRef = useRef(-1);
-  const colorAttributeRef = useRef(-1);
-  const modelViewMatrixUniformRef = useRef<WebGLUniformLocation | null>(null);
-  const positionColorBufferRef = useRef<WebGLBuffer | null>(null);
-  const [points] = useState<
-    [number, number, number, number, number, number][][]
-  >([
-    [
-      [0, 0.5, -0.4, 0.4, 1, 0.4],
-      [-0.5, -0.5, -0.4, 0.4, 1, 0.4],
-      [0.5, -0.5, -0.4, 1, 0.4, 0.4],
-    ],
-    [
-      [0.5, 0.4, -0.2, 1, 0.4, 0.4],
-      [-0.5, 0.4, -0.2, 1, 1, 0.4],
-      [0, -0.6, -0.2, 1, 1, 0.4],
-    ],
-    [
-      [0, 0.5, 0, 0.4, 0.4, 1],
-      [-0.5, -0.5, 0, 0.4, 0.4, 1],
-      [0.5, -0.5, 0, 1, 0.4, 0.4],
-    ],
-  ]);
-  const positionsColors = useFloat32Array(points);
-  const [camera] = useState<
-    [number, number, number, number, number, number, number, number, number]
-  >([0.2, 0.25, 0.25, 0, 0, 0, 0, 1, 0]);
-  const [rotation] = useState<[number, number, number, number]>([-10, 0, 0, 1]);
-  const modelViewMatrix = useMemo(() => {
-    const [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ] = camera;
-    const [angle, rotationX, rotationY, rotationZ] = rotation;
-    return new Matrix4()
-      .setLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ)
-      .setRotate(angle, rotationX, rotationY, rotationZ);
-  }, [camera, rotation]);
-  const [deps, setDeps] = useState<[Float32Array | null, Matrix4 | null]>([
-    null,
-    null,
-  ]);
+  const drawRef = useRef<StateChangeAction<DemoState> | null>(null);
 
   useEffect(() => {
     const gl = glRef.current;
     if (!gl) return;
     const success = initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE);
     if (!success) return;
-    /**
-     * 变量位置
-     */
-    const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
-    const colorAttribute = gl.getAttribLocation(gl.program, 'a_Color');
-    const modelViewMatrixUniform = gl.getUniformLocation(
-      gl.program,
-      'u_ModelViewMatrix',
-    );
-    positionAttributeRef.current = positionAttribute;
-    colorAttributeRef.current = colorAttribute;
-    modelViewMatrixUniformRef.current = modelViewMatrixUniform;
-    /**
-     * 缓冲区
-     */
-    const positionColorBuffer = gl.createBuffer();
-    positionColorBufferRef.current = positionColorBuffer;
-    /**
-     * 清空和变量设置
-     */
-    gl.clearColor(0, 0, 0, 1);
-    positionAttribute >= 0 && gl.enableVertexAttribArray(positionAttribute);
-    colorAttribute >= 0 && gl.enableVertexAttribArray(colorAttribute);
+    drawRef.current = main(gl);
   }, []);
 
   useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const positionAttribute = positionAttributeRef.current;
-    if (positionAttribute < 0) return;
-    const colorAttribute = colorAttributeRef.current;
-    if (colorAttribute < 0) return;
-    const positionColorBuffer = positionColorBufferRef.current;
-    if (!positionColorBuffer) return;
-    /**
-     * 数据写入缓冲区并分配到变量
-     */
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionColorBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, positionsColors, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(
-      positionAttribute,
-      3,
-      gl.FLOAT,
-      false,
-      positionsColors.BYTES_PER_ELEMENT * 6,
-      0,
-    );
-    gl.vertexAttribPointer(
-      colorAttribute,
-      3,
-      gl.FLOAT,
-      false,
-      positionsColors.BYTES_PER_ELEMENT * 6,
-      positionsColors.BYTES_PER_ELEMENT * 3,
-    );
-    setDeps((deps) => [positionsColors, deps[1]]);
-  }, [positionsColors]);
-
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const modelViewMatrixUniform = modelViewMatrixUniformRef.current;
-    if (!modelViewMatrixUniform) return;
-    /**
-     * 数据直接分配到变量
-     */
-    gl.uniformMatrix4fv(
-      modelViewMatrixUniform,
-      false,
-      modelViewMatrix.elements,
-    );
-    setDeps((deps) => [deps[0], modelViewMatrix]);
-  }, [modelViewMatrix]);
-
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    if (deps.some((dep) => dep === null)) return;
-    /**
-     * 清空并绘制
-     */
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(deps[0]!.length / 6));
-  }, [deps]);
+    const draw = drawRef.current;
+    if (!draw) return;
+    draw({
+      points: [
+        [
+          [0, 0.5, -0.4, 0.4, 1, 0.4],
+          [-0.5, -0.5, -0.4, 0.4, 1, 0.4],
+          [0.5, -0.5, -0.4, 1, 0.4, 0.4],
+        ],
+        [
+          [0.5, 0.4, -0.2, 1, 0.4, 0.4],
+          [-0.5, 0.4, -0.2, 1, 1, 0.4],
+          [0, -0.6, -0.2, 1, 1, 0.4],
+        ],
+        [
+          [0, 0.5, 0, 0.4, 0.4, 1],
+          [-0.5, -0.5, 0, 0.4, 0.4, 1],
+          [0.5, -0.5, 0, 1, 0.4, 0.4],
+        ],
+      ],
+      camera: [0.2, 0.25, 0.25, 0, 0, 0, 0, 1, 0],
+      rotation: [-10, 0, 0, 1],
+    });
+  }, []);
 
   return (
     <Canvas
