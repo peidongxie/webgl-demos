@@ -13,11 +13,11 @@ class Vector3 {
 
   normalize(): this {
     const a = this.elements;
-    const magnitude = Math.sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2]);
+    const magnitude = Math.sqrt(a[0]! * a[0]! + a[1]! * a[1]! + a[2]! * a[2]!);
     if (magnitude) {
-      a[0] = a[0] / magnitude;
-      a[1] = a[1] / magnitude;
-      a[2] = a[2] / magnitude;
+      a[0] = a[0]! / magnitude;
+      a[1] = a[1]! / magnitude;
+      a[2] = a[2]! / magnitude;
     } else {
       a[0] = 0;
       a[1] = 0;
@@ -96,15 +96,15 @@ class Matrix4 {
     const b = a === other.elements ? a.slice() : other.elements;
     const c = this.elements;
     for (let i = 0; i < 4; i++) {
-      const ai0 = a[i];
-      const ai1 = a[i + 4];
-      const ai2 = a[i + 8];
-      const ai3 = a[i + 12];
+      const ai0 = a[i]!;
+      const ai1 = a[i + 4]!;
+      const ai2 = a[i + 8]!;
+      const ai3 = a[i + 12]!;
       for (let j = 0; j < 4; j++) {
-        const b0j = b[j * 4];
-        const b1j = b[j * 4 + 1];
-        const b2j = b[j * 4 + 2];
-        const b3j = b[j * 4 + 3];
+        const b0j = b[j * 4]!;
+        const b1j = b[j * 4 + 1]!;
+        const b2j = b[j * 4 + 2]!;
+        const b3j = b[j * 4 + 3]!;
         c[i + j * 4] = ai0 * b0j + ai1 * b1j + ai2 * b2j + ai3 * b3j;
       }
     }
@@ -121,13 +121,13 @@ class Matrix4 {
     const result = new Vector3();
     const c = result.elements;
     for (let i = 0; i < 3; i++) {
-      const ai0 = a[i];
-      const ai1 = a[i + 4];
-      const ai2 = a[i + 8];
-      const ai3 = a[i + 12];
-      const b00 = b[0];
-      const b10 = b[1];
-      const b20 = b[2];
+      const ai0 = a[i]!;
+      const ai1 = a[i + 4]!;
+      const ai2 = a[i + 8]!;
+      const ai3 = a[i + 12]!;
+      const b00 = b[0]!;
+      const b10 = b[1]!;
+      const b20 = b[2]!;
       const b30 = 1;
       c[i] = ai0 * b00 + ai1 * b10 + ai2 * b20 + ai3 * b30;
     }
@@ -140,14 +140,14 @@ class Matrix4 {
     const result = new Vector4();
     const c = result.elements;
     for (let i = 0; i < 4; i++) {
-      const ai0 = a[i];
-      const ai1 = a[i + 4];
-      const ai2 = a[i + 8];
-      const ai3 = a[i + 12];
-      const b00 = b[0];
-      const b10 = b[1];
-      const b20 = b[2];
-      const b30 = b[3];
+      const ai0 = a[i]!;
+      const ai1 = a[i + 4]!;
+      const ai2 = a[i + 8]!;
+      const ai3 = a[i + 12]!;
+      const b00 = b[0]!;
+      const b10 = b[1]!;
+      const b20 = b[2]!;
+      const b30 = b[3]!;
       c[i] = ai0 * b00 + ai1 * b10 + ai2 * b20 + ai3 * b30;
     }
     return result;
@@ -158,8 +158,8 @@ class Matrix4 {
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < i; j++) {
         const tmp = a[i + j * 4];
-        a[i + j * 4] = a[i * 4 + j];
-        a[i * 4 + j] = tmp;
+        a[i + j * 4] = a[i * 4 + j]!;
+        a[i * 4 + j] = tmp!;
       }
     }
     return this;
@@ -170,15 +170,15 @@ class Matrix4 {
     const b = new Float32Array(16);
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 4; j++) {
-        const tmp00 = a[(i > 0 ? 0 : 1) * 4 + (j > 0 ? 0 : 1)];
-        const tmp01 = a[(i > 0 ? 0 : 1) * 4 + (j > 1 ? 1 : 2)];
-        const tmp02 = a[(i > 0 ? 0 : 1) * 4 + (j > 2 ? 2 : 3)];
-        const tmp10 = a[(i > 1 ? 1 : 2) * 4 + (j > 0 ? 0 : 1)];
-        const tmp11 = a[(i > 1 ? 1 : 2) * 4 + (j > 1 ? 1 : 2)];
-        const tmp12 = a[(i > 1 ? 1 : 2) * 4 + (j > 2 ? 2 : 3)];
-        const tmp20 = a[(i > 2 ? 2 : 3) * 4 + (j > 0 ? 0 : 1)];
-        const tmp21 = a[(i > 2 ? 2 : 3) * 4 + (j > 1 ? 1 : 2)];
-        const tmp22 = a[(i > 2 ? 2 : 3) * 4 + (j > 2 ? 2 : 3)];
+        const tmp00 = a[(i > 0 ? 0 : 1) * 4 + (j > 0 ? 0 : 1)]!;
+        const tmp01 = a[(i > 0 ? 0 : 1) * 4 + (j > 1 ? 1 : 2)]!;
+        const tmp02 = a[(i > 0 ? 0 : 1) * 4 + (j > 2 ? 2 : 3)]!;
+        const tmp10 = a[(i > 1 ? 1 : 2) * 4 + (j > 0 ? 0 : 1)]!;
+        const tmp11 = a[(i > 1 ? 1 : 2) * 4 + (j > 1 ? 1 : 2)]!;
+        const tmp12 = a[(i > 1 ? 1 : 2) * 4 + (j > 2 ? 2 : 3)]!;
+        const tmp20 = a[(i > 2 ? 2 : 3) * 4 + (j > 0 ? 0 : 1)]!;
+        const tmp21 = a[(i > 2 ? 2 : 3) * 4 + (j > 1 ? 1 : 2)]!;
+        const tmp22 = a[(i > 2 ? 2 : 3) * 4 + (j > 2 ? 2 : 3)]!;
         b[i + j * 4] =
           ((i + j) % 2 ? -1 : 1) *
           (tmp00 * tmp11 * tmp22 +
@@ -189,10 +189,10 @@ class Matrix4 {
             tmp02 * tmp11 * tmp20);
       }
     }
-    const rank = a[0] * b[0] + a[4] * b[1] + a[8] * b[2] + a[12] * b[3];
+    const rank = a[0]! * b[0]! + a[4]! * b[1]! + a[8]! * b[2]! + a[12]! * b[3]!;
     if (rank !== 0) {
       for (let i = 0; i < 16; i++) {
-        this.elements[i] = b[i] / rank;
+        this.elements[i] = b[i]! / rank;
       }
     }
     return this;
@@ -304,7 +304,7 @@ class Matrix4 {
   translate(x: number, y: number, z: number): this {
     const a = this.elements;
     for (let i = 0; i < 4; i++) {
-      a[i + 12] += a[i] * x + a[i + 4] * y + a[i + 8] * z;
+      a[i + 12] += a[i]! * x + a[i + 4]! * y + a[i + 8]! * z;
     }
     return this;
   }
