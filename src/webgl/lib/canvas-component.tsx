@@ -7,11 +7,11 @@ import {
   useRef,
 } from 'react';
 
-import { getWebGLContext } from './cuon-utils';
+import { getWebGLContext, initShaders } from './cuon-utils';
 
 interface CanvasProps extends HTMLAttributes<HTMLCanvasElement> {
-  // glVertexShader: string;
-  // glFragmentShader: string;
+  glVertexShader?: string;
+  glFragmentShader?: string;
   onContextCreate?: (
     canvas: HTMLCanvasElement,
     gl: WebGLRenderingContext,
@@ -28,8 +28,14 @@ interface CanvasProps extends HTMLAttributes<HTMLCanvasElement> {
 
 const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
   (props, ref) => {
-    const { onContextCreate, onProgramInit, onWindowResize, ...canvasProps } =
-      props;
+    const {
+      glVertexShader,
+      glFragmentShader,
+      onContextCreate,
+      onProgramInit,
+      onWindowResize,
+      ...canvasProps
+    } = props;
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const glRef = useRef<WebGLRenderingContext | null>(null);
@@ -55,7 +61,7 @@ const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
       canvas.width = canvas.clientWidth;
       canvas.height = canvas.clientHeight;
       glRef.current.viewport(0, 0, canvas.width, canvas.height);
-      return onProgramInit?.(canvas, glRef.current);
+      return onContextCreate?.(canvas, glRef.current);
     };
     const initRef = useRef(() => {});
     initRef.current = () => {
@@ -65,9 +71,11 @@ const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
       if (!gl) return;
       const program = gl.getParameter(gl.CURRENT_PROGRAM);
       if (program) return;
-      // const success = initShaders(gl, glVertexShader, glFragmentShader);
-      // if (!success) return;
-      return onContextCreate?.(canvas, gl);
+      const shader = !!(glVertexShader && glFragmentShader);
+      if (!shader) return;
+      const success = initShaders(gl, glVertexShader, glFragmentShader);
+      if (!success) return;
+      return onProgramInit?.(canvas, gl);
     };
 
     useLayoutEffect(() => {
