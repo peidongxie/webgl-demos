@@ -1,6 +1,7 @@
 import {
   forwardRef,
   type HTMLAttributes,
+  useEffect,
   useImperativeHandle,
   useLayoutEffect,
   useRef,
@@ -11,7 +12,11 @@ import { getWebGLContext } from './cuon-utils';
 interface CanvasProps extends HTMLAttributes<HTMLCanvasElement> {
   // glVertexShader: string;
   // glFragmentShader: string;
-  onContextInit?: (
+  onContextCreate?: (
+    canvas: HTMLCanvasElement,
+    gl: WebGLRenderingContext,
+  ) => void;
+  onProgramInit?: (
     canvas: HTMLCanvasElement,
     gl: WebGLRenderingContext,
   ) => void;
@@ -23,26 +28,11 @@ interface CanvasProps extends HTMLAttributes<HTMLCanvasElement> {
 
 const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
   (props, ref) => {
-    const { onContextInit, onWindowResize, ...canvasProps } = props;
+    const { onContextCreate, onProgramInit, onWindowResize, ...canvasProps } =
+      props;
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const glRef = useRef<WebGLRenderingContext | null>(null);
-    const initRef = useRef(() => {});
-    initRef.current = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const gl = glRef.current || getWebGLContext(canvas);
-      if (!gl) return;
-      const program = gl.getParameter(gl.CURRENT_PROGRAM);
-      if (program) return;
-      // const success = initShaders(gl, glVertexShader, glFragmentShader);
-      // if (!success) return;
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
-      gl.viewport(0, 0, canvas.width, canvas.height);
-      glRef.current = gl;
-      onContextInit?.(canvas, gl);
-    };
     const resizerRef = useRef(() => {});
     resizerRef.current = () => {
       const canvas = canvasRef.current;
@@ -54,10 +44,31 @@ const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
       gl.viewport(0, 0, canvas.width, canvas.height);
       return onWindowResize?.(canvas, gl);
     };
-
-    useLayoutEffect(() => {
-      initRef.current();
-    }, []);
+    const createRef = useRef(() => {});
+    createRef.current = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const gl = glRef.current;
+      if (gl) return;
+      glRef.current = getWebGLContext(canvas);
+      if (!glRef.current) return;
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+      glRef.current.viewport(0, 0, canvas.width, canvas.height);
+      return onProgramInit?.(canvas, glRef.current);
+    };
+    const initRef = useRef(() => {});
+    initRef.current = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const gl = glRef.current;
+      if (!gl) return;
+      const program = gl.getParameter(gl.CURRENT_PROGRAM);
+      if (program) return;
+      // const success = initShaders(gl, glVertexShader, glFragmentShader);
+      // if (!success) return;
+      return onContextCreate?.(canvas, gl);
+    };
 
     useLayoutEffect(() => {
       let timeoutId = 0;
@@ -67,6 +78,14 @@ const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
       };
       globalThis.addEventListener('resize', listener);
       return () => globalThis.removeEventListener('resize', listener);
+    }, []);
+
+    useLayoutEffect(() => {
+      createRef.current();
+    });
+
+    useEffect(() => {
+      initRef.current();
     }, []);
 
     useImperativeHandle<
