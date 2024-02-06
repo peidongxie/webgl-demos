@@ -71,10 +71,9 @@ const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
       if (!gl) return;
       const program = gl.getParameter(gl.CURRENT_PROGRAM);
       if (program) return;
-      const shader = !!(glVertexShader && glFragmentShader);
-      if (!shader) return;
-      const success = initShaders(gl, glVertexShader, glFragmentShader);
-      if (!success) return;
+      if (glVertexShader && glFragmentShader) {
+        initShaders(gl, glVertexShader, glFragmentShader);
+      }
       return onProgramInit?.(canvas, gl);
     };
 

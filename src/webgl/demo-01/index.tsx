@@ -1,4 +1,4 @@
-import { type FC, useEffect, useRef } from 'react';
+import { type FC, useEffect, useLayoutEffect, useRef } from 'react';
 
 import { type ComponentProps } from '../../type';
 
@@ -9,9 +9,13 @@ const Demo01: FC<ComponentProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    const ctx = ctxRef.current;
+    if (ctx) return;
+    ctxRef.current = canvas.getContext('2d');
+    if (!ctxRef.current) return;
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
   }, []);
@@ -19,12 +23,6 @@ const Demo01: FC<ComponentProps> = () => {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = ctxRef.current;
-    if (ctx) return;
-    ctxRef.current = canvas.getContext('2d');
-  }, []);
-
-  useEffect(() => {
     const ctx = ctxRef.current;
     if (!ctx) return;
     ctx.fillStyle = 'rgba(0, 0, 255, 1)';
