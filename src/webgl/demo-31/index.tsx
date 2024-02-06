@@ -1,10 +1,9 @@
-import { type FC, useEffect, useRef } from 'react';
+import { type FC, useCallback, useEffect, useRef } from 'react';
 
 import { flatArray, useImage } from '../../lib/react-utils';
 import { type ComponentProps } from '../../type';
 import SKY_IMAGE from '../assets/sky.jpg';
 import Canvas from '../lib/canvas-component';
-import { initShaders } from '../lib/cuon-utils';
 import {
   type BaseState,
   parseStateStore,
@@ -24,127 +23,133 @@ interface DemoState extends BaseState {
   picture: [TexImageSource, 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7];
 }
 
-const main = (gl: WebGLRenderingContext): StateChangeAction<DemoState> => {
-  const draw = parseStateStore<DemoState>({
-    // 着色器程序
-    root: {
-      deps: ['a_Position', 'a_TexCoord', 'u_Sampler'],
-      data: () => {
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-        gl.clearColor(0, 0, 0, 1);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-      },
-      onChange: ({ points }) => {
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, points.length);
-      },
-    },
-    // 着色器变量：a_Position
-    a_Position: {
-      deps: ['positionTexCoordBuffer'],
-      data: gl.getAttribLocation(gl.program, 'a_Position'),
-      onChange: ({ a_Position, positionTexCoordArray }) => {
-        gl.vertexAttribPointer(
-          a_Position,
-          2,
-          gl.FLOAT,
-          false,
-          positionTexCoordArray.BYTES_PER_ELEMENT * 4,
-          0,
-        );
-        gl.enableVertexAttribArray(a_Position);
-      },
-    },
-    // 着色器变量：a_TexCoord
-    a_TexCoord: {
-      deps: ['positionTexCoordBuffer'],
-      data: gl.getAttribLocation(gl.program, 'a_TexCoord'),
-      onChange: ({ a_TexCoord, positionTexCoordArray }) => {
-        gl.vertexAttribPointer(
-          a_TexCoord,
-          2,
-          gl.FLOAT,
-          false,
-          positionTexCoordArray.BYTES_PER_ELEMENT * 4,
-          positionTexCoordArray.BYTES_PER_ELEMENT * 2,
-        );
-        gl.enableVertexAttribArray(a_TexCoord);
-      },
-    },
-    // 着色器变量：u_Sampler
-    u_Sampler: {
-      deps: ['samplerTexture'],
-      data: gl.getUniformLocation(gl.program, 'u_Sampler'),
-      onChange: ({ u_Sampler, picture }) => {
-        gl.uniform1i(u_Sampler, picture[1]);
-      },
-    },
-    // 派生数据：顶点位置坐标缓冲区
-    positionTexCoordBuffer: {
-      deps: ['positionTexCoordArray'],
-      data: gl.createBuffer(),
-      onChange: ({ positionTexCoordBuffer, positionTexCoordArray }) => {
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionTexCoordBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, positionTexCoordArray, gl.STATIC_DRAW);
-      },
-    },
-    // 派生数据：采样器纹理
-    samplerTexture: {
-      deps: ['picture'],
-      data: gl.createTexture(),
-      onChange: ({ samplerTexture, picture }) => {
-        const [source, unit] = picture;
-        gl.activeTexture(gl[`TEXTURE${unit}`]);
-        gl.bindTexture(gl.TEXTURE_2D, samplerTexture);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.MIRRORED_REPEAT);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texImage2D(
-          gl.TEXTURE_2D,
-          0,
-          gl.RGB,
-          gl.RGB,
-          gl.UNSIGNED_BYTE,
-          source,
-        );
-      },
-    },
-    // 派生数据：顶点位置坐标数组
-    positionTexCoordArray: {
-      deps: ['points'],
-      data: new Float32Array(16),
-      onChange: ({ positionTexCoordArray, points }) => {
-        positionTexCoordArray.set(flatArray(points));
-      },
-    },
-    // 原子数据：顶点
-    points: {
-      deps: [],
-      data: [],
-    },
-    // 原子数据：图片
-    picture: {
-      deps: [],
-      data: [new Image(), 0],
-    },
-  });
-  return draw;
-};
-
 /**
  * 绘制镜像纹理
  */
 const Demo31: FC<ComponentProps> = () => {
-  const glRef = useRef<WebGLRenderingContext>(null);
   const drawRef = useRef<StateChangeAction<DemoState> | null>(null);
   const image = useImage(SKY_IMAGE);
 
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const success = initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE);
-    if (!success) return;
-    drawRef.current = main(gl);
-  }, []);
+  const handleProgramInit = useCallback(
+    (_: HTMLCanvasElement, gl: WebGLRenderingContext) => {
+      const draw = parseStateStore<DemoState>({
+        // 着色器程序
+        root: {
+          deps: ['a_Position', 'a_TexCoord', 'u_Sampler'],
+          data: () => {
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+            gl.clearColor(0, 0, 0, 1);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+          },
+          onChange: ({ points }) => {
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, points.length);
+          },
+        },
+        // 着色器变量：a_Position
+        a_Position: {
+          deps: ['positionTexCoordBuffer'],
+          data: gl.getAttribLocation(gl.program, 'a_Position'),
+          onChange: ({ a_Position, positionTexCoordArray }) => {
+            gl.vertexAttribPointer(
+              a_Position,
+              2,
+              gl.FLOAT,
+              false,
+              positionTexCoordArray.BYTES_PER_ELEMENT * 4,
+              0,
+            );
+            gl.enableVertexAttribArray(a_Position);
+          },
+        },
+        // 着色器变量：a_TexCoord
+        a_TexCoord: {
+          deps: ['positionTexCoordBuffer'],
+          data: gl.getAttribLocation(gl.program, 'a_TexCoord'),
+          onChange: ({ a_TexCoord, positionTexCoordArray }) => {
+            gl.vertexAttribPointer(
+              a_TexCoord,
+              2,
+              gl.FLOAT,
+              false,
+              positionTexCoordArray.BYTES_PER_ELEMENT * 4,
+              positionTexCoordArray.BYTES_PER_ELEMENT * 2,
+            );
+            gl.enableVertexAttribArray(a_TexCoord);
+          },
+        },
+        // 着色器变量：u_Sampler
+        u_Sampler: {
+          deps: ['samplerTexture'],
+          data: gl.getUniformLocation(gl.program, 'u_Sampler'),
+          onChange: ({ u_Sampler, picture }) => {
+            gl.uniform1i(u_Sampler, picture[1]);
+          },
+        },
+        // 派生数据：顶点位置坐标缓冲区
+        positionTexCoordBuffer: {
+          deps: ['positionTexCoordArray'],
+          data: gl.createBuffer(),
+          onChange: ({ positionTexCoordBuffer, positionTexCoordArray }) => {
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionTexCoordBuffer);
+            gl.bufferData(
+              gl.ARRAY_BUFFER,
+              positionTexCoordArray,
+              gl.STATIC_DRAW,
+            );
+          },
+        },
+        // 派生数据：采样器纹理
+        samplerTexture: {
+          deps: ['picture'],
+          data: gl.createTexture(),
+          onChange: ({ samplerTexture, picture }) => {
+            const [source, unit] = picture;
+            gl.activeTexture(gl[`TEXTURE${unit}`]);
+            gl.bindTexture(gl.TEXTURE_2D, samplerTexture);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(
+              gl.TEXTURE_2D,
+              gl.TEXTURE_WRAP_T,
+              gl.MIRRORED_REPEAT,
+            );
+            gl.texParameteri(
+              gl.TEXTURE_2D,
+              gl.TEXTURE_WRAP_S,
+              gl.CLAMP_TO_EDGE,
+            );
+            gl.texImage2D(
+              gl.TEXTURE_2D,
+              0,
+              gl.RGB,
+              gl.RGB,
+              gl.UNSIGNED_BYTE,
+              source,
+            );
+          },
+        },
+        // 派生数据：顶点位置坐标数组
+        positionTexCoordArray: {
+          deps: ['points'],
+          data: new Float32Array(16),
+          onChange: ({ positionTexCoordArray, points }) => {
+            positionTexCoordArray.set(flatArray(points));
+          },
+        },
+        // 原子数据：顶点
+        points: {
+          deps: [],
+          data: [],
+        },
+        // 原子数据：图片
+        picture: {
+          deps: [],
+          data: [new Image(), 0],
+        },
+      });
+      drawRef.current = draw;
+    },
+    [],
+  );
 
   useEffect(() => {
     const draw = drawRef.current;
@@ -163,7 +168,9 @@ const Demo31: FC<ComponentProps> = () => {
 
   return (
     <Canvas
-      ref={glRef}
+      glVertexShader={VSHADER_SOURCE}
+      glFragmentShader={FSHADER_SOURCE}
+      onProgramInit={handleProgramInit}
       style={{ width: '100vw', height: '100vh', backgroundColor: '#000000' }}
     />
   );
