@@ -1,64 +1,167 @@
-import { type FC, useEffect, useMemo, useRef, useState } from 'react';
+import { type FC, useCallback, useRef } from 'react';
 
-import { type GuiOptions, type GuiSchema, useGui } from '../../lib/gui-utils';
-import { useFloat32Array } from '../../lib/react-utils';
+import { useGui } from '../../lib/gui-utils';
+import { flatArray } from '../../lib/react-utils';
 import { type ComponentProps } from '../../type';
 import Canvas from '../lib/canvas-component';
 import { Matrix4 } from '../lib/cuon-matrix';
-import { initShaders } from '../lib/cuon-utils';
+import {
+  type BaseState,
+  parseStateStore,
+  type StateChangeAction,
+} from '../lib/webgl-store';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
+
+interface DemoState extends BaseState {
+  a_Position: GLint;
+  a_Color: GLint;
+  u_ProjMatrix: WebGLUniformLocation | null;
+  positionColorBuffer: WebGLBuffer | null;
+  positionColorArray: Float32Array;
+  projMatrix: Matrix4;
+  points: [number, number, number, number, number, number][][];
+  orthographic: [number, number, number, number, number, number];
+}
 
 /**
  * 收窄视野
  */
 const Demo40: FC<ComponentProps> = () => {
-  const glRef = useRef<WebGLRenderingContext>(null);
-  const positionAttributeRef = useRef(-1);
-  const colorAttributeRef = useRef(-1);
-  const projMatrixUniformRef = useRef<WebGLUniformLocation | null>(null);
-  const positionColorBufferRef = useRef<WebGLBuffer | null>(null);
-  const [points] = useState<
-    [number, number, number, number, number, number][][]
-  >([
+  const drawRef = useRef<StateChangeAction<DemoState> | null>(null);
+
+  const handleProgramInit = useCallback(
+    (_: HTMLCanvasElement, gl: WebGLRenderingContext) => {
+      const draw = parseStateStore<DemoState>({
+        // 着色器程序
+        root: {
+          deps: ['a_Position', 'a_Color', 'u_ProjMatrix'],
+          data: () => {
+            gl.clearColor(0, 0, 0, 1);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+          },
+          onChange: ({ points }) => {
+            gl.drawArrays(gl.TRIANGLES, 0, points.flat().length);
+          },
+        },
+        // 着色器变量：a_Position
+        a_Position: {
+          deps: ['positionColorBuffer'],
+          data: gl.getAttribLocation(gl.program, 'a_Position'),
+          onChange: ({ a_Position, positionColorArray }) => {
+            gl.vertexAttribPointer(
+              a_Position,
+              3,
+              gl.FLOAT,
+              false,
+              positionColorArray.BYTES_PER_ELEMENT * 6,
+              0,
+            );
+            gl.enableVertexAttribArray(a_Position);
+          },
+        },
+        // 着色器变量：a_Color
+        a_Color: {
+          deps: ['positionColorBuffer'],
+          data: gl.getAttribLocation(gl.program, 'a_Color'),
+          onChange: ({ a_Color, positionColorArray }) => {
+            gl.vertexAttribPointer(
+              a_Color,
+              3,
+              gl.FLOAT,
+              false,
+              positionColorArray.BYTES_PER_ELEMENT * 6,
+              positionColorArray.BYTES_PER_ELEMENT * 3,
+            );
+            gl.enableVertexAttribArray(a_Color);
+          },
+        },
+        // 着色器变量：u_ProjMatrix
+        u_ProjMatrix: {
+          deps: ['projMatrix'],
+          data: gl.getUniformLocation(gl.program, 'u_ProjMatrix'),
+          onChange: ({ u_ProjMatrix, projMatrix }) => {
+            gl.uniformMatrix4fv(u_ProjMatrix, false, projMatrix.elements);
+          },
+        },
+        // 派生数据：顶点位置颜色缓冲区
+        positionColorBuffer: {
+          deps: ['positionColorArray'],
+          data: gl.createBuffer(),
+          onChange: ({ positionColorBuffer, positionColorArray }) => {
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionColorBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, positionColorArray, gl.STATIC_DRAW);
+          },
+        },
+        // 派生数据：顶点位置颜色数组
+        positionColorArray: {
+          deps: ['points'],
+          data: new Float32Array(54),
+          onChange: ({ positionColorArray, points }) => {
+            positionColorArray.set(flatArray(points));
+          },
+        },
+        // 派生数据：投影矩阵
+        projMatrix: {
+          deps: ['orthographic'],
+          data: new Matrix4(),
+          onChange: ({ projMatrix, orthographic }) => {
+            const [
+              left,
+              right,
+              bottom,
+              top,
+              orthographicNear,
+              orthographicFar,
+            ] = orthographic;
+            projMatrix.setOrtho(
+              left,
+              right,
+              bottom,
+              top,
+              orthographicNear,
+              orthographicFar,
+            );
+          },
+        },
+        // 原子数据：顶点
+        points: {
+          deps: [],
+          data: [],
+        },
+        // 原子数据：正视
+        orthographic: {
+          deps: [],
+          data: [0, 0, 0, 0, 0, 0],
+        },
+      });
+      draw({
+        points: [
+          [
+            [0, 0.6, -0.4, 0.4, 1, 0.4],
+            [-0.5, -0.4, -0.4, 0.4, 1, 0.4],
+            [0.5, -0.4, -0.4, 1, 0.4, 0.4],
+          ],
+          [
+            [0.5, 0.4, -0.2, 1, 0.4, 0.4],
+            [-0.5, 0.4, -0.2, 1, 1, 0.4],
+            [0, -0.6, -0.2, 1, 1, 0.4],
+          ],
+          [
+            [0, 0.5, 0, 0.4, 0.4, 1],
+            [-0.5, -0.5, 0, 0.4, 0.4, 1],
+            [0.5, -0.5, 0, 1, 0.4, 0.4],
+          ],
+        ],
+        orthographic: [-0.3, 0.3, -1, 1, 0, 0.5],
+      });
+      drawRef.current = draw;
+    },
+    [],
+  );
+
+  useGui(
     [
-      [0, 0.6, -0.4, 0.4, 1, 0.4],
-      [-0.5, -0.4, -0.4, 0.4, 1, 0.4],
-      [0.5, -0.4, -0.4, 1, 0.4, 0.4],
-    ],
-    [
-      [0.5, 0.4, -0.2, 1, 0.4, 0.4],
-      [-0.5, 0.4, -0.2, 1, 1, 0.4],
-      [0, -0.6, -0.2, 1, 1, 0.4],
-    ],
-    [
-      [0, 0.5, 0, 0.4, 0.4, 1],
-      [-0.5, -0.5, 0, 0.4, 0.4, 1],
-      [0.5, -0.5, 0, 1, 0.4, 0.4],
-    ],
-  ]);
-  const positionsColors = useFloat32Array(points);
-  const [orthographic, setOrthographic] = useState<
-    [number, number, number, number, number, number]
-  >([-0.3, 0.3, -1, 1, 0, 0.5]);
-  const projMatrix = useMemo(() => {
-    const [left, right, bottom, top, orthographicNear, orthographicFar] =
-      orthographic;
-    return new Matrix4().setOrtho(
-      left,
-      right,
-      bottom,
-      top,
-      orthographicNear,
-      orthographicFar,
-    );
-  }, [orthographic]);
-  const [deps, setDeps] = useState<[Float32Array | null, Matrix4 | null]>([
-    null,
-    null,
-  ]);
-  const schemas = useMemo<GuiSchema[]>(() => {
-    return [
       {
         type: 'number',
         name: '可视范围近处',
@@ -67,17 +170,19 @@ const Demo40: FC<ComponentProps> = () => {
         max: 1,
         step: 0.01,
         onChange: (value) => {
-          setOrthographic((orthographic) => {
-            const [left, right, bottom, top] = orthographic;
-            const orthographicFar = orthographic[5];
-            return [
-              left,
-              right,
-              bottom,
-              top,
-              value - 1 / Number.MAX_SAFE_INTEGER,
-              orthographicFar,
-            ];
+          const draw = drawRef.current;
+          if (!draw) return;
+          draw(({ orthographic }) => {
+            return {
+              orthographic: [
+                orthographic[0],
+                orthographic[1],
+                orthographic[2],
+                orthographic[3],
+                value - 1 / Number.MAX_SAFE_INTEGER,
+                orthographic[5],
+              ],
+            };
           });
         },
       },
@@ -89,118 +194,34 @@ const Demo40: FC<ComponentProps> = () => {
         max: 1,
         step: 0.01,
         onChange: (value) => {
-          setOrthographic((orthographic) => {
-            const [left, right, bottom, top] = orthographic;
-            const orthographicNear = orthographic[4];
-            return [
-              left,
-              right,
-              bottom,
-              top,
-              orthographicNear,
-              value + 1 / Number.MAX_SAFE_INTEGER,
-            ];
+          const draw = drawRef.current;
+          if (!draw) return;
+          draw(({ orthographic }) => {
+            return {
+              orthographic: [
+                orthographic[0],
+                orthographic[1],
+                orthographic[2],
+                orthographic[3],
+                orthographic[4],
+                value + 1 / Number.MAX_SAFE_INTEGER,
+              ],
+            };
           });
         },
       },
-    ];
-  }, []);
-  const options = useMemo<GuiOptions>(
-    () => ({
+    ],
+    {
       container: '#gui-demo',
       title: '可视空间控件',
-    }),
-    [],
+    },
   );
-
-  useGui(schemas, options);
-
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const success = initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE);
-    if (!success) return;
-    /**
-     * 变量位置
-     */
-    const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
-    const colorAttribute = gl.getAttribLocation(gl.program, 'a_Color');
-    const projMatrixUniform = gl.getUniformLocation(gl.program, 'u_ProjMatrix');
-    positionAttributeRef.current = positionAttribute;
-    colorAttributeRef.current = colorAttribute;
-    projMatrixUniformRef.current = projMatrixUniform;
-    /**
-     * 缓冲区
-     */
-    const positionColorBuffer = gl.createBuffer();
-    positionColorBufferRef.current = positionColorBuffer;
-    /**
-     * 清空和变量设置
-     */
-    gl.clearColor(0, 0, 0, 1);
-    positionAttribute >= 0 && gl.enableVertexAttribArray(positionAttribute);
-    colorAttribute >= 0 && gl.enableVertexAttribArray(colorAttribute);
-  }, []);
-
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const positionAttribute = positionAttributeRef.current;
-    if (positionAttribute < 0) return;
-    const colorAttribute = colorAttributeRef.current;
-    if (colorAttribute < 0) return;
-    const positionColorBuffer = positionColorBufferRef.current;
-    if (!positionColorBuffer) return;
-    /**
-     * 数据写入缓冲区并分配到变量
-     */
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionColorBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, positionsColors, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(
-      positionAttribute,
-      3,
-      gl.FLOAT,
-      false,
-      positionsColors.BYTES_PER_ELEMENT * 6,
-      0,
-    );
-    gl.vertexAttribPointer(
-      colorAttribute,
-      3,
-      gl.FLOAT,
-      false,
-      positionsColors.BYTES_PER_ELEMENT * 6,
-      positionsColors.BYTES_PER_ELEMENT * 3,
-    );
-    setDeps((deps) => [positionsColors, deps[1]]);
-  }, [positionsColors]);
-
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const projMatrixUniform = projMatrixUniformRef.current;
-    if (!projMatrixUniform) return;
-    /**
-     * 数据直接分配到变量
-     */
-    gl.uniformMatrix4fv(projMatrixUniform, false, projMatrix.elements);
-    setDeps((deps) => [deps[0], projMatrix]);
-  }, [projMatrix]);
-
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    if (deps.some((dep) => dep === null)) return;
-    /**
-     * 清空并绘制
-     */
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES, 0, Math.floor(deps[0]!.length / 6));
-  }, [deps]);
 
   return (
     <Canvas
-      ref={glRef}
+      glVertexShader={VSHADER_SOURCE}
+      glFragmentShader={FSHADER_SOURCE}
+      onProgramInit={handleProgramInit}
       style={{ width: '100vw', height: '100vh', backgroundColor: '#000000' }}
     />
   );
