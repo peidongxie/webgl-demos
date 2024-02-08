@@ -11,6 +11,13 @@ class Vector3 {
     }
   }
 
+  set(vector: Vector3): this {
+    if (this.elements !== vector.elements) {
+      this.elements.set(vector.elements);
+    }
+    return this;
+  }
+
   normalize(): this {
     const a = this.elements;
     const magnitude = Math.sqrt(a[0]! * a[0]! + a[1]! * a[1]! + a[2]! * a[2]!);
@@ -23,6 +30,30 @@ class Vector3 {
       a[1] = 0;
       a[2] = 0;
     }
+    return this;
+  }
+
+  setColor(red: number, green: number, blue: number): this {
+    const a = this.elements;
+    a[0] = red;
+    a[1] = green;
+    a[2] = blue;
+    return this;
+  }
+
+  setDirection(x: number, y: number, z: number): this {
+    const a = this.elements;
+    a[0] = x;
+    a[1] = y;
+    a[2] = z;
+    return this;
+  }
+
+  setPosition(x: number, y: number, z: number): this {
+    const a = this.elements;
+    a[0] = x;
+    a[1] = y;
+    a[2] = z;
     return this;
   }
 }
@@ -38,6 +69,13 @@ class Vector4 {
     } else {
       this.elements = new Float32Array(4);
     }
+  }
+
+  set(vector: Vector4): this {
+    if (this.elements !== vector.elements) {
+      this.elements.set(vector.elements);
+    }
+    return this;
   }
 }
 
