@@ -43,7 +43,7 @@ interface DemoState extends BaseState {
     number,
     number,
     number,
-  ][][];
+  ][][][];
   surfaces: [number, number, number][][];
   translations: [
     [number, number, number],
@@ -61,14 +61,6 @@ interface DemoState extends BaseState {
     [number, number, number, number],
     [number, number, number, number],
   ];
-  scales: [
-    [number, number, number],
-    [number, number, number],
-    [number, number, number],
-    [number, number, number],
-    [number, number, number],
-    [number, number, number],
-  ];
   camera: [
     number,
     number,
@@ -85,9 +77,9 @@ interface DemoState extends BaseState {
 }
 
 /**
- * 绘制多关节
+ * 解耦模型顶点
  */
-const Demo61: FC<ComponentProps> = () => {
+const Demo62: FC<ComponentProps> = () => {
   const drawRef = useRef<StateChangeAction<DemoState> | null>(null);
 
   const handleWindowResize = useCallback(
@@ -143,7 +135,8 @@ const Demo61: FC<ComponentProps> = () => {
         a_Position: {
           deps: ['positionColorNormalBuffer', 'indexBuffer'],
           data: gl.getAttribLocation(gl.program, 'a_Position'),
-          onChange: ({ a_Position, positionColorNormalArray }) => {
+          onChange: ({ a_Position, positionColorNormalArray }, index) => {
+            if (index >= 6) return false;
             gl.vertexAttribPointer(
               a_Position,
               3,
@@ -153,13 +146,15 @@ const Demo61: FC<ComponentProps> = () => {
               0,
             );
             gl.enableVertexAttribArray(a_Position);
+            return true;
           },
         },
         // 着色器变量：a_Color
         a_Color: {
           deps: ['positionColorNormalBuffer', 'indexBuffer'],
           data: gl.getAttribLocation(gl.program, 'a_Color'),
-          onChange: ({ a_Color, positionColorNormalArray }) => {
+          onChange: ({ a_Color, positionColorNormalArray }, index) => {
+            if (index >= 6) return false;
             gl.vertexAttribPointer(
               a_Color,
               3,
@@ -169,13 +164,15 @@ const Demo61: FC<ComponentProps> = () => {
               positionColorNormalArray.BYTES_PER_ELEMENT * 3,
             );
             gl.enableVertexAttribArray(a_Color);
+            return true;
           },
         },
         // 着色器变量：a_Normal
         a_Normal: {
           deps: ['positionColorNormalBuffer', 'indexBuffer'],
           data: gl.getAttribLocation(gl.program, 'a_Normal'),
-          onChange: ({ a_Normal, positionColorNormalArray }) => {
+          onChange: ({ a_Normal, positionColorNormalArray }, index) => {
+            if (index >= 6) return false;
             gl.vertexAttribPointer(
               a_Normal,
               3,
@@ -185,6 +182,7 @@ const Demo61: FC<ComponentProps> = () => {
               positionColorNormalArray.BYTES_PER_ELEMENT * 6,
             );
             gl.enableVertexAttribArray(a_Normal);
+            return true;
           },
         },
         // 着色器变量：u_MvpMatrix
@@ -243,16 +241,18 @@ const Demo61: FC<ComponentProps> = () => {
         positionColorNormalBuffer: {
           deps: ['positionColorNormalArray'],
           data: gl.createBuffer(),
-          onChange: ({
-            positionColorNormalBuffer,
-            positionColorNormalArray,
-          }) => {
+          onChange: (
+            { positionColorNormalBuffer, positionColorNormalArray },
+            index,
+          ) => {
+            if (index >= 6) return false;
             gl.bindBuffer(gl.ARRAY_BUFFER, positionColorNormalBuffer);
             gl.bufferData(
               gl.ARRAY_BUFFER,
               positionColorNormalArray,
               gl.STATIC_DRAW,
             );
+            return true;
           },
         },
         // 派生数据：顶点索引缓冲区
@@ -268,8 +268,10 @@ const Demo61: FC<ComponentProps> = () => {
         positionColorNormalArray: {
           deps: ['points'],
           data: new Float32Array(216),
-          onChange: ({ positionColorNormalArray, points }) => {
-            positionColorNormalArray.set(flatArray(points));
+          onChange: ({ positionColorNormalArray, points }, index) => {
+            if (index >= 6) return false;
+            positionColorNormalArray.set(flatArray(points[index]));
+            return true;
           },
         },
         // 派生数据：顶点索引数组
@@ -320,7 +322,7 @@ const Demo61: FC<ComponentProps> = () => {
         },
         // 派生数据：模型矩阵
         modelMatrices: {
-          deps: ['translations', 'rotations', 'scales'],
+          deps: ['translations', 'rotations'],
           data: [
             new Matrix4(),
             new Matrix4(),
@@ -329,10 +331,7 @@ const Demo61: FC<ComponentProps> = () => {
             new Matrix4(),
             new Matrix4(),
           ],
-          onChange: (
-            { modelMatrices, translations, rotations, scales },
-            index,
-          ) => {
+          onChange: ({ modelMatrices, translations, rotations }, index) => {
             if (index >= 6) return false;
             const modelMatrix = modelMatrices[index];
             modelMatrix.setIdentity();
@@ -345,8 +344,6 @@ const Demo61: FC<ComponentProps> = () => {
                 .translate(translationX, translationY, translationZ)
                 .rotate(angle, rotationX, rotationY, rotationZ);
             }
-            const [scaleX, scaleY, scaleZ] = scales[index];
-            modelMatrix.scale(scaleX, scaleY, scaleZ);
             return true;
           },
         },
@@ -437,18 +434,6 @@ const Demo61: FC<ComponentProps> = () => {
             [0, 0, 0, 0],
           ],
         },
-        // 原子数据：缩放
-        scales: {
-          deps: [],
-          data: [
-            [1, 1, 1],
-            [1, 1, 1],
-            [1, 1, 1],
-            [1, 1, 1],
-            [1, 1, 1],
-            [1, 1, 1],
-          ],
-        },
         // 原子数据：相机
         camera: {
           deps: [],
@@ -468,40 +453,232 @@ const Demo61: FC<ComponentProps> = () => {
       draw({
         points: [
           [
-            [0.5, 1, 0.5, 1, 0.4, 0, 0, 0, 1],
-            [-0.5, 1, 0.5, 1, 0.4, 0, 0, 0, 1],
-            [-0.5, 0, 0.5, 1, 0.4, 0, 0, 0, 1],
-            [0.5, 0, 0.5, 1, 0.4, 0, 0, 0, 1],
+            [
+              [5.0, 2.0, 5.0, 1, 0.4, 0, 0, 0, 1],
+              [-5.0, 2.0, 5.0, 1, 0.4, 0, 0, 0, 1],
+              [-5.0, 0.0, 5.0, 1, 0.4, 0, 0, 0, 1],
+              [5.0, 0.0, 5.0, 1, 0.4, 0, 0, 0, 1],
+            ],
+            [
+              [5.0, 2.0, 5.0, 1, 0.4, 0, 1, 0, 0],
+              [5.0, 0.0, 5.0, 1, 0.4, 0, 1, 0, 0],
+              [5.0, 0.0, -5.0, 1, 0.4, 0, 1, 0, 0],
+              [5.0, 2.0, -5.0, 1, 0.4, 0, 1, 0, 0],
+            ],
+            [
+              [5.0, 2.0, 5.0, 1, 0.4, 0, 0, 1, 0],
+              [5.0, 2.0, -5.0, 1, 0.4, 0, 0, 1, 0],
+              [-5.0, 2.0, -5.0, 1, 0.4, 0, 0, 1, 0],
+              [-5.0, 2.0, 5.0, 1, 0.4, 0, 0, 1, 0],
+            ],
+            [
+              [-5.0, 2.0, 5.0, 1, 0.4, 0, -1, 0, 0],
+              [-5.0, 2.0, -5.0, 1, 0.4, 0, -1, 0, 0],
+              [-5.0, 0.0, -5.0, 1, 0.4, 0, -1, 0, 0],
+              [-5.0, 0.0, 5.0, 1, 0.4, 0, -1, 0, 0],
+            ],
+            [
+              [-5.0, 0.0, -5.0, 1, 0.4, 0, 0, -1, 0],
+              [5.0, 0.0, -5.0, 1, 0.4, 0, 0, -1, 0],
+              [5.0, 0.0, 5.0, 1, 0.4, 0, 0, -1, 0],
+              [-5.0, 0.0, 5.0, 1, 0.4, 0, 0, -1, 0],
+            ],
+            [
+              [5.0, 0.0, -5.0, 1, 0.4, 0, 0, 0, -1],
+              [-5.0, 0.0, -5.0, 1, 0.4, 0, 0, 0, -1],
+              [-5.0, 2.0, -5.0, 1, 0.4, 0, 0, 0, -1],
+              [5.0, 2.0, -5.0, 1, 0.4, 0, 0, 0, -1],
+            ],
           ],
           [
-            [0.5, 1, 0.5, 1, 0.4, 0, 1, 0, 0],
-            [0.5, 0, 0.5, 1, 0.4, 0, 1, 0, 0],
-            [0.5, 0, -0.5, 1, 0.4, 0, 1, 0, 0],
-            [0.5, 1, -0.5, 1, 0.4, 0, 1, 0, 0],
+            [
+              [1.5, 10.0, 1.5, 1, 0.4, 0, 0, 0, 1],
+              [-1.5, 10.0, 1.5, 1, 0.4, 0, 0, 0, 1],
+              [-1.5, 0.0, 1.5, 1, 0.4, 0, 0, 0, 1],
+              [1.5, 0.0, 1.5, 1, 0.4, 0, 0, 0, 1],
+            ],
+            [
+              [1.5, 10.0, 1.5, 1, 0.4, 0, 1, 0, 0],
+              [1.5, 0.0, 1.5, 1, 0.4, 0, 1, 0, 0],
+              [1.5, 0.0, -1.5, 1, 0.4, 0, 1, 0, 0],
+              [1.5, 10.0, -1.5, 1, 0.4, 0, 1, 0, 0],
+            ],
+            [
+              [1.5, 10.0, 1.5, 1, 0.4, 0, 0, 1, 0],
+              [1.5, 10.0, -1.5, 1, 0.4, 0, 0, 1, 0],
+              [-1.5, 10.0, -1.5, 1, 0.4, 0, 0, 1, 0],
+              [-1.5, 10.0, 1.5, 1, 0.4, 0, 0, 1, 0],
+            ],
+            [
+              [-1.5, 10.0, 1.5, 1, 0.4, 0, -1, 0, 0],
+              [-1.5, 10.0, -1.5, 1, 0.4, 0, -1, 0, 0],
+              [-1.5, 0.0, -1.5, 1, 0.4, 0, -1, 0, 0],
+              [-1.5, 0.0, 1.5, 1, 0.4, 0, -1, 0, 0],
+            ],
+            [
+              [-1.5, 0.0, -1.5, 1, 0.4, 0, 0, -1, 0],
+              [1.5, 0.0, -1.5, 1, 0.4, 0, 0, -1, 0],
+              [1.5, 0.0, 1.5, 1, 0.4, 0, 0, -1, 0],
+              [-1.5, 0.0, 1.5, 1, 0.4, 0, 0, -1, 0],
+            ],
+            [
+              [1.5, 0.0, -1.5, 1, 0.4, 0, 0, 0, -1],
+              [-1.5, 0.0, -1.5, 1, 0.4, 0, 0, 0, -1],
+              [-1.5, 10.0, -1.5, 1, 0.4, 0, 0, 0, -1],
+              [1.5, 10.0, -1.5, 1, 0.4, 0, 0, 0, -1],
+            ],
           ],
           [
-            [0.5, 1, 0.5, 1, 0.4, 0, 0, 1, 0],
-            [0.5, 1, -0.5, 1, 0.4, 0, 0, 1, 0],
-            [-0.5, 1, -0.5, 1, 0.4, 0, 0, 1, 0],
-            [-0.5, 1, 0.5, 1, 0.4, 0, 0, 1, 0],
+            [
+              [2.0, 10.0, 2.0, 1, 0.4, 0, 0, 0, 1],
+              [-2.0, 10.0, 2.0, 1, 0.4, 0, 0, 0, 1],
+              [-2.0, 0.0, 2.0, 1, 0.4, 0, 0, 0, 1],
+              [2.0, 0.0, 2.0, 1, 0.4, 0, 0, 0, 1],
+            ],
+            [
+              [2.0, 10.0, 2.0, 1, 0.4, 0, 1, 0, 0],
+              [2.0, 0.0, 2.0, 1, 0.4, 0, 1, 0, 0],
+              [2.0, 0.0, -2.0, 1, 0.4, 0, 1, 0, 0],
+              [2.0, 10.0, -2.0, 1, 0.4, 0, 1, 0, 0],
+            ],
+            [
+              [2.0, 10.0, 2.0, 1, 0.4, 0, 0, 1, 0],
+              [2.0, 10.0, -2.0, 1, 0.4, 0, 0, 1, 0],
+              [-2.0, 10.0, -2.0, 1, 0.4, 0, 0, 1, 0],
+              [-2.0, 10.0, 2.0, 1, 0.4, 0, 0, 1, 0],
+            ],
+            [
+              [-2.0, 10.0, 2.0, 1, 0.4, 0, -1, 0, 0],
+              [-2.0, 10.0, -2.0, 1, 0.4, 0, -1, 0, 0],
+              [-2.0, 0.0, -2.0, 1, 0.4, 0, -1, 0, 0],
+              [-2.0, 0.0, 2.0, 1, 0.4, 0, -1, 0, 0],
+            ],
+            [
+              [-2.0, 0.0, -2.0, 1, 0.4, 0, 0, -1, 0],
+              [2.0, 0.0, -2.0, 1, 0.4, 0, 0, -1, 0],
+              [2.0, 0.0, 2.0, 1, 0.4, 0, 0, -1, 0],
+              [-2.0, 0.0, 2.0, 1, 0.4, 0, 0, -1, 0],
+            ],
+            [
+              [2.0, 0.0, -2.0, 1, 0.4, 0, 0, 0, -1],
+              [-2.0, 0.0, -2.0, 1, 0.4, 0, 0, 0, -1],
+              [-2.0, 10.0, -2.0, 1, 0.4, 0, 0, 0, -1],
+              [2.0, 10.0, -2.0, 1, 0.4, 0, 0, 0, -1],
+            ],
           ],
           [
-            [-0.5, 1, 0.5, 1, 0.4, 0, -1, 0, 0],
-            [-0.5, 1, -0.5, 1, 0.4, 0, -1, 0, 0],
-            [-0.5, 0, -0.5, 1, 0.4, 0, -1, 0, 0],
-            [-0.5, 0, 0.5, 1, 0.4, 0, -1, 0, 0],
+            [
+              [1.0, 2.0, 3.0, 1, 0.4, 0, 0, 0, 1],
+              [-1.0, 2.0, 3.0, 1, 0.4, 0, 0, 0, 1],
+              [-1.0, 0.0, 3.0, 1, 0.4, 0, 0, 0, 1],
+              [1.0, 0.0, 3.0, 1, 0.4, 0, 0, 0, 1],
+            ],
+            [
+              [1.0, 2.0, 3.0, 1, 0.4, 0, 1, 0, 0],
+              [1.0, 0.0, 3.0, 1, 0.4, 0, 1, 0, 0],
+              [1.0, 0.0, -3.0, 1, 0.4, 0, 1, 0, 0],
+              [1.0, 2.0, -3.0, 1, 0.4, 0, 1, 0, 0],
+            ],
+            [
+              [1.0, 2.0, 3.0, 1, 0.4, 0, 0, 1, 0],
+              [1.0, 2.0, -3.0, 1, 0.4, 0, 0, 1, 0],
+              [-1.0, 2.0, -3.0, 1, 0.4, 0, 0, 1, 0],
+              [-1.0, 2.0, 3.0, 1, 0.4, 0, 0, 1, 0],
+            ],
+            [
+              [-1.0, 2.0, 3.0, 1, 0.4, 0, -1, 0, 0],
+              [-1.0, 2.0, -3.0, 1, 0.4, 0, -1, 0, 0],
+              [-1.0, 0.0, -3.0, 1, 0.4, 0, -1, 0, 0],
+              [-1.0, 0.0, 3.0, 1, 0.4, 0, -1, 0, 0],
+            ],
+            [
+              [-1.0, 0.0, -3.0, 1, 0.4, 0, 0, -1, 0],
+              [1.0, 0.0, -3.0, 1, 0.4, 0, 0, -1, 0],
+              [1.0, 0.0, 3.0, 1, 0.4, 0, 0, -1, 0],
+              [-1.0, 0.0, 3.0, 1, 0.4, 0, 0, -1, 0],
+            ],
+            [
+              [1.0, 0.0, -3.0, 1, 0.4, 0, 0, 0, -1],
+              [-1.0, 0.0, -3.0, 1, 0.4, 0, 0, 0, -1],
+              [-1.0, 2.0, -3.0, 1, 0.4, 0, 0, 0, -1],
+              [1.0, 2.0, -3.0, 1, 0.4, 0, 0, 0, -1],
+            ],
           ],
           [
-            [-0.5, 0, -0.5, 1, 0.4, 0, 0, -1, 0],
-            [0.5, 0, -0.5, 1, 0.4, 0, 0, -1, 0],
-            [0.5, 0, 0.5, 1, 0.4, 0, 0, -1, 0],
-            [-0.5, 0, 0.5, 1, 0.4, 0, 0, -1, 0],
+            [
+              [0.5, 2.0, 0.5, 1, 0.4, 0, 0, 0, 1],
+              [-0.5, 2.0, 0.5, 1, 0.4, 0, 0, 0, 1],
+              [-0.5, 0.0, 0.5, 1, 0.4, 0, 0, 0, 1],
+              [0.5, 0.0, 0.5, 1, 0.4, 0, 0, 0, 1],
+            ],
+            [
+              [0.5, 2.0, 0.5, 1, 0.4, 0, 1, 0, 0],
+              [0.5, 0.0, 0.5, 1, 0.4, 0, 1, 0, 0],
+              [0.5, 0.0, -0.5, 1, 0.4, 0, 1, 0, 0],
+              [0.5, 2.0, -0.5, 1, 0.4, 0, 1, 0, 0],
+            ],
+            [
+              [0.5, 2.0, 0.5, 1, 0.4, 0, 0, 1, 0],
+              [0.5, 2.0, -0.5, 1, 0.4, 0, 0, 1, 0],
+              [-0.5, 2.0, -0.5, 1, 0.4, 0, 0, 1, 0],
+              [-0.5, 2.0, 0.5, 1, 0.4, 0, 0, 1, 0],
+            ],
+            [
+              [-0.5, 2.0, 0.5, 1, 0.4, 0, -1, 0, 0],
+              [-0.5, 2.0, -0.5, 1, 0.4, 0, -1, 0, 0],
+              [-0.5, 0.0, -0.5, 1, 0.4, 0, -1, 0, 0],
+              [-0.5, 0.0, 0.5, 1, 0.4, 0, -1, 0, 0],
+            ],
+            [
+              [-0.5, 0.0, -0.5, 1, 0.4, 0, 0, -1, 0],
+              [0.5, 0.0, -0.5, 1, 0.4, 0, 0, -1, 0],
+              [0.5, 0.0, 0.5, 1, 0.4, 0, 0, -1, 0],
+              [-0.5, 0.0, 0.5, 1, 0.4, 0, 0, -1, 0],
+            ],
+            [
+              [0.5, 0.0, -0.5, 1, 0.4, 0, 0, 0, -1],
+              [-0.5, 0.0, -0.5, 1, 0.4, 0, 0, 0, -1],
+              [-0.5, 2.0, -0.5, 1, 0.4, 0, 0, 0, -1],
+              [0.5, 2.0, -0.5, 1, 0.4, 0, 0, 0, -1],
+            ],
           ],
           [
-            [0.5, 0, -0.5, 1, 0.4, 0, 0, 0, -1],
-            [-0.5, 0, -0.5, 1, 0.4, 0, 0, 0, -1],
-            [-0.5, 1, -0.5, 1, 0.4, 0, 0, 0, -1],
-            [0.5, 1, -0.5, 1, 0.4, 0, 0, 0, -1],
+            [
+              [0.5, 2.0, 0.5, 1, 0.4, 0, 0, 0, 1],
+              [-0.5, 2.0, 0.5, 1, 0.4, 0, 0, 0, 1],
+              [-0.5, 0.0, 0.5, 1, 0.4, 0, 0, 0, 1],
+              [0.5, 0.0, 0.5, 1, 0.4, 0, 0, 0, 1],
+            ],
+            [
+              [0.5, 2.0, 0.5, 1, 0.4, 0, 1, 0, 0],
+              [0.5, 0.0, 0.5, 1, 0.4, 0, 1, 0, 0],
+              [0.5, 0.0, -0.5, 1, 0.4, 0, 1, 0, 0],
+              [0.5, 2.0, -0.5, 1, 0.4, 0, 1, 0, 0],
+            ],
+            [
+              [0.5, 2.0, 0.5, 1, 0.4, 0, 0, 1, 0],
+              [0.5, 2.0, -0.5, 1, 0.4, 0, 0, 1, 0],
+              [-0.5, 2.0, -0.5, 1, 0.4, 0, 0, 1, 0],
+              [-0.5, 2.0, 0.5, 1, 0.4, 0, 0, 1, 0],
+            ],
+            [
+              [-0.5, 2.0, 0.5, 1, 0.4, 0, -1, 0, 0],
+              [-0.5, 2.0, -0.5, 1, 0.4, 0, -1, 0, 0],
+              [-0.5, 0.0, -0.5, 1, 0.4, 0, -1, 0, 0],
+              [-0.5, 0.0, 0.5, 1, 0.4, 0, -1, 0, 0],
+            ],
+            [
+              [-0.5, 0.0, -0.5, 1, 0.4, 0, 0, -1, 0],
+              [0.5, 0.0, -0.5, 1, 0.4, 0, 0, -1, 0],
+              [0.5, 0.0, 0.5, 1, 0.4, 0, 0, -1, 0],
+              [-0.5, 0.0, 0.5, 1, 0.4, 0, 0, -1, 0],
+            ],
+            [
+              [0.5, 0.0, -0.5, 1, 0.4, 0, 0, 0, -1],
+              [-0.5, 0.0, -0.5, 1, 0.4, 0, 0, 0, -1],
+              [-0.5, 2.0, -0.5, 1, 0.4, 0, 0, 0, -1],
+              [0.5, 2.0, -0.5, 1, 0.4, 0, 0, 0, -1],
+            ],
           ],
         ],
         surfaces: [
@@ -546,14 +723,6 @@ const Demo61: FC<ComponentProps> = () => {
           [0, 1, 0, 0],
           [0, 1, 0, 0],
         ],
-        scales: [
-          [10, 2, 10],
-          [3, 10, 3],
-          [4, 10, 4],
-          [2, 2, 6],
-          [1, 2, 1],
-          [1, 2, 1],
-        ],
         camera: [20, 10, 30, 0, 0, 0, 0, 1, 0],
         perspective: [50, canvas.width / canvas.height, 1, 100],
         lights: [
@@ -574,9 +743,10 @@ const Demo61: FC<ComponentProps> = () => {
         initialValue: () => {
           const draw = drawRef.current;
           if (!draw) return;
-          draw(({ rotations }) => {
+          draw(({ points, rotations }) => {
             const [angle, rotationX, rotationY, rotationZ] = rotations[1];
             return {
+              points,
               rotations: [
                 rotations[0],
                 [angle + 3, rotationX, rotationY, rotationZ],
@@ -595,9 +765,10 @@ const Demo61: FC<ComponentProps> = () => {
         initialValue: () => {
           const draw = drawRef.current;
           if (!draw) return;
-          draw(({ rotations }) => {
+          draw(({ points, rotations }) => {
             const [angle, rotationX, rotationY, rotationZ] = rotations[1];
             return {
+              points,
               rotations: [
                 rotations[0],
                 [angle - 3, rotationX, rotationY, rotationZ],
@@ -616,10 +787,11 @@ const Demo61: FC<ComponentProps> = () => {
         initialValue: () => {
           const draw = drawRef.current;
           if (!draw) return;
-          draw(({ rotations }) => {
+          draw(({ points, rotations }) => {
             const [angle, rotationX, rotationY, rotationZ] = rotations[2];
             if (angle >= 135) return { rotations };
             return {
+              points,
               rotations: [
                 rotations[0],
                 rotations[1],
@@ -638,10 +810,11 @@ const Demo61: FC<ComponentProps> = () => {
         initialValue: () => {
           const draw = drawRef.current;
           if (!draw) return;
-          draw(({ rotations }) => {
+          draw(({ points, rotations }) => {
             const [angle, rotationX, rotationY, rotationZ] = rotations[2];
             if (angle <= -135) return { rotations };
             return {
+              points,
               rotations: [
                 rotations[0],
                 rotations[1],
@@ -660,9 +833,10 @@ const Demo61: FC<ComponentProps> = () => {
         initialValue: () => {
           const draw = drawRef.current;
           if (!draw) return;
-          draw(({ rotations }) => {
+          draw(({ points, rotations }) => {
             const [angle, rotationX, rotationY, rotationZ] = rotations[3];
             return {
+              points,
               rotations: [
                 rotations[0],
                 rotations[1],
@@ -681,9 +855,10 @@ const Demo61: FC<ComponentProps> = () => {
         initialValue: () => {
           const draw = drawRef.current;
           if (!draw) return;
-          draw(({ rotations }) => {
+          draw(({ points, rotations }) => {
             const [angle, rotationX, rotationY, rotationZ] = rotations[3];
             return {
+              points,
               rotations: [
                 rotations[0],
                 rotations[1],
@@ -702,10 +877,11 @@ const Demo61: FC<ComponentProps> = () => {
         initialValue: () => {
           const draw = drawRef.current;
           if (!draw) return;
-          draw(({ rotations }) => {
+          draw(({ points, rotations }) => {
             const [angle, rotationX, rotationY, rotationZ] = rotations[4];
             if (angle >= 60) return { rotations };
             return {
+              points,
               rotations: [
                 rotations[0],
                 rotations[1],
@@ -724,10 +900,11 @@ const Demo61: FC<ComponentProps> = () => {
         initialValue: () => {
           const draw = drawRef.current;
           if (!draw) return;
-          draw(({ rotations }) => {
+          draw(({ points, rotations }) => {
             const [angle, rotationX, rotationY, rotationZ] = rotations[4];
             if (angle <= -60) return { rotations };
             return {
+              points,
               rotations: [
                 rotations[0],
                 rotations[1],
@@ -758,4 +935,4 @@ const Demo61: FC<ComponentProps> = () => {
   );
 };
 
-export default Demo61;
+export default Demo62;
