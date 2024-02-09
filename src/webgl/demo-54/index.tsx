@@ -1,335 +1,438 @@
-import {
-  type FC,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { type FC, useCallback, useRef } from 'react';
 
-import {
-  useFloat32Array,
-  useFrameRequest,
-  useUint8Array,
-} from '../../lib/react-utils';
+import { flatArray, useFrameRequest } from '../../lib/react-utils';
 import { type ComponentProps } from '../../type';
 import Canvas from '../lib/canvas-component';
 import { Matrix4, Vector3 } from '../lib/cuon-matrix';
-import { initShaders } from '../lib/cuon-utils';
+import {
+  type BaseState,
+  parseStateStore,
+  type StateChangeAction,
+} from '../lib/webgl-store';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
+
+interface DemoState extends BaseState {
+  a_Position: GLint;
+  a_Color: GLint;
+  a_Normal: GLint;
+  u_MvpMatrix: WebGLUniformLocation | null;
+  u_NormalMatrix: WebGLUniformLocation | null;
+  u_LightColor: WebGLUniformLocation | null;
+  u_LightDirection: WebGLUniformLocation | null;
+  positionColorNormalBuffer: WebGLBuffer | null;
+  indexBuffer: WebGLBuffer | null;
+  positionColorNormalArray: Float32Array;
+  indexArray: Uint8Array;
+  mvpMatrix: Matrix4;
+  normalMatrix: Matrix4;
+  modelMatrix: Matrix4;
+  lightColorVector: Vector3;
+  lightDirectionVector: Vector3;
+  points: [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+  ][][];
+  surfaces: [number, number, number][][];
+  rotation: [number, number, number, number];
+  velocity: number;
+  time: number;
+  camera: [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+  ];
+  perspective: [number, number, number, number];
+  light: [number, number, number, number, number, number];
+}
 
 /**
  * 绘制光照动画
  */
 const Demo54: FC<ComponentProps> = () => {
-  const glRef = useRef<WebGLRenderingContext>(null);
-  const positionAttributeRef = useRef(-1);
-  const colorAttributeRef = useRef(-1);
-  const normalAttributeRef = useRef(-1);
-  const mvpMatrixUniformRef = useRef<WebGLUniformLocation | null>(null);
-  const normalMatrixUniformRef = useRef<WebGLUniformLocation | null>(null);
-  const lightColorUniformRef = useRef<WebGLUniformLocation | null>(null);
-  const lightDirectionUniformRef = useRef<WebGLUniformLocation | null>(null);
-  const positionColorNormalBufferRef = useRef<WebGLBuffer | null>(null);
-  const indexBufferRef = useRef<WebGLBuffer | null>(null);
-  const [points] = useState<
-    [number, number, number, number, number, number, number, number, number][][]
-  >([
-    [
-      [1, 1, 1, 1, 0, 0, 0, 0, 1],
-      [-1, 1, 1, 1, 0, 0, 0, 0, 1],
-      [-1, -1, 1, 1, 0, 0, 0, 0, 1],
-      [1, -1, 1, 1, 0, 0, 0, 0, 1],
-    ],
-    [
-      [1, 1, 1, 1, 0, 0, 1, 0, 0],
-      [1, -1, 1, 1, 0, 0, 1, 0, 0],
-      [1, -1, -1, 1, 0, 0, 1, 0, 0],
-      [1, 1, -1, 1, 0, 0, 1, 0, 0],
-    ],
-    [
-      [1, 1, 1, 1, 0, 0, 0, 1, 0],
-      [1, 1, -1, 1, 0, 0, 0, 1, 0],
-      [-1, 1, -1, 1, 0, 0, 0, 1, 0],
-      [-1, 1, 1, 1, 0, 0, 0, 1, 0],
-    ],
-    [
-      [-1, 1, 1, 1, 0, 0, -1, 0, 0],
-      [-1, 1, -1, 1, 0, 0, -1, 0, 0],
-      [-1, -1, -1, 1, 0, 0, -1, 0, 0],
-      [-1, -1, 1, 1, 0, 0, -1, 0, 0],
-    ],
-    [
-      [-1, -1, -1, 1, 0, 0, 0, -1, 0],
-      [1, -1, -1, 1, 0, 0, 0, -1, 0],
-      [1, -1, 1, 1, 0, 0, 0, -1, 0],
-      [-1, -1, 1, 1, 0, 0, 0, -1, 0],
-    ],
-    [
-      [1, -1, -1, 1, 0, 0, 0, 0, -1],
-      [-1, -1, -1, 1, 0, 0, 0, 0, -1],
-      [-1, 1, -1, 1, 0, 0, 0, 0, -1],
-      [1, 1, -1, 1, 0, 0, 0, 0, -1],
-    ],
-  ]);
-  const positionsColorNormals = useFloat32Array(points);
-  const [surfaces] = useState<[number, number, number][][]>([
-    [
-      [0, 1, 2],
-      [0, 2, 3],
-    ],
-    [
-      [4, 5, 6],
-      [4, 6, 7],
-    ],
-    [
-      [8, 9, 10],
-      [8, 10, 11],
-    ],
-    [
-      [12, 13, 14],
-      [12, 14, 15],
-    ],
-    [
-      [16, 17, 18],
-      [16, 18, 19],
-    ],
-    [
-      [20, 21, 22],
-      [20, 22, 23],
-    ],
-  ]);
-  const indices = useUint8Array(surfaces);
-  const perspectiveRef = useRef<[number, number, number, number]>([
-    30, 1, 1, 100,
-  ]);
-  const cameraRef = useRef<
-    [number, number, number, number, number, number, number, number, number]
-  >([3, 3, 7, 0, 0, 0, 0, 1, 0]);
-  const rotationRef = useRef<[number, number, number, number]>([0, 0, 1, 0]);
-  const velocityRef = useRef(30);
-  const timeRef = useRef(Date.now());
-  const mvpMatrixRef = useRef<Matrix4 | null>(null);
-  if (!mvpMatrixRef.current) mvpMatrixRef.current = new Matrix4();
-  const normalMatrixRef = useRef<Matrix4 | null>(null);
-  if (!normalMatrixRef.current) normalMatrixRef.current = new Matrix4();
-  const [light] = useState<[number, number, number, number, number, number]>([
-    1, 1, 1, 0.5, 3, 4,
-  ]);
-  const lightColor = useMemo<[number, number, number]>(() => {
-    return [light[0], light[1], light[2]];
-  }, [light]);
-  const lightDirection = useMemo(() => {
-    return new Vector3([light[3], light[4], light[5]]).normalize();
-  }, [light]);
-  const [deps, setDeps] = useState<
-    [
-      Float32Array | null,
-      Uint8Array | null,
-      [number, number, number] | null,
-      Vector3 | null,
-    ]
-  >([null, null, null, null]);
+  const drawRef = useRef<StateChangeAction<DemoState> | null>(null);
 
-  const tick = useCallback(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const mvpMatrixUniform = mvpMatrixUniformRef.current;
-    if (!mvpMatrixUniform) return;
-    const normalMatrixUniform = normalMatrixUniformRef.current;
-    if (!normalMatrixUniform) return;
-    const mvpMatrix = mvpMatrixRef.current;
-    if (!mvpMatrix) return;
-    const normalMatrix = normalMatrixRef.current;
-    if (!normalMatrix) return;
-    if (deps.some((dep) => dep === null)) return;
-    /**
-     * 数据直接分配到变量
-     */
-    const [fovy, aspect, perspectiveNear, perspectiveFar] =
-      perspectiveRef.current;
-    const [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ] =
-      cameraRef.current;
-    const [angle, rotationX, rotationY, rotationZ] = rotationRef.current;
-    const timeEnd = Date.now();
-    const timeStart = timeRef.current;
-    const timeSpan = timeEnd - timeStart;
-    const angleStart = angle;
-    const angleSpan = (velocityRef.current * timeSpan) / 1000;
-    const angleEnd = angleStart + angleSpan;
-    mvpMatrix
-      .setPerspective(fovy, aspect, perspectiveNear, perspectiveFar)
-      .lookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ)
-      .rotate(angleEnd, rotationX, rotationY, rotationZ);
-    gl.uniformMatrix4fv(mvpMatrixUniform, false, mvpMatrix.elements);
-    normalMatrix
-      .setRotate(angleEnd, rotationX, rotationY, rotationZ)
-      .invert()
-      .transpose();
-    gl.uniformMatrix4fv(normalMatrixUniform, false, normalMatrix.elements);
-    timeRef.current = timeEnd;
-    rotationRef.current[0] = angleEnd;
-    /**
-     * 清空并绘制
-     */
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.drawElements(gl.TRIANGLES, deps[1]!.length, gl.UNSIGNED_BYTE, 0);
-  }, [deps]);
+  const handleWindowResize = useCallback(
+    (canvas?: HTMLCanvasElement, gl?: WebGLRenderingContext) => {
+      if (!canvas) return;
+      if (!gl) return;
+      const draw = drawRef.current;
+      if (!draw) return;
+      draw(({ perspective }) => ({
+        perspective: [
+          perspective[0],
+          canvas.width / canvas.height,
+          perspective[2],
+          perspective[3],
+        ],
+      }));
+    },
+    [],
+  );
 
-  useFrameRequest(tick);
+  const handleProgramInit = useCallback(
+    (canvas: HTMLCanvasElement, gl: WebGLRenderingContext) => {
+      const draw = parseStateStore<DemoState>({
+        // 着色器程序
+        root: {
+          deps: [
+            'a_Position',
+            'a_Color',
+            'a_Normal',
+            'u_MvpMatrix',
+            'u_NormalMatrix',
+            'u_LightColor',
+            'u_LightDirection',
+          ],
+          data: () => {
+            gl.clearColor(0, 0, 0, 1);
+            gl.enable(gl.DEPTH_TEST);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+          },
+          onChange: ({ surfaces }) => {
+            gl.drawElements(
+              gl.TRIANGLES,
+              surfaces.flat(2).length,
+              gl.UNSIGNED_BYTE,
+              0,
+            );
+          },
+        },
+        // 着色器变量：a_Position
+        a_Position: {
+          deps: ['positionColorNormalBuffer', 'indexBuffer'],
+          data: gl.getAttribLocation(gl.program, 'a_Position'),
+          onChange: ({ a_Position, positionColorNormalArray }) => {
+            gl.vertexAttribPointer(
+              a_Position,
+              3,
+              gl.FLOAT,
+              false,
+              positionColorNormalArray.BYTES_PER_ELEMENT * 9,
+              0,
+            );
+            gl.enableVertexAttribArray(a_Position);
+          },
+        },
+        // 着色器变量：a_Color
+        a_Color: {
+          deps: ['positionColorNormalBuffer', 'indexBuffer'],
+          data: gl.getAttribLocation(gl.program, 'a_Color'),
+          onChange: ({ a_Color, positionColorNormalArray }) => {
+            gl.vertexAttribPointer(
+              a_Color,
+              3,
+              gl.FLOAT,
+              false,
+              positionColorNormalArray.BYTES_PER_ELEMENT * 9,
+              positionColorNormalArray.BYTES_PER_ELEMENT * 3,
+            );
+            gl.enableVertexAttribArray(a_Color);
+          },
+        },
+        // 着色器变量：a_Normal
+        a_Normal: {
+          deps: ['positionColorNormalBuffer', 'indexBuffer'],
+          data: gl.getAttribLocation(gl.program, 'a_Normal'),
+          onChange: ({ a_Normal, positionColorNormalArray }) => {
+            gl.vertexAttribPointer(
+              a_Normal,
+              3,
+              gl.FLOAT,
+              false,
+              positionColorNormalArray.BYTES_PER_ELEMENT * 9,
+              positionColorNormalArray.BYTES_PER_ELEMENT * 6,
+            );
+            gl.enableVertexAttribArray(a_Normal);
+          },
+        },
+        // 着色器变量：u_MvpMatrix
+        u_MvpMatrix: {
+          deps: ['mvpMatrix'],
+          data: gl.getUniformLocation(gl.program, 'u_MvpMatrix'),
+          onChange: ({ u_MvpMatrix, mvpMatrix }) => {
+            gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
+          },
+        },
+        // 着色器变量：u_NormalMatrix
+        u_NormalMatrix: {
+          deps: ['normalMatrix'],
+          data: gl.getUniformLocation(gl.program, 'u_NormalMatrix'),
+          onChange: ({ u_NormalMatrix, normalMatrix }) => {
+            gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements);
+          },
+        },
+        // 着色器变量：u_LightColor
+        u_LightColor: {
+          deps: ['lightColorVector'],
+          data: gl.getUniformLocation(gl.program, 'u_LightColor'),
+          onChange: ({ u_LightColor, lightColorVector }) => {
+            gl.uniform3fv(u_LightColor, lightColorVector.elements);
+          },
+        },
+        // 着色器变量：u_LightDirection
+        u_LightDirection: {
+          deps: ['lightDirectionVector'],
+          data: gl.getUniformLocation(gl.program, 'u_LightDirection'),
+          onChange: ({ u_LightDirection, lightDirectionVector }) => {
+            gl.uniform3fv(u_LightDirection, lightDirectionVector.elements);
+          },
+        },
+        // 派生数据：顶点位置颜色法向缓冲区
+        positionColorNormalBuffer: {
+          deps: ['positionColorNormalArray'],
+          data: gl.createBuffer(),
+          onChange: ({
+            positionColorNormalBuffer,
+            positionColorNormalArray,
+          }) => {
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionColorNormalBuffer);
+            gl.bufferData(
+              gl.ARRAY_BUFFER,
+              positionColorNormalArray,
+              gl.STATIC_DRAW,
+            );
+          },
+        },
+        // 派生数据：顶点索引缓冲区
+        indexBuffer: {
+          deps: ['indexArray'],
+          data: gl.createBuffer(),
+          onChange: ({ indexBuffer, indexArray }) => {
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexArray, gl.STATIC_DRAW);
+          },
+        },
+        // 派生数据：顶点位置颜色法向数组
+        positionColorNormalArray: {
+          deps: ['points'],
+          data: new Float32Array(216),
+          onChange: ({ positionColorNormalArray, points }) => {
+            positionColorNormalArray.set(flatArray(points));
+          },
+        },
+        // 派生数据：顶点索引数组
+        indexArray: {
+          deps: ['surfaces'],
+          data: new Uint8Array(36),
+          onChange: ({ indexArray, surfaces }) => {
+            indexArray.set(flatArray(surfaces));
+          },
+        },
+        // 派生数据：模型视图投影矩阵
+        mvpMatrix: {
+          deps: ['modelMatrix', 'camera', 'perspective'],
+          data: new Matrix4(),
+          onChange: ({ mvpMatrix, modelMatrix, camera, perspective }) => {
+            const [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ] =
+              camera;
+            const [fovy, aspect, perspectiveNear, perspectiveFar] = perspective;
+            mvpMatrix
+              .setPerspective(fovy, aspect, perspectiveNear, perspectiveFar)
+              .lookAt(
+                eyeX,
+                eyeY,
+                eyeZ,
+                centerX,
+                centerY,
+                centerZ,
+                upX,
+                upY,
+                upZ,
+              )
+              .multiply(modelMatrix);
+          },
+        },
+        // 派生数据：法向量矩阵
+        normalMatrix: {
+          deps: ['modelMatrix'],
+          data: new Matrix4(),
+          onChange: ({ normalMatrix, modelMatrix }) => {
+            normalMatrix.setInverseOf(modelMatrix).transpose();
+          },
+        },
+        // 派生数据：模型矩阵
+        modelMatrix: {
+          deps: ['rotation', 'velocity', 'time'],
+          data: new Matrix4(),
+          onChange: ({ modelMatrix, rotation }) => {
+            const [angle, rotationX, rotationY, rotationZ] = rotation;
+            modelMatrix.setRotate(angle, rotationX, rotationY, rotationZ);
+          },
+        },
+        // 派生数据：光线颜色向量
+        lightColorVector: {
+          deps: ['light'],
+          data: new Vector3(),
+          onChange: ({ lightColorVector, light }) => {
+            lightColorVector.setColor(light[0], light[1], light[2]);
+          },
+        },
+        // 派生数据：光线方向向量
+        lightDirectionVector: {
+          deps: ['light'],
+          data: new Vector3(),
+          onChange: ({ lightDirectionVector, light }) => {
+            lightDirectionVector
+              .setDirection(light[3], light[4], light[5])
+              .normalize();
+          },
+        },
+        // 原子数据：顶点
+        points: {
+          deps: [],
+          data: [],
+        },
+        // 原子数据：表面
+        surfaces: {
+          deps: [],
+          data: [],
+        },
+        // 原子数据：旋转
+        rotation: {
+          deps: [],
+          data: [0, 0, 0, 0],
+        },
+        // 原子数据：速度
+        velocity: {
+          deps: [],
+          data: 0,
+        },
+        // 原子数据：时间
+        time: {
+          deps: [],
+          data: 0,
+        },
+        // 原子数据：相机
+        camera: {
+          deps: [],
+          data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        },
+        // 原子数据：透视
+        perspective: {
+          deps: [],
+          data: [0, 0, 0, 0],
+        },
+        // 原子数据：光线
+        light: {
+          deps: [],
+          data: [0, 0, 0, 0, 0, 0],
+        },
+      });
+      draw({
+        points: [
+          [
+            [1, 1, 1, 1, 0, 0, 0, 0, 1],
+            [-1, 1, 1, 1, 0, 0, 0, 0, 1],
+            [-1, -1, 1, 1, 0, 0, 0, 0, 1],
+            [1, -1, 1, 1, 0, 0, 0, 0, 1],
+          ],
+          [
+            [1, 1, 1, 1, 0, 0, 1, 0, 0],
+            [1, -1, 1, 1, 0, 0, 1, 0, 0],
+            [1, -1, -1, 1, 0, 0, 1, 0, 0],
+            [1, 1, -1, 1, 0, 0, 1, 0, 0],
+          ],
+          [
+            [1, 1, 1, 1, 0, 0, 0, 1, 0],
+            [1, 1, -1, 1, 0, 0, 0, 1, 0],
+            [-1, 1, -1, 1, 0, 0, 0, 1, 0],
+            [-1, 1, 1, 1, 0, 0, 0, 1, 0],
+          ],
+          [
+            [-1, 1, 1, 1, 0, 0, -1, 0, 0],
+            [-1, 1, -1, 1, 0, 0, -1, 0, 0],
+            [-1, -1, -1, 1, 0, 0, -1, 0, 0],
+            [-1, -1, 1, 1, 0, 0, -1, 0, 0],
+          ],
+          [
+            [-1, -1, -1, 1, 0, 0, 0, -1, 0],
+            [1, -1, -1, 1, 0, 0, 0, -1, 0],
+            [1, -1, 1, 1, 0, 0, 0, -1, 0],
+            [-1, -1, 1, 1, 0, 0, 0, -1, 0],
+          ],
+          [
+            [1, -1, -1, 1, 0, 0, 0, 0, -1],
+            [-1, -1, -1, 1, 0, 0, 0, 0, -1],
+            [-1, 1, -1, 1, 0, 0, 0, 0, -1],
+            [1, 1, -1, 1, 0, 0, 0, 0, -1],
+          ],
+        ],
+        surfaces: [
+          [
+            [0, 1, 2],
+            [0, 2, 3],
+          ],
+          [
+            [4, 5, 6],
+            [4, 6, 7],
+          ],
+          [
+            [8, 9, 10],
+            [8, 10, 11],
+          ],
+          [
+            [12, 13, 14],
+            [12, 14, 15],
+          ],
+          [
+            [16, 17, 18],
+            [16, 18, 19],
+          ],
+          [
+            [20, 21, 22],
+            [20, 22, 23],
+          ],
+        ],
+        rotation: [0, 0, 1, 0],
+        velocity: 30,
+        time: Date.now(),
+        camera: [3, 3, 7, 0, 0, 0, 0, 1, 0],
+        perspective: [30, canvas.width / canvas.height, 1, 100],
+        light: [1, 1, 1, 0.5, 3, 4],
+      });
+      drawRef.current = draw;
+    },
+    [],
+  );
 
-  const handleWindowResize = useCallback((canvas?: HTMLCanvasElement) => {
-    if (!canvas) return;
-    perspectiveRef.current = [
-      perspectiveRef.current[0],
-      canvas.width / canvas.height,
-      perspectiveRef.current[2],
-      perspectiveRef.current[3],
-    ];
-  }, []);
-
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const success = initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE);
-    if (!success) return;
-    /**
-     * 变量位置
-     */
-    const positionAttribute = gl.getAttribLocation(gl.program, 'a_Position');
-    const colorAttribute = gl.getAttribLocation(gl.program, 'a_Color');
-    const normalAttribute = gl.getAttribLocation(gl.program, 'a_Normal');
-    const mvpMatrixUniform = gl.getUniformLocation(gl.program, 'u_MvpMatrix');
-    const normalMatrixUniform = gl.getUniformLocation(
-      gl.program,
-      'u_NormalMatrix',
-    );
-    const lightColorUniform = gl.getUniformLocation(gl.program, 'u_LightColor');
-    const lightDirectionUniform = gl.getUniformLocation(
-      gl.program,
-      'u_LightDirection',
-    );
-    positionAttributeRef.current = positionAttribute;
-    colorAttributeRef.current = colorAttribute;
-    normalAttributeRef.current = normalAttribute;
-    mvpMatrixUniformRef.current = mvpMatrixUniform;
-    normalMatrixUniformRef.current = normalMatrixUniform;
-    lightColorUniformRef.current = lightColorUniform;
-    lightDirectionUniformRef.current = lightDirectionUniform;
-    /**
-     * 缓冲区
-     */
-    const positionColorBuffer = gl.createBuffer();
-    positionColorNormalBufferRef.current = positionColorBuffer;
-    const indexBuffer = gl.createBuffer();
-    indexBufferRef.current = indexBuffer;
-    /**
-     * 清空、深度和变量设置
-     */
-    gl.clearColor(0, 0, 0, 1);
-    gl.enable(gl.DEPTH_TEST);
-    positionAttribute >= 0 && gl.enableVertexAttribArray(positionAttribute);
-    colorAttribute >= 0 && gl.enableVertexAttribArray(colorAttribute);
-    normalAttribute >= 0 && gl.enableVertexAttribArray(normalAttribute);
-  }, []);
-
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const positionAttribute = positionAttributeRef.current;
-    if (positionAttribute < 0) return;
-    const colorAttribute = colorAttributeRef.current;
-    if (colorAttribute < 0) return;
-    const normalAttribute = normalAttributeRef.current;
-    if (normalAttribute < 0) return;
-    const positionColorNormalBuffer = positionColorNormalBufferRef.current;
-    if (!positionColorNormalBuffer) return;
-    /**
-     * 数据写入缓冲区并分配到变量
-     */
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionColorNormalBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, positionsColorNormals, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(
-      positionAttribute,
-      3,
-      gl.FLOAT,
-      false,
-      positionsColorNormals.BYTES_PER_ELEMENT * 9,
-      0,
-    );
-    gl.vertexAttribPointer(
-      colorAttribute,
-      3,
-      gl.FLOAT,
-      false,
-      positionsColorNormals.BYTES_PER_ELEMENT * 9,
-      positionsColorNormals.BYTES_PER_ELEMENT * 3,
-    );
-    gl.vertexAttribPointer(
-      normalAttribute,
-      3,
-      gl.FLOAT,
-      false,
-      positionsColorNormals.BYTES_PER_ELEMENT * 9,
-      positionsColorNormals.BYTES_PER_ELEMENT * 6,
-    );
-    setDeps((deps) => [positionsColorNormals, deps[1], deps[2], deps[3]]);
-  }, [positionsColorNormals]);
-
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const indexBuffer = indexBufferRef.current;
-    if (!indexBuffer) return;
-    /**
-     * 数据写入缓冲区并分配到变量
-     */
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-    setDeps((deps) => [deps[0], indices, deps[2], deps[3]]);
-  }, [indices]);
-
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const lightColorUniform = lightColorUniformRef.current;
-    if (!lightColorUniform) return;
-    /**
-     * 数据直接分配到变量
-     */
-    const [red, green, blue] = lightColor;
-    gl.uniform3f(lightColorUniform, red, green, blue);
-    setDeps((deps) => [deps[0], deps[1], lightColor, deps[3]]);
-  }, [lightColor]);
-
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    const lightDirectionUniform = lightDirectionUniformRef.current;
-    if (!lightDirectionUniform) return;
-    /**
-     * 数据直接分配到变量
-     */
-    gl.uniform3fv(lightDirectionUniform, lightDirection.elements);
-    setDeps((deps) => [deps[0], deps[1], deps[2], lightDirection]);
-  }, [lightDirection]);
-
-  useEffect(() => {
-    const gl = glRef.current;
-    if (!gl) return;
-    if (deps.some((dep) => dep === null)) return;
-    /**
-     * 清空并绘制
-     */
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.drawElements(gl.TRIANGLES, deps[1]!.length, gl.UNSIGNED_BYTE, 0);
-  }, [deps]);
+  useFrameRequest(() => {
+    const draw = drawRef.current;
+    if (!draw) return;
+    draw(({ rotation, velocity, time }) => {
+      const [angle, rotationX, rotationY, rotationZ] = rotation;
+      const timeEnd = Date.now();
+      const timeStart = time;
+      const timeSpan = timeEnd - timeStart;
+      const angleStart = angle;
+      const angleSpan = (velocity * timeSpan) / 1000;
+      const angleEnd = angleStart + angleSpan;
+      return {
+        rotation: [angleEnd, rotationX, rotationY, rotationZ],
+        time: timeEnd,
+      };
+    });
+  });
 
   return (
     <Canvas
+      glVertexShader={VSHADER_SOURCE}
+      glFragmentShader={FSHADER_SOURCE}
+      onProgramInit={handleProgramInit}
       onWindowResize={handleWindowResize}
-      ref={glRef}
       style={{ width: '100vw', height: '100vh', backgroundColor: '#000000' }}
     />
   );
