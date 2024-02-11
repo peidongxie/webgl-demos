@@ -10,6 +10,9 @@ declare interface HTMLCanvasElement {
 
 declare interface WebGLRenderingContext {
   program: WebGLProgram;
+  getParameter(
+    pname: WebGLRenderingContext['CURRENT_PROGRAM'],
+  ): WebGLProgram | null;
 }
 
 declare interface Window {

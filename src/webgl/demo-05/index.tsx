@@ -41,7 +41,10 @@ const Demo05: FC<ComponentProps> = () => {
         // 着色器变量：a_Position
         a_Position: {
           deps: ['points'],
-          data: gl.getAttribLocation(gl.program, 'a_Position'),
+          data: gl.getAttribLocation(
+            gl.getParameter(gl.CURRENT_PROGRAM)!,
+            'a_Position',
+          ),
           onChange: ({ a_Position, points }, index) => {
             if (points.length <= index) return false;
             const [x, y] = points[index]!;

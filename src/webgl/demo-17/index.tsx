@@ -38,7 +38,10 @@ const Demo17: FC<ComponentProps> = () => {
         // 着色器变量：a_Position
         a_Position: {
           deps: ['positionBuffer'],
-          data: gl.getAttribLocation(gl.program, 'a_Position'),
+          data: gl.getAttribLocation(
+            gl.getParameter(gl.CURRENT_PROGRAM)!,
+            'a_Position',
+          ),
           onChange: ({ a_Position }) => {
             gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(a_Position);
@@ -47,7 +50,10 @@ const Demo17: FC<ComponentProps> = () => {
         // 着色器变量：u_xformMatrix
         u_xformMatrix: {
           deps: ['xformArray'],
-          data: gl.getUniformLocation(gl.program, 'u_xformMatrix'),
+          data: gl.getUniformLocation(
+            gl.getParameter(gl.CURRENT_PROGRAM)!,
+            'u_xformMatrix',
+          ),
           onChange: ({ u_xformMatrix, xformArray }) => {
             gl.uniformMatrix4fv(u_xformMatrix, false, xformArray);
           },

@@ -42,7 +42,10 @@ const Demo06: FC<ComponentProps> = () => {
         // 着色器变量：a_Position
         a_Position: {
           deps: ['points'],
-          data: gl.getAttribLocation(gl.program, 'a_Position'),
+          data: gl.getAttribLocation(
+            gl.getParameter(gl.CURRENT_PROGRAM)!,
+            'a_Position',
+          ),
           onChange: ({ a_Position, points }, index) => {
             if (points.length <= index) return false;
             const [x, y] = points[index]!;
@@ -53,7 +56,10 @@ const Demo06: FC<ComponentProps> = () => {
         // 着色器变量：u_FragColor
         u_FragColor: {
           deps: ['points'],
-          data: gl.getUniformLocation(gl.program, 'u_FragColor'),
+          data: gl.getUniformLocation(
+            gl.getParameter(gl.CURRENT_PROGRAM)!,
+            'u_FragColor',
+          ),
           onChange: ({ u_FragColor, points }, index) => {
             if (points.length <= index) return false;
             gl.uniform4f(

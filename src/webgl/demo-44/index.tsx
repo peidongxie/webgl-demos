@@ -83,7 +83,10 @@ const Demo44: FC<ComponentProps> = () => {
         // 着色器变量：a_Position
         a_Position: {
           deps: ['positionColorBuffer'],
-          data: gl.getAttribLocation(gl.program, 'a_Position'),
+          data: gl.getAttribLocation(
+            gl.getParameter(gl.CURRENT_PROGRAM)!,
+            'a_Position',
+          ),
           onChange: ({ a_Position, positionColorArray }) => {
             gl.vertexAttribPointer(
               a_Position,
@@ -99,7 +102,10 @@ const Demo44: FC<ComponentProps> = () => {
         // 着色器变量：a_Color
         a_Color: {
           deps: ['positionColorBuffer'],
-          data: gl.getAttribLocation(gl.program, 'a_Color'),
+          data: gl.getAttribLocation(
+            gl.getParameter(gl.CURRENT_PROGRAM)!,
+            'a_Color',
+          ),
           onChange: ({ a_Color, positionColorArray }) => {
             gl.vertexAttribPointer(
               a_Color,
@@ -115,7 +121,10 @@ const Demo44: FC<ComponentProps> = () => {
         // 着色器变量：u_MvpMatrix
         u_MvpMatrix: {
           deps: ['mvpMatrices'],
-          data: gl.getUniformLocation(gl.program, 'u_MvpMatrix'),
+          data: gl.getUniformLocation(
+            gl.getParameter(gl.CURRENT_PROGRAM)!,
+            'u_MvpMatrix',
+          ),
           onChange: ({ u_MvpMatrix, mvpMatrices, translations }, index) => {
             if (translations.length <= index) return false;
             gl.uniformMatrix4fv(
