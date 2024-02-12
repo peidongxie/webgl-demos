@@ -61,7 +61,6 @@ const initShaders = (
     return false;
   }
   gl.useProgram(program);
-  gl.program = program;
   return true;
 };
 
