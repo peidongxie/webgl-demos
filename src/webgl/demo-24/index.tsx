@@ -38,7 +38,10 @@ const Demo24: FC<ComponentProps> = () => {
         // 着色器变量：a_Position
         a_Position: {
           deps: ['positionBuffer'],
-          data: gl.getAttribLocation(gl.program, 'a_Position'),
+          data: gl.getAttribLocation(
+            gl.getParameter(gl.CURRENT_PROGRAM)!,
+            'a_Position',
+          ),
           onChange: ({ a_Position }) => {
             gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(a_Position);
@@ -47,7 +50,10 @@ const Demo24: FC<ComponentProps> = () => {
         // 着色器变量：a_PointSize
         a_PointSize: {
           deps: ['sizeBuffer'],
-          data: gl.getAttribLocation(gl.program, 'a_PointSize'),
+          data: gl.getAttribLocation(
+            gl.getParameter(gl.CURRENT_PROGRAM)!,
+            'a_PointSize',
+          ),
           onChange: ({ a_PointSize }) => {
             gl.vertexAttribPointer(a_PointSize, 1, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(a_PointSize);

@@ -32,7 +32,10 @@ const Demo04: FC<ComponentProps> = () => {
         // 着色器变量：a_Position
         a_Position: {
           deps: ['point'],
-          data: gl.getAttribLocation(gl.program, 'a_Position'),
+          data: gl.getAttribLocation(
+            gl.getParameter(gl.CURRENT_PROGRAM)!,
+            'a_Position',
+          ),
           onChange: ({ a_Position, point }) => {
             const [x, y] = point;
             gl.vertexAttrib3f(a_Position, x, y, 0);

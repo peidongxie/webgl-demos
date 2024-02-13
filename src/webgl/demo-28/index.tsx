@@ -38,7 +38,10 @@ const Demo28: FC<ComponentProps> = () => {
         // 着色器变量：a_Position
         a_Position: {
           deps: ['positionBuffer'],
-          data: gl.getAttribLocation(gl.program, 'a_Position'),
+          data: gl.getAttribLocation(
+            gl.getParameter(gl.CURRENT_PROGRAM)!,
+            'a_Position',
+          ),
           onChange: ({ a_Position }) => {
             gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(a_Position);
@@ -47,7 +50,10 @@ const Demo28: FC<ComponentProps> = () => {
         // 着色器变量：u_Width
         u_Width: {
           deps: ['drawingSize'],
-          data: gl.getUniformLocation(gl.program, 'u_Width'),
+          data: gl.getUniformLocation(
+            gl.getParameter(gl.CURRENT_PROGRAM)!,
+            'u_Width',
+          ),
           onChange: ({ u_Width, drawingSize }) => {
             gl.uniform1f(u_Width, drawingSize[0]);
           },
@@ -55,7 +61,10 @@ const Demo28: FC<ComponentProps> = () => {
         // 着色器变量：u_Height
         u_Height: {
           deps: ['drawingSize'],
-          data: gl.getUniformLocation(gl.program, 'u_Height'),
+          data: gl.getUniformLocation(
+            gl.getParameter(gl.CURRENT_PROGRAM)!,
+            'u_Height',
+          ),
           onChange: ({ u_Height, drawingSize }) => {
             gl.uniform1f(u_Height, drawingSize[1]);
           },
