@@ -6,14 +6,14 @@ import { type ComponentProps } from '../../type';
 import Canvas from '../lib/canvas-component';
 import { Matrix4 } from '../lib/cuon-matrix';
 import {
-  type BaseState,
   parseStateStore,
   type StateChangeAction,
+  type StateWithRoot,
 } from '../lib/webgl-store';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
-interface DemoState extends BaseState {
+type DemoState = StateWithRoot<{
   a_Position: GLint;
   a_Color: GLint;
   u_ViewMatrix: WebGLUniformLocation | null;
@@ -35,7 +35,7 @@ interface DemoState extends BaseState {
     number,
   ];
   orthographic: [number, number, number, number, number, number];
-}
+}>;
 
 /**
  * 拉近控制观察
@@ -52,6 +52,7 @@ const Demo38: FC<ComponentProps> = () => {
           data: () => {
             gl.clearColor(0, 0, 0, 1);
             gl.clear(gl.COLOR_BUFFER_BIT);
+            return 1;
           },
           onChange: ({ points }) => {
             gl.drawArrays(gl.TRIANGLES, 0, points.flat().length);

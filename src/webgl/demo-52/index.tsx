@@ -5,14 +5,14 @@ import { type ComponentProps } from '../../type';
 import Canvas from '../lib/canvas-component';
 import { Matrix4, Vector3 } from '../lib/cuon-matrix';
 import {
-  type BaseState,
   parseStateStore,
   type StateChangeAction,
+  type StateWithRoot,
 } from '../lib/webgl-store';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
-interface DemoState extends BaseState {
+type DemoState = StateWithRoot<{
   a_Position: GLint;
   a_Color: GLint;
   a_Normal: GLint;
@@ -58,7 +58,7 @@ interface DemoState extends BaseState {
   ];
   perspective: [number, number, number, number];
   lights: [number, number, number, number, number, number][];
-}
+}>;
 
 /**
  * 绘制光下变换
@@ -103,6 +103,7 @@ const Demo52: FC<ComponentProps> = () => {
             gl.clearColor(0, 0, 0, 1);
             gl.enable(gl.DEPTH_TEST);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            return 1;
           },
           onChange: ({ surfaces }) => {
             gl.drawElements(

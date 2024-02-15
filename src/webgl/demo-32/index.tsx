@@ -6,14 +6,14 @@ import CIRCLE_IMAGE from '../assets/circle.gif';
 import SKY_IMAGE from '../assets/sky.jpg';
 import Canvas from '../lib/canvas-component';
 import {
-  type BaseState,
   parseStateStore,
   type StateChangeAction,
+  type StateWithRoot,
 } from '../lib/webgl-store';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
-interface DemoState extends BaseState {
+type DemoState = StateWithRoot<{
   a_Position: GLint;
   a_TexCoord: GLint;
   u_Sampler0: WebGLUniformLocation | null;
@@ -25,7 +25,7 @@ interface DemoState extends BaseState {
   points: [number, number, number, number][];
   picture0: [TexImageSource, 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7];
   picture1: [TexImageSource, 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7];
-}
+}>;
 
 /**
  * 绘制多纹理
@@ -45,6 +45,7 @@ const Demo32: FC<ComponentProps> = () => {
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
             gl.clearColor(0, 0, 0, 1);
             gl.clear(gl.COLOR_BUFFER_BIT);
+            return 1;
           },
           onChange: ({ points }) => {
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, points.length);

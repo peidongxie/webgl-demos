@@ -3,17 +3,17 @@ import { type FC, useCallback } from 'react';
 import { flatArray } from '../../lib/react-utils';
 import { type ComponentProps } from '../../type';
 import Canvas from '../lib/canvas-component';
-import { type BaseState, parseStateStore } from '../lib/webgl-store';
+import { parseStateStore, type StateWithRoot } from '../lib/webgl-store';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
-interface DemoState extends BaseState {
+type DemoState = StateWithRoot<{
   a_Position: GLint;
   a_Color: GLint;
   positionColorBuffer: WebGLBuffer | null;
   positionColorArray: Float32Array;
   points: [number, number, number, number, number][];
-}
+}>;
 
 /**
  * 渐变
@@ -28,6 +28,7 @@ const Demo27: FC<ComponentProps> = () => {
           data: () => {
             gl.clearColor(0, 0, 0, 1);
             gl.clear(gl.COLOR_BUFFER_BIT);
+            return 1;
           },
           onChange: ({ points }) => {
             gl.drawArrays(gl.TRIANGLES, 0, points.length);

@@ -3,16 +3,16 @@ import { type FC, useCallback } from 'react';
 import { flatArray } from '../../lib/react-utils';
 import { type ComponentProps } from '../../type';
 import Canvas from '../lib/canvas-component';
-import { type BaseState, parseStateStore } from '../lib/webgl-store';
+import { parseStateStore, type StateWithRoot } from '../lib/webgl-store';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
-interface DemoState extends BaseState {
+type DemoState = StateWithRoot<{
   a_Position: GLint;
   positionBuffer: WebGLBuffer | null;
   positionArray: Float32Array;
   points: [number, number][];
-}
+}>;
 
 /**
  * 绘制连接线
@@ -27,6 +27,7 @@ const Demo10: FC<ComponentProps> = () => {
           data: () => {
             gl.clearColor(0, 0, 0, 1);
             gl.clear(gl.COLOR_BUFFER_BIT);
+            return 1;
           },
           onChange: ({ points }) => {
             gl.drawArrays(gl.LINE_STRIP, 0, points.length);
