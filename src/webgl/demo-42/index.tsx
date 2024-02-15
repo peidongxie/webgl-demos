@@ -5,14 +5,14 @@ import { type ComponentProps } from '../../type';
 import Canvas from '../lib/canvas-component';
 import { Matrix4 } from '../lib/cuon-matrix';
 import {
-  type BaseState,
   parseStateStore,
   type StateChangeAction,
+  type StateWithRoot,
 } from '../lib/webgl-store';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
-interface DemoState extends BaseState {
+type DemoState = StateWithRoot<{
   a_Position: GLint;
   a_Color: GLint;
   u_ModelMatrix: WebGLUniformLocation | null;
@@ -37,7 +37,7 @@ interface DemoState extends BaseState {
     number,
   ];
   perspective: [number, number, number, number];
-}
+}>;
 
 /**
  * 透视平移
@@ -82,11 +82,10 @@ const Demo42: FC<ComponentProps> = () => {
           data: () => {
             gl.clearColor(0, 0, 0, 1);
             gl.clear(gl.COLOR_BUFFER_BIT);
+            return 2;
           },
-          onChange: ({ points, translations }, index) => {
-            if (translations.length <= index) return false;
+          onChange: ({ points }) => {
             gl.drawArrays(gl.TRIANGLES, 0, points.flat().length);
-            return true;
           },
         },
         // 着色器变量：a_Position
@@ -134,14 +133,12 @@ const Demo42: FC<ComponentProps> = () => {
             gl.getParameter(gl.CURRENT_PROGRAM)!,
             'u_ModelMatrix',
           ),
-          onChange: ({ u_ModelMatrix, modelMatrices, translations }, index) => {
-            if (translations.length <= index) return false;
+          onChange: ({ u_ModelMatrix, modelMatrices }, index) => {
             gl.uniformMatrix4fv(
               u_ModelMatrix,
               false,
               modelMatrices[index].elements,
             );
-            return true;
           },
         },
         // 着色器变量：u_ViewMatrix
@@ -188,7 +185,6 @@ const Demo42: FC<ComponentProps> = () => {
           deps: ['translations'],
           data: [new Matrix4(), new Matrix4()],
           onChange: ({ modelMatrices, translations }, index) => {
-            if (translations.length <= index) return false;
             const [translationX, translationY, translationZ] =
               translations[index];
             modelMatrices[index].setTranslate(
@@ -196,7 +192,6 @@ const Demo42: FC<ComponentProps> = () => {
               translationY,
               translationZ,
             );
-            return true;
           },
         },
         // 派生数据：视图矩阵

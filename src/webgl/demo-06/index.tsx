@@ -3,18 +3,18 @@ import { type FC, type MouseEventHandler, useCallback, useRef } from 'react';
 import { type ComponentProps } from '../../type';
 import Canvas from '../lib/canvas-component';
 import {
-  type BaseState,
   parseStateStore,
   type StateChangeAction,
+  type StateWithRoot,
 } from '../lib/webgl-store';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
-interface DemoState extends BaseState {
+type DemoState = StateWithRoot<{
   a_Position: GLint;
   u_FragColor: WebGLUniformLocation | null;
   points: [number, number, number, number, number, number][];
-}
+}>;
 
 /**
  * 绘制彩点
@@ -29,14 +29,13 @@ const Demo06: FC<ComponentProps> = () => {
         // 着色器程序
         root: {
           deps: ['a_Position', 'u_FragColor'],
-          data: () => {
+          data: ({ points }) => {
             gl.clearColor(0, 0, 0, 1);
             gl.clear(gl.COLOR_BUFFER_BIT);
+            return points.length;
           },
-          onChange: ({ points }, index) => {
-            if (points.length <= index) return false;
+          onChange: () => {
             gl.drawArrays(gl.POINTS, 0, 1);
-            return true;
           },
         },
         // 着色器变量：a_Position
@@ -47,10 +46,8 @@ const Demo06: FC<ComponentProps> = () => {
             'a_Position',
           ),
           onChange: ({ a_Position, points }, index) => {
-            if (points.length <= index) return false;
             const [x, y] = points[index]!;
             gl.vertexAttrib3f(a_Position, x, y, 0);
-            return true;
           },
         },
         // 着色器变量：u_FragColor
@@ -61,7 +58,6 @@ const Demo06: FC<ComponentProps> = () => {
             'u_FragColor',
           ),
           onChange: ({ u_FragColor, points }, index) => {
-            if (points.length <= index) return false;
             gl.uniform4f(
               u_FragColor,
               points[index]![2],
@@ -69,7 +65,6 @@ const Demo06: FC<ComponentProps> = () => {
               points[index]![4],
               points[index]![5],
             );
-            return true;
           },
         },
         // 原子数据：顶点

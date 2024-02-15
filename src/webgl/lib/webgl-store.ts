@@ -1,32 +1,33 @@
-interface BaseState {
-  root: () => void;
-}
+type StateWithRoot<S extends Record<string, unknown> = Record<string, never>> =
+  Omit<S, 'root'> & {
+    root: (state: StateWithRoot<S>) => number;
+  };
 
-type StateChangeAction<S extends BaseState> = (
+type StateChangeAction<S extends StateWithRoot<S>> = (
   action?: Partial<S> | ((state: S) => Partial<S>),
 ) => void;
 
-type StateChangeEffect<S extends BaseState> = (
+type StateChangeEffect<S extends StateWithRoot<S>> = (
   state: S,
   index: number,
-) => void | boolean;
+) => void;
 
-interface StateItem<S extends BaseState, K extends keyof S> {
+interface StateItem<S extends StateWithRoot<S>, K extends keyof S> {
   data: S[K];
   onChange?: StateChangeEffect<S>;
 }
 
-type StateStore<S extends BaseState> = {
+type StateStore<S extends StateWithRoot<S>> = {
   [K in keyof S]: { deps: Exclude<keyof S, K | 'root'>[] } & StateItem<S, K>;
 };
 
-interface StateGraph<S extends BaseState, K extends keyof S> {
+interface StateGraph<S extends StateWithRoot<S>, K extends keyof S> {
   key: K;
   value: StateItem<S, K>;
   children: StateGraph<S, Exclude<keyof S, K | 'root'>>[];
 }
 
-const buildStateGraph = <S extends BaseState, K extends keyof S>(
+const buildStateGraph = <S extends StateWithRoot<S>, K extends keyof S>(
   store: StateStore<S>,
   key: K,
 ): StateGraph<S, K> => ({
@@ -35,7 +36,7 @@ const buildStateGraph = <S extends BaseState, K extends keyof S>(
   children: (store[key]?.deps || []).map((dep) => buildStateGraph(store, dep)),
 });
 
-const parseStateGraph = <S extends BaseState, K extends keyof S>(
+const parseStateGraph = <S extends StateWithRoot<S>, K extends keyof S>(
   graph: StateGraph<S, K>,
   scope: (keyof S)[],
 ): StateChangeEffect<S> | null => {
@@ -47,13 +48,10 @@ const parseStateGraph = <S extends BaseState, K extends keyof S>(
   const callbacks = graph.children
     .map((child) => parseStateGraph(child, scope))
     .filter((callback) => callback);
-  const nextCallbacks = new Set(callbacks);
   return graph.key === 'root' || callbacks.length
     ? (state: S, index: number) => {
         for (const callback of callbacks) {
-          if (!nextCallbacks.has(callback)) continue;
-          const next = callback?.(state, index);
-          if (!next) nextCallbacks.delete(callback);
+          callback?.(state, index);
         }
         if (typeof graph.value.onChange !== 'function') return false;
         return graph.value.onChange(state, index);
@@ -61,7 +59,7 @@ const parseStateGraph = <S extends BaseState, K extends keyof S>(
     : null;
 };
 
-const parseStateStore = <S extends BaseState>(
+const parseStateStore = <S extends StateWithRoot<S> = StateWithRoot>(
   store: StateStore<S>,
 ): StateChangeAction<S> => {
   const graph = buildStateGraph(store, 'root');
@@ -79,14 +77,16 @@ const parseStateStore = <S extends BaseState>(
       graph,
       Reflect.ownKeys(partialState) as (keyof S)[],
     );
-    graph.value.data();
-    for (let index = 0; callback?.(newState, index); index++) {}
+    const round = (graph.value.data as (state: S) => number)(newState);
+    for (let index = 0; index < round; index++) {
+      callback?.(newState, index);
+    }
   };
 };
 
 export {
-  type BaseState,
   parseStateStore,
   type StateChangeAction,
   type StateChangeEffect,
+  type StateWithRoot,
 };

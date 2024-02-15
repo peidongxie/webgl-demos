@@ -6,14 +6,14 @@ import { type ComponentProps } from '../../type';
 import Canvas from '../lib/canvas-component';
 import { Matrix4, Vector3 } from '../lib/cuon-matrix';
 import {
-  type BaseState,
   parseStateStore,
   type StateChangeAction,
+  type StateWithRoot,
 } from '../lib/webgl-store';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
-interface DemoState extends BaseState {
+type DemoState = StateWithRoot<{
   a_Position: GLint;
   a_Color: GLint;
   a_Normal: GLint;
@@ -74,7 +74,7 @@ interface DemoState extends BaseState {
   ];
   perspective: [number, number, number, number];
   lights: [number, number, number, number, number, number][];
-}
+}>;
 
 /**
  * 解耦模型顶点
@@ -119,16 +119,15 @@ const Demo62: FC<ComponentProps> = () => {
             gl.clearColor(0, 0, 0, 1);
             gl.enable(gl.DEPTH_TEST);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            return 6;
           },
-          onChange: ({ surfaces }, index) => {
-            if (index >= 6) return false;
+          onChange: ({ surfaces }) => {
             gl.drawElements(
               gl.TRIANGLES,
               surfaces.flat(2).length,
               gl.UNSIGNED_BYTE,
               0,
             );
-            return true;
           },
         },
         // 着色器变量：a_Position
@@ -138,8 +137,7 @@ const Demo62: FC<ComponentProps> = () => {
             gl.getParameter(gl.CURRENT_PROGRAM)!,
             'a_Position',
           ),
-          onChange: ({ a_Position, positionColorNormalArray }, index) => {
-            if (index >= 6) return false;
+          onChange: ({ a_Position, positionColorNormalArray }) => {
             gl.vertexAttribPointer(
               a_Position,
               3,
@@ -149,7 +147,6 @@ const Demo62: FC<ComponentProps> = () => {
               0,
             );
             gl.enableVertexAttribArray(a_Position);
-            return true;
           },
         },
         // 着色器变量：a_Color
@@ -159,8 +156,7 @@ const Demo62: FC<ComponentProps> = () => {
             gl.getParameter(gl.CURRENT_PROGRAM)!,
             'a_Color',
           ),
-          onChange: ({ a_Color, positionColorNormalArray }, index) => {
-            if (index >= 6) return false;
+          onChange: ({ a_Color, positionColorNormalArray }) => {
             gl.vertexAttribPointer(
               a_Color,
               3,
@@ -170,7 +166,6 @@ const Demo62: FC<ComponentProps> = () => {
               positionColorNormalArray.BYTES_PER_ELEMENT * 3,
             );
             gl.enableVertexAttribArray(a_Color);
-            return true;
           },
         },
         // 着色器变量：a_Normal
@@ -180,8 +175,7 @@ const Demo62: FC<ComponentProps> = () => {
             gl.getParameter(gl.CURRENT_PROGRAM)!,
             'a_Normal',
           ),
-          onChange: ({ a_Normal, positionColorNormalArray }, index) => {
-            if (index >= 6) return false;
+          onChange: ({ a_Normal, positionColorNormalArray }) => {
             gl.vertexAttribPointer(
               a_Normal,
               3,
@@ -191,7 +185,6 @@ const Demo62: FC<ComponentProps> = () => {
               positionColorNormalArray.BYTES_PER_ELEMENT * 6,
             );
             gl.enableVertexAttribArray(a_Normal);
-            return true;
           },
         },
         // 着色器变量：u_MvpMatrix
@@ -202,13 +195,11 @@ const Demo62: FC<ComponentProps> = () => {
             'u_MvpMatrix',
           ),
           onChange: ({ u_MvpMatrix, mvpMatrices }, index) => {
-            if (index >= 6) return false;
             gl.uniformMatrix4fv(
               u_MvpMatrix,
               false,
               mvpMatrices[index].elements,
             );
-            return true;
           },
         },
         // 着色器变量：u_NormalMatrix
@@ -219,13 +210,11 @@ const Demo62: FC<ComponentProps> = () => {
             'u_NormalMatrix',
           ),
           onChange: ({ u_NormalMatrix, normalMatrices }, index) => {
-            if (index >= 6) return false;
             gl.uniformMatrix4fv(
               u_NormalMatrix,
               false,
               normalMatrices[index].elements,
             );
-            return true;
           },
         },
         // 着色器变量：u_LightColor
@@ -265,18 +254,16 @@ const Demo62: FC<ComponentProps> = () => {
         positionColorNormalBuffer: {
           deps: ['positionColorNormalArray'],
           data: gl.createBuffer(),
-          onChange: (
-            { positionColorNormalBuffer, positionColorNormalArray },
-            index,
-          ) => {
-            if (index >= 6) return false;
+          onChange: ({
+            positionColorNormalBuffer,
+            positionColorNormalArray,
+          }) => {
             gl.bindBuffer(gl.ARRAY_BUFFER, positionColorNormalBuffer);
             gl.bufferData(
               gl.ARRAY_BUFFER,
               positionColorNormalArray,
               gl.STATIC_DRAW,
             );
-            return true;
           },
         },
         // 派生数据：顶点索引缓冲区
@@ -293,9 +280,7 @@ const Demo62: FC<ComponentProps> = () => {
           deps: ['points'],
           data: new Float32Array(216),
           onChange: ({ positionColorNormalArray, points }, index) => {
-            if (index >= 6) return false;
             positionColorNormalArray.set(flatArray(points[index]));
-            return true;
           },
         },
         // 派生数据：顶点索引数组
@@ -318,11 +303,9 @@ const Demo62: FC<ComponentProps> = () => {
             new Matrix4(),
           ],
           onChange: ({ mvpMatrices, modelMatrices, viewProjMatrix }, index) => {
-            if (index >= 6) return false;
             mvpMatrices[index]
               .set(viewProjMatrix)
               .multiply(modelMatrices[index]);
-            return true;
           },
         },
         // 派生数据：法向量矩阵
@@ -337,11 +320,9 @@ const Demo62: FC<ComponentProps> = () => {
             new Matrix4(),
           ],
           onChange: ({ normalMatrices, modelMatrices }, index) => {
-            if (index >= 6) return false;
             normalMatrices[index]
               .setInverseOf(modelMatrices[index])
               .transpose();
-            return true;
           },
         },
         // 派生数据：模型矩阵
@@ -356,7 +337,6 @@ const Demo62: FC<ComponentProps> = () => {
             new Matrix4(),
           ],
           onChange: ({ modelMatrices, translations, rotations }, index) => {
-            if (index >= 6) return false;
             const modelMatrix = modelMatrices[index];
             modelMatrix.setIdentity();
             for (let i = 0; i <= index; i++) {
@@ -368,7 +348,6 @@ const Demo62: FC<ComponentProps> = () => {
                 .translate(translationX, translationY, translationZ)
                 .rotate(angle, rotationX, rotationY, rotationZ);
             }
-            return true;
           },
         },
         // 派生数据：视图投影矩阵

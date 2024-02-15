@@ -2,7 +2,7 @@ import { type FC, useCallback } from 'react';
 
 import { type ComponentProps } from '../../type';
 import Canvas from '../lib/canvas-component';
-import { type BaseState, parseStateStore } from '../lib/webgl-store';
+import { parseStateStore } from '../lib/webgl-store';
 
 /**
  * 清空画布
@@ -10,13 +10,14 @@ import { type BaseState, parseStateStore } from '../lib/webgl-store';
 const Demo02: FC<ComponentProps> = () => {
   const handleProgramInit = useCallback(
     (_: HTMLCanvasElement, gl: WebGLRenderingContext) => {
-      const draw = parseStateStore<BaseState>({
+      const draw = parseStateStore({
         // 着色器程序
         root: {
           deps: [],
           data: () => {
             gl.clearColor(0, 0, 0, 1);
             gl.clear(gl.COLOR_BUFFER_BIT);
+            return 1;
           },
         },
       });

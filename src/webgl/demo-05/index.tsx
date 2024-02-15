@@ -3,17 +3,17 @@ import { type FC, type MouseEventHandler, useCallback, useRef } from 'react';
 import { type ComponentProps } from '../../type';
 import Canvas from '../lib/canvas-component';
 import {
-  type BaseState,
   parseStateStore,
   type StateChangeAction,
+  type StateWithRoot,
 } from '../lib/webgl-store';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
-interface DemoState extends BaseState {
+type DemoState = StateWithRoot<{
   a_Position: GLint;
   points: [number, number][];
-}
+}>;
 
 /**
  * 点击绘制点
@@ -28,14 +28,13 @@ const Demo05: FC<ComponentProps> = () => {
         // 着色器程序
         root: {
           deps: ['a_Position'],
-          data: () => {
+          data: ({ points }) => {
             gl.clearColor(0, 0, 0, 1);
             gl.clear(gl.COLOR_BUFFER_BIT);
+            return points.length;
           },
-          onChange: ({ points }, index) => {
-            if (points.length <= index) return false;
+          onChange: () => {
             gl.drawArrays(gl.POINTS, 0, 1);
-            return true;
           },
         },
         // 着色器变量：a_Position
@@ -46,10 +45,8 @@ const Demo05: FC<ComponentProps> = () => {
             'a_Position',
           ),
           onChange: ({ a_Position, points }, index) => {
-            if (points.length <= index) return false;
             const [x, y] = points[index]!;
             gl.vertexAttrib3f(a_Position, x, y, 0);
-            return true;
           },
         },
         // 原子数据：顶点
