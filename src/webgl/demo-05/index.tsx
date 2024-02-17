@@ -52,7 +52,6 @@ const Demo05: FC<ComponentProps> = () => {
         // 原子数据：顶点
         points: {
           deps: [],
-          data: [],
         },
       });
       draw({ points: [] });

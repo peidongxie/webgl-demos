@@ -89,12 +89,10 @@ const Demo18: FC<ComponentProps> = () => {
         // 原子数据：顶点
         points: {
           deps: [],
-          data: [],
         },
         // 原子数据：旋转
         rotation: {
           deps: [],
-          data: [0, 0, 0, 0],
         },
       });
       draw({

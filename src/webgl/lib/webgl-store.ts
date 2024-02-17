@@ -17,11 +17,19 @@ type StateItem<
   K extends keyof S = keyof S,
 > = K extends never
   ? never
-  : {
-      deps: (keyof S)[];
-      data: S[K];
-      onChange?: StateChangeEffect<S>;
-    };
+  :
+      | {
+          deps: (keyof S)[];
+          type?: 'single' | 'multi' | 'dynamic';
+          data: S[K];
+          onChange?: StateChangeEffect<S>;
+        }
+      | {
+          deps: [];
+          type?: 'single' | 'multi' | 'dynamic';
+          data?: S[K];
+          onChange?: StateChangeEffect<S>;
+        };
 
 type StateGraph<S extends StateWithRoot<S>> = StateItem<S>[];
 

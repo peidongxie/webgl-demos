@@ -357,32 +357,26 @@ const Demo56: FC<ComponentProps> = () => {
         // 原子数据：顶点
         points: {
           deps: [],
-          data: [],
         },
         // 原子数据：表面
         surfaces: {
           deps: [],
-          data: [],
         },
         // 原子数据：旋转
         rotation: {
           deps: [],
-          data: [0, 0, 0, 0],
         },
         // 原子数据：相机
         camera: {
           deps: [],
-          data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
         },
         // 原子数据：透视
         perspective: {
           deps: [],
-          data: [0, 0, 0, 0],
         },
         // 原子数据：光线
         lights: {
           deps: [],
-          data: [],
         },
       });
       const points: [

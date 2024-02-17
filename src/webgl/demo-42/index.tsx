@@ -231,22 +231,18 @@ const Demo42: FC<ComponentProps> = () => {
         // 原子数据：顶点
         points: {
           deps: [],
-          data: [],
         },
         // 原子数据：平移
         translations: {
           deps: [],
-          data: [],
         },
         // 原子数据：相机
         camera: {
           deps: [],
-          data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
         },
         // 原子数据：透视
         perspective: {
           deps: [],
-          data: [0, 0, 0, 0],
         },
       });
       draw({

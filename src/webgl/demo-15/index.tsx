@@ -94,12 +94,10 @@ const Demo15: FC<ComponentProps> = () => {
         // 原子数据：顶点
         points: {
           deps: [],
-          data: [],
         },
         // 原子数据：角度
         angle: {
           deps: [],
-          data: 0,
         },
       });
       draw({

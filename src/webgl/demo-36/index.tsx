@@ -144,12 +144,10 @@ const Demo36: FC<ComponentProps> = () => {
         // 原子数据：顶点
         points: {
           deps: [],
-          data: [],
         },
         // 原子数据：相机
         camera: {
           deps: [],
-          data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
         },
       });
       draw({

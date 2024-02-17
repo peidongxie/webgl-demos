@@ -97,22 +97,18 @@ const Demo21: FC<ComponentProps> = () => {
         // 原子数据：顶点
         points: {
           deps: [],
-          data: [],
         },
         // 原子数据：旋转
         rotation: {
           deps: [],
-          data: [0, 0, 0, 0],
         },
         // 原子数据：速度
         velocity: {
           deps: [],
-          data: 0,
         },
         // 原子数据：时间
         time: {
           deps: [],
-          data: 0,
         },
       });
       draw({

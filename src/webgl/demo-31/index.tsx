@@ -148,12 +148,10 @@ const Demo31: FC<ComponentProps> = () => {
         // 原子数据：顶点
         points: {
           deps: [],
-          data: [],
         },
         // 原子数据：图片
         picture: {
           deps: [],
-          data: [new Image(), 0],
         },
       });
       drawRef.current = draw;
