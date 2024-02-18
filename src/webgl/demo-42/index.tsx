@@ -79,6 +79,7 @@ const Demo42: FC<ComponentProps> = () => {
             'u_ViewMatrix',
             'u_ProjMatrix',
           ],
+          type: 'dynamic',
           data: () => {
             gl.clearColor(0, 0, 0, 1);
             gl.clear(gl.COLOR_BUFFER_BIT);
@@ -129,6 +130,7 @@ const Demo42: FC<ComponentProps> = () => {
         // 着色器变量：u_ModelMatrix
         u_ModelMatrix: {
           deps: ['modelMatrices'],
+          type: 'dynamic',
           data: gl.getUniformLocation(
             gl.getParameter(gl.CURRENT_PROGRAM)!,
             'u_ModelMatrix',
@@ -183,6 +185,7 @@ const Demo42: FC<ComponentProps> = () => {
         // 派生数据：模型矩阵
         modelMatrices: {
           deps: ['translations'],
+          type: 'multi',
           data: [new Matrix4(), new Matrix4()],
           onChange: ({ modelMatrices, translations }, index) => {
             const [translationX, translationY, translationZ] =

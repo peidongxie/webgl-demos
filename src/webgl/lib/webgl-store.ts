@@ -96,12 +96,17 @@ const parseStateStore = <S extends StateWithRoot<S> = StateWithRoot>(
       store[key as keyof S].data = value;
     }
     const round = (store.root.data as (state: S) => number)(newState);
-    const callbacks = graph
-      .filter((item) => item.deps.some((dep) => Reflect.has(partialState, dep)))
-      .map((item) => item.onChange);
-    for (let index = 0; index < round; index++) {
-      for (const callback of callbacks) {
-        callback?.(newState, index);
+    for (let i = 0; i < round; i++) {
+      for (const item of graph) {
+        const single =
+          i === 0 &&
+          (item.type === undefined || item.type === 'single') &&
+          item.deps.some((dep) => Reflect.has(partialState, dep));
+        const multi =
+          item.type === 'multi' &&
+          item.deps.some((dep) => Reflect.has(partialState, dep));
+        const dynamic = item.type === 'dynamic';
+        if (single || multi || dynamic) item.onChange?.(newState, i);
       }
     }
   };

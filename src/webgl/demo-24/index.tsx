@@ -43,7 +43,8 @@ const Demo24: FC<ComponentProps> = () => {
             gl.getParameter(gl.CURRENT_PROGRAM)!,
             'a_Position',
           ),
-          onChange: ({ a_Position }) => {
+          onChange: ({ a_Position, positionBuffer }) => {
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
             gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(a_Position);
           },
@@ -55,7 +56,8 @@ const Demo24: FC<ComponentProps> = () => {
             gl.getParameter(gl.CURRENT_PROGRAM)!,
             'a_PointSize',
           ),
-          onChange: ({ a_PointSize }) => {
+          onChange: ({ a_PointSize, sizeBuffer }) => {
+            gl.bindBuffer(gl.ARRAY_BUFFER, sizeBuffer);
             gl.vertexAttribPointer(a_PointSize, 1, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(a_PointSize);
           },

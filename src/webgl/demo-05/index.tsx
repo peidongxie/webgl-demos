@@ -28,6 +28,7 @@ const Demo05: FC<ComponentProps> = () => {
         // 着色器程序
         root: {
           deps: ['a_Position'],
+          type: 'dynamic',
           data: ({ points }) => {
             gl.clearColor(0, 0, 0, 1);
             gl.clear(gl.COLOR_BUFFER_BIT);
@@ -40,6 +41,7 @@ const Demo05: FC<ComponentProps> = () => {
         // 着色器变量：a_Position
         a_Position: {
           deps: ['points'],
+          type: 'dynamic',
           data: gl.getAttribLocation(
             gl.getParameter(gl.CURRENT_PROGRAM)!,
             'a_Position',

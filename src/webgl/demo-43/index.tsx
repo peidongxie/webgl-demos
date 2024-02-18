@@ -69,6 +69,7 @@ const Demo43: FC<ComponentProps> = () => {
         // 着色器程序
         root: {
           deps: ['a_Position', 'a_Color', 'u_MvpMatrix'],
+          type: 'dynamic',
           data: () => {
             gl.clearColor(0, 0, 0, 1);
             gl.clear(gl.COLOR_BUFFER_BIT);
@@ -119,6 +120,7 @@ const Demo43: FC<ComponentProps> = () => {
         // 着色器变量：u_MvpMatrix
         u_MvpMatrix: {
           deps: ['mvpMatrices'],
+          type: 'dynamic',
           data: gl.getUniformLocation(
             gl.getParameter(gl.CURRENT_PROGRAM)!,
             'u_MvpMatrix',
@@ -151,6 +153,7 @@ const Demo43: FC<ComponentProps> = () => {
         // 派生数据：模型视图投影矩阵
         mvpMatrices: {
           deps: ['translations', 'camera', 'perspective'],
+          type: 'multi',
           data: [new Matrix4(), new Matrix4()],
           onChange: (
             { mvpMatrices, translations, camera, perspective },
