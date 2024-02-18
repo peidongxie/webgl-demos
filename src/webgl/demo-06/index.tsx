@@ -29,6 +29,7 @@ const Demo06: FC<ComponentProps> = () => {
         // 着色器程序
         root: {
           deps: ['a_Position', 'u_FragColor'],
+          type: 'dynamic',
           data: ({ points }) => {
             gl.clearColor(0, 0, 0, 1);
             gl.clear(gl.COLOR_BUFFER_BIT);
@@ -41,6 +42,7 @@ const Demo06: FC<ComponentProps> = () => {
         // 着色器变量：a_Position
         a_Position: {
           deps: ['points'],
+          type: 'dynamic',
           data: gl.getAttribLocation(
             gl.getParameter(gl.CURRENT_PROGRAM)!,
             'a_Position',
@@ -53,6 +55,7 @@ const Demo06: FC<ComponentProps> = () => {
         // 着色器变量：u_FragColor
         u_FragColor: {
           deps: ['points'],
+          type: 'dynamic',
           data: gl.getUniformLocation(
             gl.getParameter(gl.CURRENT_PROGRAM)!,
             'u_FragColor',
@@ -70,7 +73,6 @@ const Demo06: FC<ComponentProps> = () => {
         // 原子数据：顶点
         points: {
           deps: [],
-          data: [],
         },
       });
       draw({ points: [] });

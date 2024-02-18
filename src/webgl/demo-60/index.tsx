@@ -105,6 +105,7 @@ const Demo60: FC<ComponentProps> = () => {
             'u_LightDirection',
             'u_AmbientLight',
           ],
+          type: 'dynamic',
           data: () => {
             gl.clearColor(0, 0, 0, 1);
             gl.enable(gl.DEPTH_TEST);
@@ -180,6 +181,7 @@ const Demo60: FC<ComponentProps> = () => {
         // 着色器变量：u_MvpMatrix
         u_MvpMatrix: {
           deps: ['mvpMatrices'],
+          type: 'dynamic',
           data: gl.getUniformLocation(
             gl.getParameter(gl.CURRENT_PROGRAM)!,
             'u_MvpMatrix',
@@ -195,6 +197,7 @@ const Demo60: FC<ComponentProps> = () => {
         // 着色器变量：u_NormalMatrix
         u_NormalMatrix: {
           deps: ['normalMatrices'],
+          type: 'dynamic',
           data: gl.getUniformLocation(
             gl.getParameter(gl.CURRENT_PROGRAM)!,
             'u_NormalMatrix',
@@ -284,6 +287,7 @@ const Demo60: FC<ComponentProps> = () => {
         // 派生数据：模型视图投影矩阵
         mvpMatrices: {
           deps: ['modelMatrices', 'viewProjMatrix'],
+          type: 'multi',
           data: [new Matrix4(), new Matrix4()],
           onChange: ({ mvpMatrices, modelMatrices, viewProjMatrix }, index) => {
             mvpMatrices[index]
@@ -294,6 +298,7 @@ const Demo60: FC<ComponentProps> = () => {
         // 派生数据：法向量矩阵
         normalMatrices: {
           deps: ['modelMatrices'],
+          type: 'multi',
           data: [new Matrix4(), new Matrix4()],
           onChange: ({ normalMatrices, modelMatrices }, index) => {
             normalMatrices[index]
@@ -304,6 +309,7 @@ const Demo60: FC<ComponentProps> = () => {
         // 派生数据：模型矩阵
         modelMatrices: {
           deps: ['translations', 'rotations', 'scales'],
+          type: 'multi',
           data: [new Matrix4(), new Matrix4()],
           onChange: (
             { modelMatrices, translations, rotations, scales },
@@ -379,51 +385,34 @@ const Demo60: FC<ComponentProps> = () => {
         // 原子数据：顶点
         points: {
           deps: [],
-          data: [],
         },
         // 原子数据：表面
         surfaces: {
           deps: [],
-          data: [],
         },
         // 原子数据：平移
         translations: {
           deps: [],
-          data: [
-            [0, 0, 0],
-            [0, 0, 0],
-          ],
         },
         // 原子数据：旋转
         rotations: {
           deps: [],
-          data: [
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-          ],
         },
         // 原子数据：缩放
         scales: {
           deps: [],
-          data: [
-            [1, 1, 1],
-            [1, 1, 1],
-          ],
         },
         // 原子数据：相机
         camera: {
           deps: [],
-          data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
         },
         // 原子数据：透视
         perspective: {
           deps: [],
-          data: [0, 0, 0, 0],
         },
         // 原子数据：光线
         lights: {
           deps: [],
-          data: [],
         },
       });
       draw({

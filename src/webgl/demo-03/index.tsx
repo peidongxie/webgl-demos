@@ -16,6 +16,7 @@ const Demo03: FC<ComponentProps> = () => {
         // 着色器程序
         root: {
           deps: [],
+          type: 'dynamic',
           data: () => {
             gl.clearColor(0, 0, 0, 1);
             gl.clear(gl.COLOR_BUFFER_BIT);

@@ -105,12 +105,10 @@ const Demo17: FC<ComponentProps> = () => {
         // 原子数据：顶点
         points: {
           deps: [],
-          data: [],
         },
         // 原子数据：缩放
         scale: {
           deps: [],
-          data: [1, 1, 1],
         },
       });
       draw({

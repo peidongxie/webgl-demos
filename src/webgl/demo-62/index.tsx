@@ -115,6 +115,7 @@ const Demo62: FC<ComponentProps> = () => {
             'u_LightDirection',
             'u_AmbientLight',
           ],
+          type: 'dynamic',
           data: () => {
             gl.clearColor(0, 0, 0, 1);
             gl.enable(gl.DEPTH_TEST);
@@ -133,6 +134,7 @@ const Demo62: FC<ComponentProps> = () => {
         // 着色器变量：a_Position
         a_Position: {
           deps: ['positionColorNormalBuffer', 'indexBuffer'],
+          type: 'dynamic',
           data: gl.getAttribLocation(
             gl.getParameter(gl.CURRENT_PROGRAM)!,
             'a_Position',
@@ -171,6 +173,7 @@ const Demo62: FC<ComponentProps> = () => {
         // 着色器变量：a_Normal
         a_Normal: {
           deps: ['positionColorNormalBuffer', 'indexBuffer'],
+          type: 'dynamic',
           data: gl.getAttribLocation(
             gl.getParameter(gl.CURRENT_PROGRAM)!,
             'a_Normal',
@@ -190,6 +193,7 @@ const Demo62: FC<ComponentProps> = () => {
         // 着色器变量：u_MvpMatrix
         u_MvpMatrix: {
           deps: ['mvpMatrices'],
+          type: 'dynamic',
           data: gl.getUniformLocation(
             gl.getParameter(gl.CURRENT_PROGRAM)!,
             'u_MvpMatrix',
@@ -205,6 +209,7 @@ const Demo62: FC<ComponentProps> = () => {
         // 着色器变量：u_NormalMatrix
         u_NormalMatrix: {
           deps: ['normalMatrices'],
+          type: 'dynamic',
           data: gl.getUniformLocation(
             gl.getParameter(gl.CURRENT_PROGRAM)!,
             'u_NormalMatrix',
@@ -253,6 +258,7 @@ const Demo62: FC<ComponentProps> = () => {
         // 派生数据：顶点位置颜色法向缓冲区
         positionColorNormalBuffer: {
           deps: ['positionColorNormalArray'],
+          type: 'dynamic',
           data: gl.createBuffer(),
           onChange: ({
             positionColorNormalBuffer,
@@ -278,6 +284,7 @@ const Demo62: FC<ComponentProps> = () => {
         // 派生数据：顶点位置颜色法向数组
         positionColorNormalArray: {
           deps: ['points'],
+          type: 'dynamic',
           data: new Float32Array(216),
           onChange: ({ positionColorNormalArray, points }, index) => {
             positionColorNormalArray.set(flatArray(points[index]));
@@ -294,6 +301,7 @@ const Demo62: FC<ComponentProps> = () => {
         // 派生数据：模型视图投影矩阵
         mvpMatrices: {
           deps: ['modelMatrices', 'viewProjMatrix'],
+          type: 'multi',
           data: [
             new Matrix4(),
             new Matrix4(),
@@ -311,6 +319,7 @@ const Demo62: FC<ComponentProps> = () => {
         // 派生数据：法向量矩阵
         normalMatrices: {
           deps: ['modelMatrices'],
+          type: 'multi',
           data: [
             new Matrix4(),
             new Matrix4(),
@@ -328,6 +337,7 @@ const Demo62: FC<ComponentProps> = () => {
         // 派生数据：模型矩阵
         modelMatrices: {
           deps: ['translations', 'rotations'],
+          type: 'multi',
           data: [
             new Matrix4(),
             new Matrix4(),
@@ -406,51 +416,30 @@ const Demo62: FC<ComponentProps> = () => {
         // 原子数据：顶点
         points: {
           deps: [],
-          data: [],
         },
         // 原子数据：表面
         surfaces: {
           deps: [],
-          data: [],
         },
         // 原子数据：平移
         translations: {
           deps: [],
-          data: [
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-            [0, 0, 0],
-          ],
         },
         // 原子数据：旋转
         rotations: {
           deps: [],
-          data: [
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0],
-          ],
         },
         // 原子数据：相机
         camera: {
           deps: [],
-          data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
         },
         // 原子数据：透视
         perspective: {
           deps: [],
-          data: [0, 0, 0, 0],
         },
         // 原子数据：光线
         lights: {
           deps: [],
-          data: [],
         },
       });
       draw({
@@ -746,10 +735,9 @@ const Demo62: FC<ComponentProps> = () => {
         initialValue: () => {
           const draw = drawRef.current;
           if (!draw) return;
-          draw(({ points, rotations }) => {
+          draw(({ rotations }) => {
             const [angle, rotationX, rotationY, rotationZ] = rotations[1];
             return {
-              points,
               rotations: [
                 rotations[0],
                 [angle + 3, rotationX, rotationY, rotationZ],
@@ -768,10 +756,9 @@ const Demo62: FC<ComponentProps> = () => {
         initialValue: () => {
           const draw = drawRef.current;
           if (!draw) return;
-          draw(({ points, rotations }) => {
+          draw(({ rotations }) => {
             const [angle, rotationX, rotationY, rotationZ] = rotations[1];
             return {
-              points,
               rotations: [
                 rotations[0],
                 [angle - 3, rotationX, rotationY, rotationZ],
@@ -790,11 +777,10 @@ const Demo62: FC<ComponentProps> = () => {
         initialValue: () => {
           const draw = drawRef.current;
           if (!draw) return;
-          draw(({ points, rotations }) => {
+          draw(({ rotations }) => {
             const [angle, rotationX, rotationY, rotationZ] = rotations[2];
             if (angle >= 135) return { rotations };
             return {
-              points,
               rotations: [
                 rotations[0],
                 rotations[1],
@@ -813,11 +799,10 @@ const Demo62: FC<ComponentProps> = () => {
         initialValue: () => {
           const draw = drawRef.current;
           if (!draw) return;
-          draw(({ points, rotations }) => {
+          draw(({ rotations }) => {
             const [angle, rotationX, rotationY, rotationZ] = rotations[2];
             if (angle <= -135) return { rotations };
             return {
-              points,
               rotations: [
                 rotations[0],
                 rotations[1],
@@ -836,10 +821,9 @@ const Demo62: FC<ComponentProps> = () => {
         initialValue: () => {
           const draw = drawRef.current;
           if (!draw) return;
-          draw(({ points, rotations }) => {
+          draw(({ rotations }) => {
             const [angle, rotationX, rotationY, rotationZ] = rotations[3];
             return {
-              points,
               rotations: [
                 rotations[0],
                 rotations[1],
@@ -858,10 +842,9 @@ const Demo62: FC<ComponentProps> = () => {
         initialValue: () => {
           const draw = drawRef.current;
           if (!draw) return;
-          draw(({ points, rotations }) => {
+          draw(({ rotations }) => {
             const [angle, rotationX, rotationY, rotationZ] = rotations[3];
             return {
-              points,
               rotations: [
                 rotations[0],
                 rotations[1],
@@ -880,11 +863,10 @@ const Demo62: FC<ComponentProps> = () => {
         initialValue: () => {
           const draw = drawRef.current;
           if (!draw) return;
-          draw(({ points, rotations }) => {
+          draw(({ rotations }) => {
             const [angle, rotationX, rotationY, rotationZ] = rotations[4];
             if (angle >= 60) return { rotations };
             return {
-              points,
               rotations: [
                 rotations[0],
                 rotations[1],
@@ -903,11 +885,10 @@ const Demo62: FC<ComponentProps> = () => {
         initialValue: () => {
           const draw = drawRef.current;
           if (!draw) return;
-          draw(({ points, rotations }) => {
+          draw(({ rotations }) => {
             const [angle, rotationX, rotationY, rotationZ] = rotations[4];
             if (angle <= -60) return { rotations };
             return {
-              points,
               rotations: [
                 rotations[0],
                 rotations[1],

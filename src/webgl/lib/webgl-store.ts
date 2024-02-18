@@ -12,57 +12,76 @@ type StateChangeEffect<S extends StateWithRoot<S>> = (
   index: number,
 ) => void;
 
-interface StateItem<S extends StateWithRoot<S>, K extends keyof S> {
-  data: S[K];
-  onChange?: StateChangeEffect<S>;
-}
+type StateItem<
+  S extends StateWithRoot<S>,
+  K extends keyof S = keyof S,
+> = K extends never
+  ? never
+  :
+      | {
+          deps: (keyof S)[];
+          type?: 'single' | 'multi' | 'dynamic';
+          data: S[K];
+          onChange?: StateChangeEffect<S>;
+        }
+      | {
+          deps: [];
+          type?: 'single' | 'multi' | 'dynamic';
+          data?: S[K];
+          onChange?: StateChangeEffect<S>;
+        };
+
+type StateGraph<S extends StateWithRoot<S>> = StateItem<S>[];
 
 type StateStore<S extends StateWithRoot<S>> = {
-  [K in keyof S]: { deps: Exclude<keyof S, K | 'root'>[] } & StateItem<S, K>;
+  [K in keyof S]: StateItem<S, K>;
 };
 
-interface StateGraph<S extends StateWithRoot<S>, K extends keyof S> {
-  key: K;
-  value: StateItem<S, K>;
-  children: StateGraph<S, Exclude<keyof S, K | 'root'>>[];
-}
-
-const buildStateGraph = <S extends StateWithRoot<S>, K extends keyof S>(
+const resetStateDeps = <S extends StateWithRoot<S>>(
   store: StateStore<S>,
-  key: K,
-): StateGraph<S, K> => ({
-  key,
-  value: store[key],
-  children: (store[key]?.deps || []).map((dep) => buildStateGraph(store, dep)),
-});
-
-const parseStateGraph = <S extends StateWithRoot<S>, K extends keyof S>(
-  graph: StateGraph<S, K>,
-  scope: (keyof S)[],
-): StateChangeEffect<S> | null => {
-  if (scope.includes(graph.key)) {
-    return (state: S) => {
-      graph.value.data = state[graph.key];
-    };
+): void => {
+  const todoList: (keyof S)[] = ['root'];
+  const doneList: (keyof S)[] = [];
+  while (todoList.length > 0) {
+    const key = todoList[todoList.length - 1]!;
+    const { deps } = store[key];
+    const todoDeps = deps.filter(
+      (dep) => !doneList.includes(dep) && dep !== key,
+    );
+    if (todoDeps.length) {
+      todoList.push(...todoDeps);
+      continue;
+    }
+    const newDeps = deps.map((dep) => store[dep].deps).flat();
+    newDeps.unshift(key);
+    store[key].deps = Array.from(new Set(newDeps));
+    todoList.pop();
+    doneList.push(key);
   }
-  const callbacks = graph.children
-    .map((child) => parseStateGraph(child, scope))
-    .filter((callback) => callback);
-  return graph.key === 'root' || callbacks.length
-    ? (state: S, index: number) => {
-        for (const callback of callbacks) {
-          callback?.(state, index);
-        }
-        if (typeof graph.value.onChange !== 'function') return false;
-        return graph.value.onChange(state, index);
-      }
-    : null;
+};
+
+const buildStateGraph = <S extends StateWithRoot<S>>(
+  store: StateStore<S>,
+): StateGraph<S> => {
+  const graph: StateGraph<S> = [];
+  for (const [key, value] of Object.entries(store)) {
+    const item = store[key as keyof S];
+    const items = (value as StateItem<S>).deps.map((dep) => store[dep]);
+    const index = graph.findIndex((item) => items.includes(item));
+    if (index < 0) {
+      graph.push(item);
+    } else {
+      graph.splice(index, 0, item);
+    }
+  }
+  return graph.reverse();
 };
 
 const parseStateStore = <S extends StateWithRoot<S> = StateWithRoot>(
   store: StateStore<S>,
 ): StateChangeAction<S> => {
-  const graph = buildStateGraph(store, 'root');
+  resetStateDeps(store);
+  const graph = buildStateGraph(store);
   return (action) => {
     const oldState = Object.fromEntries(
       Object.entries(store).map((entry) => [entry[0], entry[1].data]),
@@ -73,13 +92,22 @@ const parseStateStore = <S extends StateWithRoot<S> = StateWithRoot>(
       ...oldState,
       ...partialState,
     };
-    const callback = parseStateGraph(
-      graph,
-      Reflect.ownKeys(partialState) as (keyof S)[],
-    );
-    const round = (graph.value.data as (state: S) => number)(newState);
-    for (let index = 0; index < round; index++) {
-      callback?.(newState, index);
+    for (const [key, value] of Object.entries(partialState)) {
+      store[key as keyof S].data = value;
+    }
+    const round = (store.root.data as (state: S) => number)(newState);
+    for (let i = 0; i < round; i++) {
+      for (const item of graph) {
+        const single =
+          i === 0 &&
+          (item.type === undefined || item.type === 'single') &&
+          item.deps.some((dep) => Reflect.has(partialState, dep));
+        const multi =
+          item.type === 'multi' &&
+          item.deps.some((dep) => Reflect.has(partialState, dep));
+        const dynamic = item.type === 'dynamic';
+        if (single || multi || dynamic) item.onChange?.(newState, i);
+      }
     }
   };
 };

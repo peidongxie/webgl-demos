@@ -85,12 +85,10 @@ const Demo14: FC<ComponentProps> = () => {
         // 原子数据：顶点
         points: {
           deps: [],
-          data: [],
         },
         // 原子数据：平移
         translation: {
           deps: [],
-          data: [0, 0, 0],
         },
       });
       draw({
