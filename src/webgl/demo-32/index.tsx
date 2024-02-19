@@ -23,8 +23,7 @@ type DemoState = StateWithRoot<{
   samplerTexture1: WebGLTexture | null;
   positionTexCoordArray: Float32Array;
   points: [number, number, number, number][];
-  picture0: [TexImageSource, 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7];
-  picture1: [TexImageSource, 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7];
+  pictures: [TexImageSource, 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7][];
 }>;
 
 /**
@@ -96,8 +95,8 @@ const Demo32: FC<ComponentProps> = () => {
             gl.getParameter(gl.CURRENT_PROGRAM)!,
             'u_Sampler0',
           ),
-          onChange: ({ u_Sampler0, picture0 }) => {
-            gl.uniform1i(u_Sampler0, picture0[1]);
+          onChange: ({ u_Sampler0, pictures }) => {
+            gl.uniform1i(u_Sampler0, pictures[0][1]);
           },
         },
         // 着色器变量：u_Sampler0
@@ -107,8 +106,8 @@ const Demo32: FC<ComponentProps> = () => {
             gl.getParameter(gl.CURRENT_PROGRAM)!,
             'u_Sampler1',
           ),
-          onChange: ({ u_Sampler1, picture1 }) => {
-            gl.uniform1i(u_Sampler1, picture1[1]);
+          onChange: ({ u_Sampler1, pictures }) => {
+            gl.uniform1i(u_Sampler1, pictures[1][1]);
           },
         },
         // 派生数据：顶点位置坐标缓冲区
@@ -126,10 +125,10 @@ const Demo32: FC<ComponentProps> = () => {
         },
         // 派生数据：采样器纹理0
         samplerTexture0: {
-          deps: ['picture0'],
+          deps: ['pictures'],
           data: gl.createTexture(),
-          onChange: ({ samplerTexture0, picture0 }) => {
-            const [source, unit] = picture0;
+          onChange: ({ samplerTexture0, pictures }) => {
+            const [source, unit] = pictures[0];
             gl.activeTexture(gl[`TEXTURE${unit}`]);
             gl.bindTexture(gl.TEXTURE_2D, samplerTexture0);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -145,10 +144,10 @@ const Demo32: FC<ComponentProps> = () => {
         },
         // 派生数据：采样器纹理1
         samplerTexture1: {
-          deps: ['picture1'],
+          deps: ['pictures'],
           data: gl.createTexture(),
-          onChange: ({ samplerTexture1, picture1 }) => {
-            const [source, unit] = picture1;
+          onChange: ({ samplerTexture1, pictures }) => {
+            const [source, unit] = pictures[1];
             gl.activeTexture(gl[`TEXTURE${unit}`]);
             gl.bindTexture(gl.TEXTURE_2D, samplerTexture1);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -174,12 +173,8 @@ const Demo32: FC<ComponentProps> = () => {
         points: {
           deps: [],
         },
-        // 原子数据：图片0
-        picture0: {
-          deps: [],
-        },
-        // 原子数据：图片1
-        picture1: {
+        // 原子数据：图片
+        pictures: {
           deps: [],
         },
       });
@@ -200,8 +195,10 @@ const Demo32: FC<ComponentProps> = () => {
         [0.5, 0.5, 1, 1],
         [0.5, -0.5, 1, 0],
       ],
-      picture0: [image0, 0],
-      picture1: [image1, 1],
+      pictures: [
+        [image0, 0],
+        [image1, 1],
+      ],
     });
   }, [image0, image1]);
 
