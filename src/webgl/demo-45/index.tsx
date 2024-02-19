@@ -64,18 +64,23 @@ const Demo45: FC<ComponentProps> = () => {
         // 着色器程序
         root: {
           deps: ['a_Position', 'a_Color', 'u_ViewProjMatrix'],
+          type: 'dynamic',
           data: () => {
             gl.clearColor(0, 0, 0, 1);
             gl.enable(gl.DEPTH_TEST);
             gl.enable(gl.POLYGON_OFFSET_FILL);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-            return 1;
+            return 2;
           },
-          onChange: ({ points }) => {
-            gl.polygonOffset(0, 0);
-            gl.drawArrays(gl.TRIANGLES, 0, points[0].length);
-            gl.polygonOffset(1, 1);
-            gl.drawArrays(gl.TRIANGLES, points[0].length, points[1].length);
+          onChange: ({ points }, index) => {
+            if (index === 0) {
+              gl.polygonOffset(0, 0);
+              gl.drawArrays(gl.TRIANGLES, 0, points[0].length);
+            }
+            if (index === 1) {
+              gl.polygonOffset(1, 1);
+              gl.drawArrays(gl.TRIANGLES, points[0].length, points[1].length);
+            }
           },
         },
         // 着色器变量：a_Position
