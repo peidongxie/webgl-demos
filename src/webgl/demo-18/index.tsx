@@ -1,7 +1,7 @@
 import { type FC, useCallback } from 'react';
 
 import { flatArray } from '../../lib/react-utils';
-import { type ComponentProps } from '../../type';
+import { type ComponentProps, type Tuple } from '../../type';
 import Canvas from '../lib/canvas-component';
 import { Matrix4 } from '../lib/cuon-matrix';
 import { parseStateStore, type StateWithRoot } from '../lib/webgl-store';
@@ -14,8 +14,8 @@ type DemoState = StateWithRoot<{
   positionBuffer: WebGLBuffer | null;
   positionArray: Float32Array;
   xformMatrix: Matrix4;
-  points: [number, number][];
-  rotation: [number, number, number, number];
+  points: Tuple<Tuple<number, 2>, 3>;
+  rotation: Tuple<number, 4>;
 }>;
 
 /**

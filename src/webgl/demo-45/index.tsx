@@ -1,7 +1,7 @@
 import { type FC, useCallback, useRef } from 'react';
 
 import { flatArray } from '../../lib/react-utils';
-import { type ComponentProps } from '../../type';
+import { type ComponentProps, type Tuple } from '../../type';
 import Canvas from '../lib/canvas-component';
 import { Matrix4 } from '../lib/cuon-matrix';
 import {
@@ -19,19 +19,9 @@ type DemoState = StateWithRoot<{
   positionColorBuffer: WebGLBuffer | null;
   positionColorArray: Float32Array;
   viewProjMatrix: Matrix4;
-  points: [number, number, number, number, number, number][][];
-  camera: [
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-  ];
-  perspective: [number, number, number, number];
+  points: Tuple<Tuple<Tuple<number, 6>, 3>, 2>;
+  camera: Tuple<number, 9>;
+  perspective: Tuple<number, 4>;
 }>;
 
 /**

@@ -1,7 +1,7 @@
 import { type FC, useCallback, useEffect, useRef } from 'react';
 
 import { flatArray, useImage } from '../../lib/react-utils';
-import { type ComponentProps } from '../../type';
+import { type ComponentProps, type Tuple } from '../../type';
 import CIRCLE_IMAGE from '../assets/circle.gif';
 import SKY_IMAGE from '../assets/sky.jpg';
 import Canvas from '../lib/canvas-component';
@@ -22,8 +22,8 @@ type DemoState = StateWithRoot<{
   samplerTexture0: WebGLTexture | null;
   samplerTexture1: WebGLTexture | null;
   positionTexCoordArray: Float32Array;
-  points: [number, number, number, number][];
-  pictures: [TexImageSource, 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7][];
+  points: Tuple<Tuple<number, 4>, 4>;
+  pictures: Tuple<[TexImageSource, 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7], 2>;
 }>;
 
 /**

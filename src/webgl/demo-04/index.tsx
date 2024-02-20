@@ -1,6 +1,6 @@
 import { type FC, useCallback } from 'react';
 
-import { type ComponentProps } from '../../type';
+import { type ComponentProps, type Tuple } from '../../type';
 import Canvas from '../lib/canvas-component';
 import { parseStateStore, type StateWithRoot } from '../lib/webgl-store';
 import FSHADER_SOURCE from './fragment.glsl?raw';
@@ -8,7 +8,7 @@ import VSHADER_SOURCE from './vertex.glsl?raw';
 
 type DemoState = StateWithRoot<{
   a_Position: GLint;
-  point: [number, number];
+  point: Tuple<number, 2>;
 }>;
 
 /**
