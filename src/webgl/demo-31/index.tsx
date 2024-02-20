@@ -1,7 +1,7 @@
 import { type FC, useCallback, useEffect, useRef } from 'react';
 
 import { flatArray, useImage } from '../../lib/react-utils';
-import { type ComponentProps } from '../../type';
+import { type ComponentProps, type Tuple } from '../../type';
 import SKY_IMAGE from '../assets/sky.jpg';
 import Canvas from '../lib/canvas-component';
 import {
@@ -19,7 +19,7 @@ type DemoState = StateWithRoot<{
   positionTexCoordBuffer: WebGLBuffer | null;
   samplerTexture: WebGLTexture | null;
   positionTexCoordArray: Float32Array;
-  points: [number, number, number, number][];
+  points: Tuple<Tuple<number, 4>, 4>;
   picture: [TexImageSource, 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7];
 }>;
 

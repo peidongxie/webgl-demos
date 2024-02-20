@@ -1,7 +1,7 @@
 import { type FC, useCallback } from 'react';
 
 import { flatArray } from '../../lib/react-utils';
-import { type ComponentProps } from '../../type';
+import { type ComponentProps, type Tuple } from '../../type';
 import Canvas from '../lib/canvas-component';
 import { parseStateStore, type StateWithRoot } from '../lib/webgl-store';
 import FSHADER_SOURCE from './fragment.glsl?raw';
@@ -11,7 +11,7 @@ type DemoState = StateWithRoot<{
   a_Position: GLint;
   positionBuffer: WebGLBuffer | null;
   positionArray: Float32Array;
-  points: [number, number][];
+  points: Tuple<Tuple<number, 2>, 3>;
 }>;
 
 /**

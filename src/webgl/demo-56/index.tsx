@@ -1,7 +1,7 @@
 import { type FC, useCallback, useRef } from 'react';
 
 import { flatArray } from '../../lib/react-utils';
-import { type ComponentProps } from '../../type';
+import { type ComponentProps, type Tuple } from '../../type';
 import Canvas from '../lib/canvas-component';
 import { Matrix4, Vector3 } from '../lib/cuon-matrix';
 import {
@@ -32,32 +32,12 @@ type DemoState = StateWithRoot<{
   lightColorVector: Vector3;
   lightPositionVector: Vector3;
   ambientLightVector: Vector3;
-  points: [
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-  ][];
-  surfaces: [number, number, number][][];
-  rotation: [number, number, number, number];
-  camera: [
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-  ];
-  perspective: [number, number, number, number];
-  lights: [number, number, number, number, number, number][];
+  points: Tuple<number, 9>[];
+  surfaces: Tuple<Tuple<number, 3>, 2>[];
+  rotation: Tuple<number, 4>;
+  camera: Tuple<number, 9>;
+  perspective: Tuple<number, 4>;
+  lights: Tuple<Tuple<number, 6>, 2>;
 }>;
 
 const DIVISION = 13;
@@ -379,19 +359,8 @@ const Demo56: FC<ComponentProps> = () => {
           deps: [],
         },
       });
-      const points: [
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-      ][] = [];
-      const surfaces: [[number, number, number], [number, number, number]][] =
-        [];
+      const points: Tuple<number, 9>[] = [];
+      const surfaces: Tuple<Tuple<number, 3>, 2>[] = [];
       for (let i = 0; i <= DIVISION; i++) {
         const latitude = (Math.PI * i) / DIVISION;
         const sinLatitude = Math.sin(latitude);

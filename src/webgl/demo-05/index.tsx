@@ -1,6 +1,6 @@
 import { type FC, type MouseEventHandler, useCallback, useRef } from 'react';
 
-import { type ComponentProps } from '../../type';
+import { type ComponentProps, type Tuple } from '../../type';
 import Canvas from '../lib/canvas-component';
 import {
   parseStateStore,
@@ -12,7 +12,7 @@ import VSHADER_SOURCE from './vertex.glsl?raw';
 
 type DemoState = StateWithRoot<{
   a_Position: GLint;
-  points: [number, number][];
+  points: Tuple<number, 2>[];
 }>;
 
 /**
@@ -79,7 +79,7 @@ const Demo05: FC<ComponentProps> = () => {
       (clientX - clientRect.left - canvas.width / 2) / (canvas.width / 2);
     const y =
       (canvas.height / 2 - (clientY - clientRect.top)) / (canvas.height / 2);
-    const point: [number, number] = [x, y];
+    const point: Tuple<number, 2> = [x, y];
     draw(({ points }) => ({ points: [...points, point] }));
   }, []);
 

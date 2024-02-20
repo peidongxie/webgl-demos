@@ -1,7 +1,7 @@
 import { type FC, useCallback, useRef } from 'react';
 
 import { flatArray, useFrameRequest } from '../../lib/react-utils';
-import { type ComponentProps } from '../../type';
+import { type ComponentProps, type Tuple } from '../../type';
 import Canvas from '../lib/canvas-component';
 import { Matrix4, Vector3 } from '../lib/cuon-matrix';
 import {
@@ -32,34 +32,14 @@ type DemoState = StateWithRoot<{
   lightColorVector: Vector3;
   lightPositionVector: Vector3;
   ambientLightVector: Vector3;
-  points: [
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-  ][][];
-  surfaces: [number, number, number][][];
-  rotation: [number, number, number, number];
+  points: Tuple<Tuple<Tuple<number, 9>, 4>, 6>;
+  surfaces: Tuple<Tuple<Tuple<number, 3>, 2>, 6>;
+  rotation: Tuple<number, 4>;
   velocity: number;
   time: number;
-  camera: [
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-  ];
-  perspective: [number, number, number, number];
-  lights: [number, number, number, number, number, number][];
+  camera: Tuple<number, 9>;
+  perspective: Tuple<number, 4>;
+  lights: Tuple<Tuple<number, 6>, 2>;
 }>;
 
 /**

@@ -2,7 +2,7 @@ import { type FC, useCallback, useRef } from 'react';
 
 import { useGui } from '../../lib/gui-utils';
 import { flatArray } from '../../lib/react-utils';
-import { type ComponentProps } from '../../type';
+import { type ComponentProps, type Tuple } from '../../type';
 import Canvas from '../lib/canvas-component';
 import { Matrix4, Vector3 } from '../lib/cuon-matrix';
 import {
@@ -26,54 +26,20 @@ type DemoState = StateWithRoot<{
   indexBuffer: WebGLBuffer | null;
   positionColorNormalArray: Float32Array;
   indexArray: Uint8Array;
-  mvpMatrices: [Matrix4, Matrix4, Matrix4, Matrix4, Matrix4, Matrix4];
-  normalMatrices: [Matrix4, Matrix4, Matrix4, Matrix4, Matrix4, Matrix4];
-  modelMatrices: [Matrix4, Matrix4, Matrix4, Matrix4, Matrix4, Matrix4];
+  mvpMatrices: Tuple<Matrix4, 6>;
+  normalMatrices: Tuple<Matrix4, 6>;
+  modelMatrices: Tuple<Matrix4, 6>;
   viewProjMatrix: Matrix4;
   lightColorVector: Vector3;
   lightDirectionVector: Vector3;
   ambientLightVector: Vector3;
-  points: [
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-  ][][][];
-  surfaces: [number, number, number][][];
-  translations: [
-    [number, number, number],
-    [number, number, number],
-    [number, number, number],
-    [number, number, number],
-    [number, number, number],
-    [number, number, number],
-  ];
-  rotations: [
-    [number, number, number, number],
-    [number, number, number, number],
-    [number, number, number, number],
-    [number, number, number, number],
-    [number, number, number, number],
-    [number, number, number, number],
-  ];
-  camera: [
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-  ];
-  perspective: [number, number, number, number];
-  lights: [number, number, number, number, number, number][];
+  points: Tuple<Tuple<Tuple<Tuple<number, 9>, 4>, 6>, 6>;
+  surfaces: Tuple<Tuple<Tuple<number, 3>, 2>, 6>;
+  translations: Tuple<Tuple<number, 3>, 6>;
+  rotations: Tuple<Tuple<number, 4>, 6>;
+  camera: Tuple<number, 9>;
+  perspective: Tuple<number, 4>;
+  lights: Tuple<Tuple<number, 6>, 2>;
 }>;
 
 /**

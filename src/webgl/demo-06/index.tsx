@@ -1,6 +1,6 @@
 import { type FC, type MouseEventHandler, useCallback, useRef } from 'react';
 
-import { type ComponentProps } from '../../type';
+import { type ComponentProps, type Tuple } from '../../type';
 import Canvas from '../lib/canvas-component';
 import {
   parseStateStore,
@@ -13,7 +13,7 @@ import VSHADER_SOURCE from './vertex.glsl?raw';
 type DemoState = StateWithRoot<{
   a_Position: GLint;
   u_FragColor: WebGLUniformLocation | null;
-  points: [number, number, number, number, number, number][];
+  points: Tuple<number, 6>[];
 }>;
 
 /**
@@ -102,14 +102,7 @@ const Demo06: FC<ComponentProps> = () => {
     const green = Number(x < 0 || y < 0);
     const blue = red && green;
     const alpha = 1;
-    const point: [number, number, number, number, number, number] = [
-      x,
-      y,
-      red,
-      green,
-      blue,
-      alpha,
-    ];
+    const point: Tuple<number, 6> = [x, y, red, green, blue, alpha];
     draw(({ points }) => ({ points: [...points, point] }));
   }, []);
 
