@@ -137,7 +137,7 @@ const Demo41: FC<ComponentProps> = () => {
         // 派生数据：顶点位置颜色数组
         positionColorArray: {
           deps: ['points'],
-          data: new Float32Array(108),
+          data: new Float32Array(6 * 3 * 6),
           onChange: ({ positionColorArray, points }) => {
             positionColorArray.set(flatArray(points));
           },
