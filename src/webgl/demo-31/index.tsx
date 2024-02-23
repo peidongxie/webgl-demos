@@ -140,7 +140,7 @@ const Demo31: FC<ComponentProps> = () => {
         // 派生数据：顶点位置坐标数组
         positionTexCoordArray: {
           deps: ['points'],
-          data: new Float32Array(16),
+          data: new Float32Array(4 * 4),
           onChange: ({ positionTexCoordArray, points }) => {
             positionTexCoordArray.set(flatArray(points));
           },

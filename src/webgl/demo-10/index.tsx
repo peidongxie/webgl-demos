@@ -57,7 +57,7 @@ const Demo10: FC<ComponentProps> = () => {
         // 派生数据：顶点位置数组
         positionArray: {
           deps: ['points'],
-          data: new Float32Array(6),
+          data: new Float32Array(2 * 3),
           onChange: ({ positionArray, points }) => {
             positionArray.set(flatArray(points));
           },

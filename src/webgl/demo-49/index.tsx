@@ -142,7 +142,7 @@ const Demo49: FC<ComponentProps> = () => {
         // 派生数据：顶点位置颜色数组
         positionColorArray: {
           deps: ['points'],
-          data: new Float32Array(144),
+          data: new Float32Array(6 * 4 * 6),
           onChange: ({ positionColorArray, points }) => {
             positionColorArray.set(flatArray(points));
           },
@@ -150,7 +150,7 @@ const Demo49: FC<ComponentProps> = () => {
         // 派生数据：顶点索引数组
         indexArray: {
           deps: ['surfaces'],
-          data: new Uint8Array(36),
+          data: new Uint8Array(3 * 2 * 6),
           onChange: ({ indexArray, surfaces }) => {
             indexArray.set(flatArray(surfaces));
           },
