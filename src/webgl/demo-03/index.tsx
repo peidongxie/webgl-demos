@@ -2,7 +2,7 @@ import { type FC, useCallback } from 'react';
 
 import { type ComponentProps } from '../../type';
 import Canvas from '../lib/canvas-component';
-import { parseStateStore } from '../lib/webgl-store';
+import { makeWebGLDraw } from '../lib/cuon-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
@@ -12,7 +12,7 @@ import VSHADER_SOURCE from './vertex.glsl?raw';
 const Demo03: FC<ComponentProps> = () => {
   const handleProgramInit = useCallback(
     (_: HTMLCanvasElement, gl: WebGLRenderingContext) => {
-      const draw = parseStateStore({
+      const draw = makeWebGLDraw(gl, VSHADER_SOURCE, FSHADER_SOURCE, () => ({
         // 着色器程序
         root: {
           deps: [],
@@ -26,7 +26,7 @@ const Demo03: FC<ComponentProps> = () => {
             gl.drawArrays(gl.POINTS, 0, 1);
           },
         },
-      });
+      }));
       draw();
     },
     [],
@@ -34,8 +34,6 @@ const Demo03: FC<ComponentProps> = () => {
 
   return (
     <Canvas
-      glVertexShader={VSHADER_SOURCE}
-      glFragmentShader={FSHADER_SOURCE}
       onProgramInit={handleProgramInit}
       style={{ width: '100vw', height: '100vh', backgroundColor: '#000000' }}
     />

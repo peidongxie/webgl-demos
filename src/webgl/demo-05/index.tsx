@@ -2,11 +2,8 @@ import { type FC, type MouseEventHandler, useCallback, useRef } from 'react';
 
 import { type ComponentProps, type Tuple } from '../../type';
 import Canvas from '../lib/canvas-component';
-import {
-  parseStateStore,
-  type StateChangeAction,
-  type StateWithRoot,
-} from '../lib/webgl-store';
+import { makeWebGLDraw } from '../lib/cuon-utils';
+import { type StateChangeAction, type StateWithRoot } from '../lib/webgl-store';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
@@ -24,38 +21,40 @@ const Demo05: FC<ComponentProps> = () => {
 
   const handleProgramInit = useCallback(
     (_: HTMLCanvasElement, gl: WebGLRenderingContext) => {
-      const draw = parseStateStore<DemoState>({
-        // 着色器程序
-        root: {
-          deps: ['a_Position'],
-          type: 'dynamic',
-          data: ({ points }) => {
-            gl.clearColor(0, 0, 0, 1);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            return points.length;
+      const draw = makeWebGLDraw<DemoState>(
+        gl,
+        VSHADER_SOURCE,
+        FSHADER_SOURCE,
+        (program) => ({
+          // 着色器程序
+          root: {
+            deps: ['a_Position'],
+            type: 'dynamic',
+            data: ({ points }) => {
+              gl.clearColor(0, 0, 0, 1);
+              gl.clear(gl.COLOR_BUFFER_BIT);
+              return points.length;
+            },
+            onChange: () => {
+              gl.drawArrays(gl.POINTS, 0, 1);
+            },
           },
-          onChange: () => {
-            gl.drawArrays(gl.POINTS, 0, 1);
+          // 着色器变量：a_Position
+          a_Position: {
+            deps: ['points'],
+            type: 'dynamic',
+            data: gl.getAttribLocation(program, 'a_Position'),
+            onChange: ({ a_Position, points }, index) => {
+              const [x, y] = points[index]!;
+              gl.vertexAttrib3f(a_Position, x, y, 0);
+            },
           },
-        },
-        // 着色器变量：a_Position
-        a_Position: {
-          deps: ['points'],
-          type: 'dynamic',
-          data: gl.getAttribLocation(
-            gl.getParameter(gl.CURRENT_PROGRAM)!,
-            'a_Position',
-          ),
-          onChange: ({ a_Position, points }, index) => {
-            const [x, y] = points[index]!;
-            gl.vertexAttrib3f(a_Position, x, y, 0);
+          // 原子数据：顶点
+          points: {
+            deps: [],
           },
-        },
-        // 原子数据：顶点
-        points: {
-          deps: [],
-        },
-      });
+        }),
+      );
       draw({ points: [] });
       drawRef.current = draw;
       glRef.current = gl;
@@ -85,8 +84,6 @@ const Demo05: FC<ComponentProps> = () => {
 
   return (
     <Canvas
-      glVertexShader={VSHADER_SOURCE}
-      glFragmentShader={FSHADER_SOURCE}
       onMouseDown={handleCanvasMouseDown}
       onProgramInit={handleProgramInit}
       style={{ width: '100vw', height: '100vh', backgroundColor: '#000000' }}

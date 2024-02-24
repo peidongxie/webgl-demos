@@ -1,4 +1,10 @@
 import { makeDebugContext } from './webgl-debug';
+import {
+  parseStateStore as makeDraw,
+  type StateChangeAction,
+  type StateStore,
+  type StateWithRoot,
+} from './webgl-store';
 import { setupWebGL } from './webgl-utils';
 
 const loadShader = (
@@ -73,4 +79,18 @@ const getWebGLContext = (
   return debug ? makeDebugContext(gl) : gl;
 };
 
-export { getWebGLContext, initShaders };
+const makeWebGLDraw = <S extends StateWithRoot<S> = StateWithRoot>(
+  gl: WebGLRenderingContext,
+  vshader: string,
+  fshader: string,
+  store: (program: WebGLProgram | null) => StateStore<S>,
+): StateChangeAction<S> => {
+  const program = createProgram(gl, vshader, fshader);
+  const draw = makeDraw(store(program));
+  return (action) => {
+    program && gl.useProgram(program);
+    draw(action);
+  };
+};
+
+export { getWebGLContext, initShaders, makeWebGLDraw };

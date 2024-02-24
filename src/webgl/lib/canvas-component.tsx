@@ -7,11 +7,9 @@ import {
   useRef,
 } from 'react';
 
-import { getWebGLContext, initShaders } from './cuon-utils';
+import { getWebGLContext } from './cuon-utils';
 
 interface CanvasProps extends HTMLAttributes<HTMLCanvasElement> {
-  glVertexShader?: string;
-  glFragmentShader?: string;
   onContextCreate?: (
     canvas: HTMLCanvasElement,
     gl: WebGLRenderingContext,
@@ -28,14 +26,8 @@ interface CanvasProps extends HTMLAttributes<HTMLCanvasElement> {
 
 const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
   (props, ref) => {
-    const {
-      glVertexShader,
-      glFragmentShader,
-      onContextCreate,
-      onProgramInit,
-      onWindowResize,
-      ...canvasProps
-    } = props;
+    const { onContextCreate, onProgramInit, onWindowResize, ...canvasProps } =
+      props;
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const glRef = useRef<WebGLRenderingContext | null>(null);
@@ -69,11 +61,6 @@ const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
       if (!canvas) return;
       const gl = glRef.current;
       if (!gl) return;
-      const program = gl.getParameter(gl.CURRENT_PROGRAM);
-      if (program) return;
-      if (glVertexShader && glFragmentShader) {
-        initShaders(gl, glVertexShader, glFragmentShader);
-      }
       return onProgramInit?.(canvas, gl);
     };
 
