@@ -37,9 +37,10 @@ type StateStore<S extends StateWithRoot<S>> = {
   [K in keyof S]: StateItem<S, K>;
 };
 
-const resetStateDeps = <S extends StateWithRoot<S>>(
-  store: StateStore<S>,
-): void => {
+const makeStateStore = <S extends StateWithRoot<S>>(
+  rawStore: StateStore<S>,
+): StateStore<S> => {
+  const store = { ...rawStore };
   const todoList: (keyof S)[] = ['root'];
   const doneList: (keyof S)[] = [];
   while (todoList.length > 0) {
@@ -54,13 +55,14 @@ const resetStateDeps = <S extends StateWithRoot<S>>(
     }
     const newDeps = deps.map((dep) => store[dep].deps).flat();
     newDeps.unshift(key);
-    store[key].deps = Array.from(new Set(newDeps));
+    store[key] = { ...store[key], deps: Array.from(new Set(newDeps)) };
     todoList.pop();
     doneList.push(key);
   }
+  return store;
 };
 
-const buildStateGraph = <S extends StateWithRoot<S>>(
+const makeStateGraph = <S extends StateWithRoot<S>>(
   store: StateStore<S>,
 ): StateGraph<S> => {
   const graph: StateGraph<S> = [];
@@ -77,12 +79,12 @@ const buildStateGraph = <S extends StateWithRoot<S>>(
   return graph.reverse();
 };
 
-const parseStateStore = <S extends StateWithRoot<S> = StateWithRoot>(
-  store: StateStore<S>,
-): StateChangeAction<S> => {
-  resetStateDeps(store);
-  const graph = buildStateGraph(store);
-  return (action) => {
+const makeStateChangeAction =
+  <S extends StateWithRoot<S> = StateWithRoot>(
+    store: StateStore<S>,
+    graph: StateGraph<S>,
+  ): StateChangeAction<S> =>
+  (action) => {
     const oldState = Object.fromEntries(
       Object.entries(store).map((entry) => [entry[0], entry[1].data]),
     ) as S;
@@ -110,11 +112,19 @@ const parseStateStore = <S extends StateWithRoot<S> = StateWithRoot>(
       }
     }
   };
+
+const makeDraw = <S extends StateWithRoot<S> = StateWithRoot>(
+  rawStore: StateStore<S>,
+): StateChangeAction<S> => {
+  const store = makeStateStore(rawStore);
+  const graph = makeStateGraph(store);
+  return makeStateChangeAction(store, graph);
 };
 
 export {
-  parseStateStore,
+  makeDraw as parseStateStore,
   type StateChangeAction,
   type StateChangeEffect,
+  type StateStore,
   type StateWithRoot,
 };
