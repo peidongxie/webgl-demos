@@ -5,11 +5,8 @@ import { flatArray } from '../../lib/react-utils';
 import { type ComponentProps, type Tuple } from '../../type';
 import Canvas from '../lib/canvas-component';
 import { Matrix4 } from '../lib/cuon-matrix';
-import {
-  parseStateStore,
-  type StateChangeAction,
-  type StateWithRoot,
-} from '../lib/webgl-store';
+import { makeWebGLDraw } from '../lib/cuon-utils';
+import { type StateChangeAction, type StateWithRoot } from '../lib/webgl-store';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
@@ -32,117 +29,117 @@ const Demo37: FC<ComponentProps> = () => {
 
   const handleProgramInit = useCallback(
     (_: HTMLCanvasElement, gl: WebGLRenderingContext) => {
-      const draw = parseStateStore<DemoState>({
-        // 着色器程序
-        root: {
-          deps: ['a_Position', 'a_Color', 'u_ProjMatrix'],
-          data: () => {
-            gl.clearColor(0, 0, 0, 1);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            return 1;
+      const draw = makeWebGLDraw<DemoState>(
+        gl,
+        VSHADER_SOURCE,
+        FSHADER_SOURCE,
+        (program) => ({
+          // 着色器程序
+          root: {
+            deps: ['a_Position', 'a_Color', 'u_ProjMatrix'],
+            data: () => {
+              gl.clearColor(0, 0, 0, 1);
+              gl.clear(gl.COLOR_BUFFER_BIT);
+              return 1;
+            },
+            onChange: ({ points }) => {
+              gl.drawArrays(gl.TRIANGLES, 0, points.flat().length);
+            },
           },
-          onChange: ({ points }) => {
-            gl.drawArrays(gl.TRIANGLES, 0, points.flat().length);
+          // 着色器变量：a_Position
+          a_Position: {
+            deps: ['positionColorBuffer'],
+            data: gl.getAttribLocation(program, 'a_Position'),
+            onChange: ({ a_Position, positionColorArray }) => {
+              gl.vertexAttribPointer(
+                a_Position,
+                3,
+                gl.FLOAT,
+                false,
+                positionColorArray.BYTES_PER_ELEMENT * 6,
+                0,
+              );
+              gl.enableVertexAttribArray(a_Position);
+            },
           },
-        },
-        // 着色器变量：a_Position
-        a_Position: {
-          deps: ['positionColorBuffer'],
-          data: gl.getAttribLocation(
-            gl.getParameter(gl.CURRENT_PROGRAM)!,
-            'a_Position',
-          ),
-          onChange: ({ a_Position, positionColorArray }) => {
-            gl.vertexAttribPointer(
-              a_Position,
-              3,
-              gl.FLOAT,
-              false,
-              positionColorArray.BYTES_PER_ELEMENT * 6,
-              0,
-            );
-            gl.enableVertexAttribArray(a_Position);
+          // 着色器变量：a_Color
+          a_Color: {
+            deps: ['positionColorBuffer'],
+            data: gl.getAttribLocation(program, 'a_Color'),
+            onChange: ({ a_Color, positionColorArray }) => {
+              gl.vertexAttribPointer(
+                a_Color,
+                3,
+                gl.FLOAT,
+                false,
+                positionColorArray.BYTES_PER_ELEMENT * 6,
+                positionColorArray.BYTES_PER_ELEMENT * 3,
+              );
+              gl.enableVertexAttribArray(a_Color);
+            },
           },
-        },
-        // 着色器变量：a_Color
-        a_Color: {
-          deps: ['positionColorBuffer'],
-          data: gl.getAttribLocation(
-            gl.getParameter(gl.CURRENT_PROGRAM)!,
-            'a_Color',
-          ),
-          onChange: ({ a_Color, positionColorArray }) => {
-            gl.vertexAttribPointer(
-              a_Color,
-              3,
-              gl.FLOAT,
-              false,
-              positionColorArray.BYTES_PER_ELEMENT * 6,
-              positionColorArray.BYTES_PER_ELEMENT * 3,
-            );
-            gl.enableVertexAttribArray(a_Color);
+          // 着色器变量：u_ProjMatrix
+          u_ProjMatrix: {
+            deps: ['projMatrix'],
+            data: gl.getUniformLocation(program, 'u_ProjMatrix'),
+            onChange: ({ u_ProjMatrix, projMatrix }) => {
+              gl.uniformMatrix4fv(u_ProjMatrix, false, projMatrix.elements);
+            },
           },
-        },
-        // 着色器变量：u_ProjMatrix
-        u_ProjMatrix: {
-          deps: ['projMatrix'],
-          data: gl.getUniformLocation(
-            gl.getParameter(gl.CURRENT_PROGRAM)!,
-            'u_ProjMatrix',
-          ),
-          onChange: ({ u_ProjMatrix, projMatrix }) => {
-            gl.uniformMatrix4fv(u_ProjMatrix, false, projMatrix.elements);
+          // 派生数据：顶点位置颜色缓冲区
+          positionColorBuffer: {
+            deps: ['positionColorArray'],
+            data: gl.createBuffer(),
+            onChange: ({ positionColorBuffer, positionColorArray }) => {
+              gl.bindBuffer(gl.ARRAY_BUFFER, positionColorBuffer);
+              gl.bufferData(
+                gl.ARRAY_BUFFER,
+                positionColorArray,
+                gl.STATIC_DRAW,
+              );
+            },
           },
-        },
-        // 派生数据：顶点位置颜色缓冲区
-        positionColorBuffer: {
-          deps: ['positionColorArray'],
-          data: gl.createBuffer(),
-          onChange: ({ positionColorBuffer, positionColorArray }) => {
-            gl.bindBuffer(gl.ARRAY_BUFFER, positionColorBuffer);
-            gl.bufferData(gl.ARRAY_BUFFER, positionColorArray, gl.STATIC_DRAW);
+          // 派生数据：顶点位置颜色数组
+          positionColorArray: {
+            deps: ['points'],
+            data: new Float32Array(6 * 3 * 3),
+            onChange: ({ positionColorArray, points }) => {
+              positionColorArray.set(flatArray(points));
+            },
           },
-        },
-        // 派生数据：顶点位置颜色数组
-        positionColorArray: {
-          deps: ['points'],
-          data: new Float32Array(6 * 3 * 3),
-          onChange: ({ positionColorArray, points }) => {
-            positionColorArray.set(flatArray(points));
+          // 派生数据：投影矩阵
+          projMatrix: {
+            deps: ['orthographic'],
+            data: new Matrix4(),
+            onChange: ({ projMatrix, orthographic }) => {
+              const [
+                left,
+                right,
+                bottom,
+                top,
+                orthographicNear,
+                orthographicFar,
+              ] = orthographic;
+              projMatrix.setOrtho(
+                left,
+                right,
+                bottom,
+                top,
+                orthographicNear,
+                orthographicFar,
+              );
+            },
           },
-        },
-        // 派生数据：投影矩阵
-        projMatrix: {
-          deps: ['orthographic'],
-          data: new Matrix4(),
-          onChange: ({ projMatrix, orthographic }) => {
-            const [
-              left,
-              right,
-              bottom,
-              top,
-              orthographicNear,
-              orthographicFar,
-            ] = orthographic;
-            projMatrix.setOrtho(
-              left,
-              right,
-              bottom,
-              top,
-              orthographicNear,
-              orthographicFar,
-            );
+          // 原子数据：顶点
+          points: {
+            deps: [],
           },
-        },
-        // 原子数据：顶点
-        points: {
-          deps: [],
-        },
-        // 原子数据：正视
-        orthographic: {
-          deps: [],
-        },
-      });
+          // 原子数据：正视
+          orthographic: {
+            deps: [],
+          },
+        }),
+      );
       draw({
         points: [
           [
@@ -227,8 +224,6 @@ const Demo37: FC<ComponentProps> = () => {
 
   return (
     <Canvas
-      glVertexShader={VSHADER_SOURCE}
-      glFragmentShader={FSHADER_SOURCE}
       onProgramInit={handleProgramInit}
       style={{ width: '100vw', height: '100vh', backgroundColor: '#000000' }}
     />

@@ -2,7 +2,7 @@ import { type FC, useCallback } from 'react';
 
 import { type ComponentProps } from '../../type';
 import Canvas from '../lib/canvas-component';
-import { parseStateStore } from '../lib/webgl-store';
+import { makeWebGLDraw } from '../lib/cuon-utils';
 
 /**
  * 清空画布
@@ -10,7 +10,7 @@ import { parseStateStore } from '../lib/webgl-store';
 const Demo02: FC<ComponentProps> = () => {
   const handleProgramInit = useCallback(
     (_: HTMLCanvasElement, gl: WebGLRenderingContext) => {
-      const draw = parseStateStore({
+      const draw = makeWebGLDraw(gl, '', '', () => ({
         // 着色器程序
         root: {
           deps: [],
@@ -21,7 +21,7 @@ const Demo02: FC<ComponentProps> = () => {
             return 1;
           },
         },
-      });
+      }));
       draw();
     },
     [],
