@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 type NumberArray = number[] | NumberArray[];
 
@@ -10,18 +10,6 @@ const flatArray = (data: number | NumberArray, mask?: number[]): number[] => {
     return (data as number[]).filter((_, index) => (mask ? mask[index] : true));
   }
   return data.map((value) => flatArray(value, mask)).flat();
-};
-
-const useUint8Array = (data: NumberArray, mask?: number[]) => {
-  return useMemo(() => new Uint8Array(flatArray(data, mask)), [data, mask]);
-};
-
-const useUint16Array = (data: NumberArray, mask?: number[]) => {
-  return useMemo(() => new Uint16Array(flatArray(data, mask)), [data, mask]);
-};
-
-const useFloat32Array = (data: NumberArray, mask?: number[]) => {
-  return useMemo(() => new Float32Array(flatArray(data, mask)), [data, mask]);
 };
 
 const useFrameRequest = (frameRequest: FrameRequestCallback | null): void => {
@@ -65,11 +53,4 @@ const useImage = (src: string): HTMLImageElement | null => {
   return image;
 };
 
-export {
-  flatArray,
-  useFloat32Array,
-  useFrameRequest,
-  useImage,
-  useUint8Array,
-  useUint16Array,
-};
+export { flatArray, useFrameRequest, useImage };
