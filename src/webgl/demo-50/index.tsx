@@ -89,7 +89,7 @@ const Demo50: FC<ComponentProps> = () => {
           // 着色器变量：a_Position
           a_Position: {
             deps: ['positionColorNormalBuffer', 'indexBuffer'],
-            data: gl.getAttribLocation(program, 'a_Position'),
+            data: gl.getAttribLocation(program!, 'a_Position'),
             onChange: ({ a_Position, positionColorNormalArray }) => {
               gl.vertexAttribPointer(
                 a_Position,
@@ -105,7 +105,7 @@ const Demo50: FC<ComponentProps> = () => {
           // 着色器变量：a_Color
           a_Color: {
             deps: ['positionColorNormalBuffer', 'indexBuffer'],
-            data: gl.getAttribLocation(program, 'a_Color'),
+            data: gl.getAttribLocation(program!, 'a_Color'),
             onChange: ({ a_Color, positionColorNormalArray }) => {
               gl.vertexAttribPointer(
                 a_Color,
@@ -121,7 +121,7 @@ const Demo50: FC<ComponentProps> = () => {
           // 着色器变量：a_Normal
           a_Normal: {
             deps: ['positionColorNormalBuffer', 'indexBuffer'],
-            data: gl.getAttribLocation(program, 'a_Normal'),
+            data: gl.getAttribLocation(program!, 'a_Normal'),
             onChange: ({ a_Normal, positionColorNormalArray }) => {
               gl.vertexAttribPointer(
                 a_Normal,
@@ -137,7 +137,7 @@ const Demo50: FC<ComponentProps> = () => {
           // 着色器变量：u_MvpMatrix
           u_MvpMatrix: {
             deps: ['mvpMatrix'],
-            data: gl.getUniformLocation(program, 'u_MvpMatrix'),
+            data: gl.getUniformLocation(program!, 'u_MvpMatrix'),
             onChange: ({ u_MvpMatrix, mvpMatrix }) => {
               gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
             },
@@ -145,7 +145,7 @@ const Demo50: FC<ComponentProps> = () => {
           // 着色器变量：u_LightColor
           u_LightColor: {
             deps: ['lightColorVector'],
-            data: gl.getUniformLocation(program, 'u_LightColor'),
+            data: gl.getUniformLocation(program!, 'u_LightColor'),
             onChange: ({ u_LightColor, lightColorVector }) => {
               gl.uniform3fv(u_LightColor, lightColorVector.elements);
             },
@@ -153,7 +153,7 @@ const Demo50: FC<ComponentProps> = () => {
           // 着色器变量：u_LightDirection
           u_LightDirection: {
             deps: ['lightDirectionVector'],
-            data: gl.getUniformLocation(program, 'u_LightDirection'),
+            data: gl.getUniformLocation(program!, 'u_LightDirection'),
             onChange: ({ u_LightDirection, lightDirectionVector }) => {
               gl.uniform3fv(u_LightDirection, lightDirectionVector.elements);
             },

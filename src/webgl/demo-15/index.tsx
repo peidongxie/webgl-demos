@@ -44,7 +44,7 @@ const Demo15: FC<ComponentProps> = () => {
           // 着色器变量：a_Position
           a_Position: {
             deps: ['positionBuffer'],
-            data: gl.getAttribLocation(program, 'a_Position'),
+            data: gl.getAttribLocation(program!, 'a_Position'),
             onChange: ({ a_Position }) => {
               gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);
               gl.enableVertexAttribArray(a_Position);
@@ -53,7 +53,7 @@ const Demo15: FC<ComponentProps> = () => {
           // 着色器变量：u_CosB
           u_CosB: {
             deps: ['angle'],
-            data: gl.getUniformLocation(program, 'u_CosB'),
+            data: gl.getUniformLocation(program!, 'u_CosB'),
             onChange: ({ u_CosB, angle }) => {
               const radian = (Math.PI * angle) / 180;
               const cos = Math.cos(radian);
@@ -63,7 +63,7 @@ const Demo15: FC<ComponentProps> = () => {
           // 着色器变量：u_SinB
           u_SinB: {
             deps: ['angle'],
-            data: gl.getUniformLocation(program, 'u_SinB'),
+            data: gl.getUniformLocation(program!, 'u_SinB'),
             onChange: ({ u_SinB, angle }) => {
               const radian = (Math.PI * angle) / 180;
               const sin = Math.sin(radian);

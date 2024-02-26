@@ -41,7 +41,7 @@ const Demo07: FC<ComponentProps> = () => {
           // 着色器变量：a_Position
           a_Position: {
             deps: ['positionBuffer'],
-            data: gl.getAttribLocation(program, 'a_Position'),
+            data: gl.getAttribLocation(program!, 'a_Position'),
             onChange: ({ a_Position }) => {
               gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);
               gl.enableVertexAttribArray(a_Position);

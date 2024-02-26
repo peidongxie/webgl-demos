@@ -50,7 +50,7 @@ const Demo29: FC<ComponentProps> = () => {
           // 着色器变量：a_Position
           a_Position: {
             deps: ['positionTexCoordBuffer'],
-            data: gl.getAttribLocation(program, 'a_Position'),
+            data: gl.getAttribLocation(program!, 'a_Position'),
             onChange: ({ a_Position, positionTexCoordArray }) => {
               gl.vertexAttribPointer(
                 a_Position,
@@ -66,7 +66,7 @@ const Demo29: FC<ComponentProps> = () => {
           // 着色器变量：a_TexCoord
           a_TexCoord: {
             deps: ['positionTexCoordBuffer'],
-            data: gl.getAttribLocation(program, 'a_TexCoord'),
+            data: gl.getAttribLocation(program!, 'a_TexCoord'),
             onChange: ({ a_TexCoord, positionTexCoordArray }) => {
               gl.vertexAttribPointer(
                 a_TexCoord,
@@ -82,7 +82,7 @@ const Demo29: FC<ComponentProps> = () => {
           // 着色器变量：u_Sampler
           u_Sampler: {
             deps: ['samplerTexture'],
-            data: gl.getUniformLocation(program, 'u_Sampler'),
+            data: gl.getUniformLocation(program!, 'u_Sampler'),
             onChange: ({ u_Sampler, picture }) => {
               gl.uniform1i(u_Sampler, picture[1]);
             },

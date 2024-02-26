@@ -40,10 +40,10 @@ const createProgram = (
   if (!vertexShader || !fragmentShader) return null;
   const program = gl.createProgram();
   if (!program) return null;
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
+  gl.attachShader(program!, vertexShader);
+  gl.attachShader(program!, fragmentShader);
   gl.linkProgram(program);
-  const linked = gl.getProgramParameter(program, gl.LINK_STATUS);
+  const linked = gl.getProgramParameter(program!, gl.LINK_STATUS);
   if (!linked) {
     globalThis.console.log(
       'Failed to link program: ' + gl.getProgramInfoLog(program),
