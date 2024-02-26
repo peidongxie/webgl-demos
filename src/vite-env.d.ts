@@ -8,13 +8,6 @@ declare interface HTMLCanvasElement {
   ): void;
 }
 
-declare interface WebGLRenderingContext {
-  getParameter(
-    pname: WebGLRenderingContext['CURRENT_PROGRAM'],
-  ): WebGLProgram | null;
-  getParameter(pname: GLenum): unknown;
-}
-
 declare interface Window {
   cancelRequestAnimationFrame?: Window['cancelAnimationFrame'];
   mozCancelAnimationFrame?: Window['cancelAnimationFrame'];
