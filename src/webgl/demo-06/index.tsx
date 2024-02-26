@@ -44,7 +44,7 @@ const Demo06: FC<ComponentProps> = () => {
           a_Position: {
             deps: ['points'],
             type: 'dynamic',
-            data: gl.getAttribLocation(program, 'a_Position'),
+            data: gl.getAttribLocation(program!, 'a_Position'),
             onChange: ({ a_Position, points }, index) => {
               const [x, y] = points[index]!;
               gl.vertexAttrib3f(a_Position, x, y, 0);
@@ -54,7 +54,7 @@ const Demo06: FC<ComponentProps> = () => {
           u_FragColor: {
             deps: ['points'],
             type: 'dynamic',
-            data: gl.getUniformLocation(program, 'u_FragColor'),
+            data: gl.getUniformLocation(program!, 'u_FragColor'),
             onChange: ({ u_FragColor, points }, index) => {
               gl.uniform4f(
                 u_FragColor,

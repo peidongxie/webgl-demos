@@ -69,7 +69,7 @@ const Demo41: FC<ComponentProps> = () => {
           // 着色器变量：a_Position
           a_Position: {
             deps: ['positionColorBuffer'],
-            data: gl.getAttribLocation(program, 'a_Position'),
+            data: gl.getAttribLocation(program!, 'a_Position'),
             onChange: ({ a_Position, positionColorArray }) => {
               gl.vertexAttribPointer(
                 a_Position,
@@ -85,7 +85,7 @@ const Demo41: FC<ComponentProps> = () => {
           // 着色器变量：a_Color
           a_Color: {
             deps: ['positionColorBuffer'],
-            data: gl.getAttribLocation(program, 'a_Color'),
+            data: gl.getAttribLocation(program!, 'a_Color'),
             onChange: ({ a_Color, positionColorArray }) => {
               gl.vertexAttribPointer(
                 a_Color,
@@ -101,7 +101,7 @@ const Demo41: FC<ComponentProps> = () => {
           // 着色器变量：u_ViewMatrix
           u_ViewMatrix: {
             deps: ['viewMatrix'],
-            data: gl.getUniformLocation(program, 'u_ViewMatrix'),
+            data: gl.getUniformLocation(program!, 'u_ViewMatrix'),
             onChange: ({ u_ViewMatrix, viewMatrix }) => {
               gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix.elements);
             },
@@ -109,7 +109,7 @@ const Demo41: FC<ComponentProps> = () => {
           // 着色器变量：u_ProjMatrix
           u_ProjMatrix: {
             deps: ['projMatrix'],
-            data: gl.getUniformLocation(program, 'u_ProjMatrix'),
+            data: gl.getUniformLocation(program!, 'u_ProjMatrix'),
             onChange: ({ u_ProjMatrix, projMatrix }) => {
               gl.uniformMatrix4fv(u_ProjMatrix, false, projMatrix.elements);
             },

@@ -43,7 +43,7 @@ const Demo05: FC<ComponentProps> = () => {
           a_Position: {
             deps: ['points'],
             type: 'dynamic',
-            data: gl.getAttribLocation(program, 'a_Position'),
+            data: gl.getAttribLocation(program!, 'a_Position'),
             onChange: ({ a_Position, points }, index) => {
               const [x, y] = points[index]!;
               gl.vertexAttrib3f(a_Position, x, y, 0);

@@ -43,7 +43,7 @@ const Demo14: FC<ComponentProps> = () => {
           // 着色器变量：a_Position
           a_Position: {
             deps: ['positionBuffer'],
-            data: gl.getAttribLocation(program, 'a_Position'),
+            data: gl.getAttribLocation(program!, 'a_Position'),
             onChange: ({ a_Position }) => {
               gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);
               gl.enableVertexAttribArray(a_Position);
@@ -52,7 +52,7 @@ const Demo14: FC<ComponentProps> = () => {
           // 着色器变量：u_Translation
           u_Translation: {
             deps: ['translation'],
-            data: gl.getUniformLocation(program, 'u_Translation'),
+            data: gl.getUniformLocation(program!, 'u_Translation'),
             onChange: ({ u_Translation, translation }) => {
               const [translationX, translationY, translationZ] = translation;
               gl.uniform4f(
