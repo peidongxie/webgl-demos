@@ -157,7 +157,7 @@ const Demo62: FC<ComponentProps> = () => {
               gl.uniformMatrix4fv(
                 u_MvpMatrix,
                 false,
-                mvpMatrices[index].elements,
+                mvpMatrices[index]!.elements,
               );
             },
           },
@@ -170,7 +170,7 @@ const Demo62: FC<ComponentProps> = () => {
               gl.uniformMatrix4fv(
                 u_NormalMatrix,
                 false,
-                normalMatrices[index].elements,
+                normalMatrices[index]!.elements,
               );
             },
           },
@@ -234,7 +234,7 @@ const Demo62: FC<ComponentProps> = () => {
             type: 'dynamic',
             data: new Float32Array(9 * 4 * 6),
             onChange: ({ positionColorNormalArray, points }, index) => {
-              positionColorNormalArray.set(flatArray(points[index]));
+              positionColorNormalArray.set(flatArray(points[index]!));
             },
           },
           // 派生数据：顶点索引数组
@@ -261,9 +261,9 @@ const Demo62: FC<ComponentProps> = () => {
               { mvpMatrices, modelMatrices, viewProjMatrix },
               index,
             ) => {
-              mvpMatrices[index]
-                .set(viewProjMatrix)
-                .multiply(modelMatrices[index]);
+              mvpMatrices[index]!.set(viewProjMatrix).multiply(
+                modelMatrices[index]!,
+              );
             },
           },
           // 派生数据：法向量矩阵
@@ -279,9 +279,9 @@ const Demo62: FC<ComponentProps> = () => {
               new Matrix4(),
             ],
             onChange: ({ normalMatrices, modelMatrices }, index) => {
-              normalMatrices[index]
-                .setInverseOf(modelMatrices[index])
-                .transpose();
+              normalMatrices[index]!.setInverseOf(
+                modelMatrices[index]!,
+              ).transpose();
             },
           },
           // 派生数据：模型矩阵
@@ -297,13 +297,13 @@ const Demo62: FC<ComponentProps> = () => {
               new Matrix4(),
             ],
             onChange: ({ modelMatrices, translations, rotations }, index) => {
-              const modelMatrix = modelMatrices[index];
+              const modelMatrix = modelMatrices[index]!;
               modelMatrix.setIdentity();
               for (let i = 0; i <= index; i++) {
                 if (index === 5 && i === 4) continue;
                 const [translationX, translationY, translationZ] =
-                  translations[i];
-                const [angle, rotationX, rotationY, rotationZ] = rotations[i];
+                  translations[i]!;
+                const [angle, rotationX, rotationY, rotationZ] = rotations[i]!;
                 modelMatrix
                   .translate(translationX, translationY, translationZ)
                   .rotate(angle, rotationX, rotationY, rotationZ);
