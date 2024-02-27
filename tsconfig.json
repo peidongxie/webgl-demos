@@ -1,7 +1,13 @@
 {
-  "extends": ["./tsconfig.base", "./tsconfig.recommend"],
+  "extends": ["@tsconfig/strictest/tsconfig.json"],
   "include": ["src", "vite.config.ts"],
+  "exclude": [],
   "compilerOptions": {
-    "outDir": "dist"
+    "jsx": "react-jsx",
+    "lib": ["dom", "dom.iterable", "es2020", "webworker"],
+    "module": "es2020",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "target": "es2020",
   }
 }

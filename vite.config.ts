@@ -4,7 +4,7 @@ import { defineConfig, loadEnv } from 'vite';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
-    base: env.PUBLIC_URL || '/',
+    base: env['PUBLIC_URL'] || '/',
     build: {
       chunkSizeWarningLimit: 800,
     },

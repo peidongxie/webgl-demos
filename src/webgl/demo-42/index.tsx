@@ -121,7 +121,7 @@ const Demo42: FC<ComponentProps> = () => {
               gl.uniformMatrix4fv(
                 u_ModelMatrix,
                 false,
-                modelMatrices[index].elements,
+                modelMatrices[index]!.elements,
               );
             },
           },
@@ -169,8 +169,8 @@ const Demo42: FC<ComponentProps> = () => {
             data: [new Matrix4(), new Matrix4()],
             onChange: ({ modelMatrices, translations }, index) => {
               const [translationX, translationY, translationZ] =
-                translations[index];
-              modelMatrices[index].setTranslate(
+                translations[index]!;
+              modelMatrices[index]!.setTranslate(
                 translationX,
                 translationY,
                 translationZ,

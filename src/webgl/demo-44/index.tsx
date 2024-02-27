@@ -112,7 +112,7 @@ const Demo44: FC<ComponentProps> = () => {
               gl.uniformMatrix4fv(
                 u_MvpMatrix,
                 false,
-                mvpMatrices[index].elements,
+                mvpMatrices[index]!.elements,
               );
             },
           },
@@ -147,7 +147,7 @@ const Demo44: FC<ComponentProps> = () => {
               index,
             ) => {
               const [translationX, translationY, translationZ] =
-                translations[index];
+                translations[index]!;
               const [
                 eyeX,
                 eyeY,
@@ -161,8 +161,12 @@ const Demo44: FC<ComponentProps> = () => {
               ] = camera;
               const [fovy, aspect, perspectiveNear, perspectiveFar] =
                 perspective;
-              mvpMatrices[index]
-                .setPerspective(fovy, aspect, perspectiveNear, perspectiveFar)
+              mvpMatrices[index]!.setPerspective(
+                fovy,
+                aspect,
+                perspectiveNear,
+                perspectiveFar,
+              )
                 .lookAt(
                   eyeX,
                   eyeY,
