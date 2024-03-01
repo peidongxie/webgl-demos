@@ -4,7 +4,7 @@ type StateWithRoot<S extends Record<string, unknown> = Record<string, never>> =
   };
 
 type StateChangeAction<S extends StateWithRoot<S>> = (
-  action?: Partial<S> | ((state: S) => Partial<S>),
+  action?: Partial<S> | ((state: S) => Partial<S> | void),
 ) => void;
 
 type StateChangeEffect<S extends StateWithRoot<S>> = (
@@ -88,12 +88,13 @@ const makeStateChangeAction =
     const oldState = Object.fromEntries(
       Object.entries(store).map((entry) => [entry[0], entry[1].data]),
     ) as S;
-    const partialState: Partial<S> =
-      typeof action === 'function' ? action(oldState) : action || {};
+    const partialState =
+      typeof action === 'function' ? action(oldState) : action;
     const newState = {
       ...oldState,
       ...partialState,
     };
+    if (!partialState) return;
     for (const [key, value] of Object.entries(partialState)) {
       store[key as keyof S].data = value;
     }
