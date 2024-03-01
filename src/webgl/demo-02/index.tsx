@@ -22,7 +22,7 @@ const Demo02: FC<ComponentProps> = () => {
           },
         },
       }));
-      draw();
+      draw({});
     },
     [],
   );
