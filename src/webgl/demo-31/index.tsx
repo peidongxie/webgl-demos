@@ -147,6 +147,14 @@ const Demo31: FC<ComponentProps> = () => {
           },
         }),
       );
+      draw({
+        points: [
+          [-0.5, 0.5, -0.3, 1.7],
+          [-0.5, -0.5, -0.3, -0.2],
+          [0.5, 0.5, 1.7, 1.7],
+          [0.5, -0.5, 1.7, -0.2],
+        ],
+      });
       drawRef.current = draw;
     },
     [],
@@ -157,12 +165,6 @@ const Demo31: FC<ComponentProps> = () => {
     if (!draw) return;
     if (!image) return;
     draw({
-      points: [
-        [-0.5, 0.5, -0.3, 1.7],
-        [-0.5, -0.5, -0.3, -0.2],
-        [0.5, 0.5, 1.7, 1.7],
-        [0.5, -0.5, 1.7, -0.2],
-      ],
       picture: [image, 0],
     });
   }, [image]);
