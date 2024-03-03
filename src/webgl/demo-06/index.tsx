@@ -17,7 +17,6 @@ type DemoState = StateWithRoot<{
  * 绘制彩点
  */
 const Demo06: FC<ComponentProps> = () => {
-  const glRef = useRef<WebGLRenderingContext | null>(null);
   const drawRef = useRef<StateChangeAction<DemoState> | null>(null);
 
   const handleProgramInit = useCallback(
@@ -73,7 +72,6 @@ const Demo06: FC<ComponentProps> = () => {
       );
       draw({ points: [] });
       drawRef.current = draw;
-      glRef.current = gl;
     },
     [],
   );
@@ -83,8 +81,6 @@ const Demo06: FC<ComponentProps> = () => {
   >((event) => {
     const canvas = event.target as HTMLCanvasElement;
     if (!canvas) return;
-    const gl = glRef.current;
-    if (!gl) return;
     const draw = drawRef.current;
     if (!draw) return;
     const clientX = event.clientX;
