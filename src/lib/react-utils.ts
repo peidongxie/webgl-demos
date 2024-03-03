@@ -21,7 +21,7 @@ const useFrameRequest = (frameRequest: FrameRequestCallback | null): void => {
     if (frameRequest) {
       frameRequest(time);
       nextFrameRef.current = nextFrame;
-      requestAnimationFrame(nextFrame);
+      window.requestAnimationFrame(nextFrame);
     } else {
       nextFrameRef.current = null;
     }
@@ -31,7 +31,7 @@ const useFrameRequest = (frameRequest: FrameRequestCallback | null): void => {
     frameRequestRef.current = frameRequest;
     if (frameRequestRef.current && !nextFrameRef.current) {
       nextFrameRef.current = nextFrame;
-      requestAnimationFrame(nextFrame);
+      window.requestAnimationFrame(nextFrame);
     }
     return () => {
       frameRequestRef.current = null;
