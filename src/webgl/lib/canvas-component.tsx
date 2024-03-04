@@ -65,10 +65,13 @@ const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
     };
 
     useLayoutEffect(() => {
-      let timeoutId = 0;
+      let requestId = 0;
       const listener = () => {
-        window.clearTimeout(timeoutId);
-        timeoutId = window.setTimeout(resizerRef.current, 1000 / 60);
+        if (requestId) return;
+        requestId = window.requestAnimationFrame(() => {
+          resizerRef.current();
+          requestId = 0;
+        });
       };
       globalThis.addEventListener('resize', listener);
       return () => globalThis.removeEventListener('resize', listener);
