@@ -82,7 +82,7 @@ const Demo22: FC<ComponentProps> = () => {
           },
           // 派生数据：模型矩阵
           modelMatrix: {
-            deps: ['rotation', 'translation', 'velocity', 'time'],
+            deps: ['rotation', 'translation'],
             data: new Matrix4(),
             onChange: ({ modelMatrix, rotation, translation }) => {
               const [angle, rotationX, rotationY, rotationZ] = rotation;

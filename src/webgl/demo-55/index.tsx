@@ -32,11 +32,11 @@ type DemoState = StateWithRoot<{
   points: Tuple<Tuple<Tuple<number, 9>, 4>, 6>;
   surfaces: Tuple<Tuple<Tuple<number, 3>, 2>, 6>;
   rotation: Tuple<number, 4>;
-  velocity: number;
-  time: number;
   camera: Tuple<number, 9>;
   perspective: Tuple<number, 4>;
   lights: Tuple<Tuple<number, 6>, 2>;
+  velocity: number;
+  time: number;
 }>;
 
 /**
@@ -283,7 +283,7 @@ const Demo55: FC<ComponentProps> = () => {
           },
           // 派生数据：模型矩阵
           modelMatrix: {
-            deps: ['rotation', 'velocity', 'time'],
+            deps: ['rotation'],
             data: new Matrix4(),
             onChange: ({ modelMatrix, rotation }) => {
               const [angle, rotationX, rotationY, rotationZ] = rotation;
@@ -338,14 +338,6 @@ const Demo55: FC<ComponentProps> = () => {
           rotation: {
             deps: [],
           },
-          // 原子数据：速度
-          velocity: {
-            deps: [],
-          },
-          // 原子数据：时间
-          time: {
-            deps: [],
-          },
           // 原子数据：相机
           camera: {
             deps: [],
@@ -356,6 +348,14 @@ const Demo55: FC<ComponentProps> = () => {
           },
           // 原子数据：光线
           lights: {
+            deps: [],
+          },
+          // 原子数据：速度
+          velocity: {
+            deps: [],
+          },
+          // 原子数据：时间
+          time: {
             deps: [],
           },
         }),
