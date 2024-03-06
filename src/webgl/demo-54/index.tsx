@@ -408,7 +408,7 @@ const Demo54: FC<ComponentProps> = () => {
       const timeSpan = timeEnd - timeStart;
       const angleStart = angle;
       const angleSpan = (velocity * timeSpan) / 1000;
-      const angleEnd = angleStart + angleSpan;
+      const angleEnd = (angleStart + angleSpan) % 360;
       return {
         rotation: [angleEnd, rotationX, rotationY, rotationZ],
         time: timeEnd,
