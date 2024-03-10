@@ -1,6 +1,6 @@
 import { type FC, useCallback, useEffect, useRef } from 'react';
 
-import Canvas from '../../lib/canvas-component';
+import Canvas from '../../components/canvas';
 import { makeWebGLDraw } from '../../lib/cuon-utils';
 import { flatArray, useImage } from '../../lib/react-utils';
 import {

@@ -1,6 +1,6 @@
 import { type FC, type MouseEventHandler, useCallback, useRef } from 'react';
 
-import Canvas from '../../lib/canvas-component';
+import Canvas from '../../components/canvas';
 import { makeWebGLDraw } from '../../lib/cuon-utils';
 import {
   type StateChangeAction,

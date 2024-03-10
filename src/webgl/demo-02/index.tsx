@@ -1,6 +1,6 @@
 import { type FC, useCallback } from 'react';
 
-import Canvas from '../../lib/canvas-component';
+import Canvas from '../../components/canvas';
 import { makeWebGLDraw } from '../../lib/cuon-utils';
 import { type ComponentProps } from '../../type';
 
