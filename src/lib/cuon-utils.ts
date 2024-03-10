@@ -1,6 +1,6 @@
 import { makeDebugContext } from './webgl-debug';
 import {
-  parseStateStore as makeDraw,
+  makeDraw,
   type StateChangeAction,
   type StateStore,
   type StateWithRoot,

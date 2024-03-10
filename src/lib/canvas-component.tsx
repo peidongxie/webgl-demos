@@ -65,12 +65,11 @@ const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
     };
 
     useLayoutEffect(() => {
-      let requestId = 0;
+      let requestTime = 0;
       const listener = () => {
-        if (requestId) return;
-        requestId = window.requestAnimationFrame(() => {
-          resizerRef.current();
-          requestId = 0;
+        window.requestAnimationFrame((time) => {
+          if (time > requestTime) resizerRef.current();
+          requestTime = time;
         });
       };
       globalThis.addEventListener('resize', listener);

@@ -1,8 +1,8 @@
 import { type FC, useCallback } from 'react';
 
+import Canvas from '../../lib/canvas-component';
+import { makeWebGLDraw } from '../../lib/cuon-utils';
 import { type ComponentProps } from '../../type';
-import Canvas from '../lib/canvas-component';
-import { makeWebGLDraw } from '../lib/cuon-utils';
 
 /**
  * 清空画布

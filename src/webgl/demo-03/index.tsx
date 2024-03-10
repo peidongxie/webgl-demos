@@ -1,8 +1,8 @@
 import { type FC, useCallback } from 'react';
 
+import Canvas from '../../lib/canvas-component';
+import { makeWebGLDraw } from '../../lib/cuon-utils';
 import { type ComponentProps } from '../../type';
-import Canvas from '../lib/canvas-component';
-import { makeWebGLDraw } from '../lib/cuon-utils';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
 
