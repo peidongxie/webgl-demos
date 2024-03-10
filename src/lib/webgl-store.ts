@@ -123,7 +123,7 @@ const makeDraw = <S extends StateWithRoot<S> = StateWithRoot>(
 };
 
 export {
-  makeDraw as parseStateStore,
+  makeDraw,
   type StateChangeAction,
   type StateChangeEffect,
   type StateStore,

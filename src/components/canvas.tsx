@@ -7,7 +7,7 @@ import {
   useRef,
 } from 'react';
 
-import { getWebGLContext } from './cuon-utils';
+import { getWebGLContext } from '../lib/cuon-utils';
 
 interface CanvasProps extends HTMLAttributes<HTMLCanvasElement> {
   onContextCreate?: (
@@ -65,12 +65,11 @@ const Canvas = forwardRef<WebGLRenderingContext | null, CanvasProps>(
     };
 
     useLayoutEffect(() => {
-      let requestId = 0;
+      let requestTime = 0;
       const listener = () => {
-        if (requestId) return;
-        requestId = window.requestAnimationFrame(() => {
-          resizerRef.current();
-          requestId = 0;
+        window.requestAnimationFrame((time) => {
+          if (time > requestTime) resizerRef.current();
+          requestTime = time;
         });
       };
       globalThis.addEventListener('resize', listener);
