@@ -1,9 +1,7 @@
 import { type FC, useCallback } from 'react';
 
-import Canvas from '../../components/canvas';
-import { makeWebGLDraw } from '../../lib/cuon-utils';
-import { flatArray } from '../../lib/react-utils';
-import { type StateWithRoot } from '../../lib/webgl-store';
+import Canvas from '../../component/canvas';
+import { flatArray, makeWebGLDraw, type StateWithRoot } from '../../lib';
 import { type ComponentProps, type Tuple } from '../../type';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';

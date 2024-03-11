@@ -1,12 +1,13 @@
 import { type FC, useCallback, useEffect, useRef } from 'react';
 
-import Canvas from '../../components/canvas';
-import { makeWebGLDraw } from '../../lib/cuon-utils';
-import { flatArray, useImage } from '../../lib/react-utils';
+import Canvas from '../../component/canvas';
 import {
+  flatArray,
+  makeWebGLDraw,
   type StateChangeAction,
   type StateWithRoot,
-} from '../../lib/webgl-store';
+  useImage,
+} from '../../lib';
 import { type ComponentProps, type Tuple } from '../../type';
 import CIRCLE_IMAGE from '../assets/circle.gif';
 import SKY_IMAGE from '../assets/sky.jpg';

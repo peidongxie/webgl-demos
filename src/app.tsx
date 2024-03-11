@@ -3,7 +3,7 @@ import './app.css';
 import { type FC, useMemo } from 'react';
 import { Outlet, useMatches, useNavigate } from 'react-router-dom';
 
-import { type GuiOptions, type GuiSchema, useGui } from './lib/gui-utils';
+import { type GuiOptions, type GuiSchema, useGui } from './lib';
 import { type ComponentProps, type MatchData } from './type';
 
 const App: FC<ComponentProps> = () => {

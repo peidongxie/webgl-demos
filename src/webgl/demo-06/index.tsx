@@ -1,11 +1,11 @@
 import { type FC, type MouseEventHandler, useCallback, useRef } from 'react';
 
-import Canvas from '../../components/canvas';
-import { makeWebGLDraw } from '../../lib/cuon-utils';
+import Canvas from '../../component/canvas';
 import {
+  makeWebGLDraw,
   type StateChangeAction,
   type StateWithRoot,
-} from '../../lib/webgl-store';
+} from '../../lib';
 import { type ComponentProps, type Tuple } from '../../type';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';

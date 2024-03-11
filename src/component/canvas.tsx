@@ -7,7 +7,7 @@ import {
   useRef,
 } from 'react';
 
-import { getWebGLContext } from '../lib/cuon-utils';
+import { getWebGLContext } from '../lib';
 
 interface CanvasProps extends HTMLAttributes<HTMLCanvasElement> {
   onContextCreate?: (
