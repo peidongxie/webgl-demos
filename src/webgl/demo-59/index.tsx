@@ -1,13 +1,14 @@
 import { type FC, useCallback, useRef } from 'react';
 
-import Canvas from '../../components/canvas';
-import { Matrix4, Vector3 } from '../../lib/cuon-matrix';
-import { makeWebGLDraw } from '../../lib/cuon-utils';
-import { flatArray } from '../../lib/react-utils';
+import Canvas from '../../component/canvas';
 import {
+  flatArray,
+  makeWebGLDraw,
+  Matrix4,
   type StateChangeAction,
   type StateWithRoot,
-} from '../../lib/webgl-store';
+  Vector3,
+} from '../../lib';
 import { type ComponentProps, type Tuple } from '../../type';
 import FSHADER_SOURCE from './fragment.glsl?raw';
 import VSHADER_SOURCE from './vertex.glsl?raw';
