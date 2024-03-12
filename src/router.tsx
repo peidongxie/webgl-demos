@@ -73,6 +73,7 @@ const WebglDemo59 = lazy(() => import('./webgl/demo-59'));
 const WebglDemo60 = lazy(() => import('./webgl/demo-60'));
 const WebglDemo61 = lazy(() => import('./webgl/demo-61'));
 const WebglDemo62 = lazy(() => import('./webgl/demo-62'));
+const WebglDemo63 = lazy(() => import('./webgl/demo-63'));
 const GalaceanEffectsDemo01 = lazy(() => import('./galacean-effects/demo-01'));
 const GalaceanEngineDemo01 = lazy(() => import('./galacean-engine/demo-01'));
 const GalaceanEngineDemo02 = lazy(() => import('./galacean-engine/demo-02'));
@@ -576,6 +577,14 @@ const webglChildren: RouteObject[] = [
     element: <WebglDemo62 />,
     loader: (): MatchData => ({
       value: ['62 解耦模型顶点', '/demo-62'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-63',
+    element: <WebglDemo63 />,
+    loader: (): MatchData => ({
+      value: ['63 拖拽旋转', '/demo-63'],
       children: [],
     }),
   },
