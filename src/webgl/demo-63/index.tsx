@@ -13,7 +13,6 @@ import {
   Matrix4,
   type StateChangeAction,
   type StateWithRoot,
-  useFrameRequest,
   useImage,
 } from '../../lib';
 import { type ComponentProps, type Tuple } from '../../type';
@@ -40,7 +39,6 @@ type DemoState = StateWithRoot<{
   picture: [TexImageSource, 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7];
   dragging: boolean;
   base: [number, number];
-  offset: [number, number];
 }>;
 
 /**
@@ -269,12 +267,8 @@ const Demo63: FC<ComponentProps> = () => {
           dragging: {
             deps: [],
           },
-          // 原子数据：基准
+          // 原子数据：基准位置
           base: {
-            deps: [],
-          },
-          // 原子数据：偏移
-          offset: {
             deps: [],
           },
         }),
@@ -352,9 +346,69 @@ const Demo63: FC<ComponentProps> = () => {
         perspective: [30, canvas.width / canvas.height, 1, 100],
         dragging: false,
         base: [0, 0],
-        offset: [0, 0],
       });
       drawRef.current = draw;
+    },
+    [],
+  );
+
+  const handlePointerDown = useCallback<PointerEventHandler<HTMLCanvasElement>>(
+    (event) => {
+      const canvas = event.target as HTMLCanvasElement;
+      if (!canvas) return;
+      const draw = drawRef.current;
+      if (!draw) return;
+      const clientX = event.clientX;
+      const clientY = event.clientY;
+      const clientRect = canvas.getBoundingClientRect();
+      const baseX = (100 * clientX) / canvas.height;
+      const baseY = (100 * clientY) / canvas.height;
+      if (
+        clientRect.left <= clientX &&
+        clientX < clientRect.right &&
+        clientRect.top <= clientY &&
+        clientY < clientRect.bottom
+      ) {
+        draw({
+          dragging: true,
+          base: [baseX, baseY],
+        });
+      }
+    },
+    [],
+  );
+
+  const handlePointerMove = useCallback<PointerEventHandler<HTMLCanvasElement>>(
+    (event) => {
+      const canvas = event.target as HTMLCanvasElement;
+      if (!canvas) return;
+      const draw = drawRef.current;
+      if (!draw) return;
+      const clientX = event.clientX;
+      const clientY = event.clientY;
+      const clientRect = canvas.getBoundingClientRect();
+      const baseX = (100 * clientX) / canvas.height;
+      const baseY = (100 * clientY) / canvas.height;
+      draw(({ rotations, dragging, base }) => {
+        if (
+          dragging &&
+          clientRect.left <= clientX &&
+          clientX < clientRect.right &&
+          clientRect.top <= clientY &&
+          clientY < clientRect.bottom
+        ) {
+          const offsetX = baseX - base[0];
+          const offsetY = baseY - base[1];
+          return {
+            rotations: [
+              [Math.max(Math.min(rotations[0][0] + offsetY, 90), -90), 1, 0, 0],
+              [rotations[1][0] + offsetX, 0, 1, 0],
+            ],
+            base: [baseX, baseY],
+          };
+        }
+        return;
+      });
     },
     [],
   );
@@ -369,67 +423,6 @@ const Demo63: FC<ComponentProps> = () => {
     });
   }, []);
 
-  const handlePointerMove = useCallback<PointerEventHandler<HTMLCanvasElement>>(
-    (event) => {
-      const canvas = event.target as HTMLCanvasElement;
-      if (!canvas) return;
-      const draw = drawRef.current;
-      if (!draw) return;
-      const clientX = event.clientX;
-      const clientY = event.clientY;
-      const clientRect = canvas.getBoundingClientRect();
-      draw(({ dragging, base, offset }) => {
-        if (
-          dragging &&
-          clientRect.left <= clientX &&
-          clientX < clientRect.right &&
-          clientRect.top <= clientY &&
-          clientY < clientRect.bottom
-        ) {
-          return {
-            base: [
-              (100 * clientX) / canvas.height,
-              (100 * clientY) / canvas.height,
-            ],
-            offset: [
-              (100 * clientX) / canvas.height - base[0] + offset[0],
-              (100 * clientY) / canvas.height - base[1] + offset[1],
-            ],
-          };
-        }
-        return;
-      });
-    },
-    [],
-  );
-
-  const handlePointerDown = useCallback<PointerEventHandler<HTMLCanvasElement>>(
-    (event) => {
-      const canvas = event.target as HTMLCanvasElement;
-      if (!canvas) return;
-      const draw = drawRef.current;
-      if (!draw) return;
-      const clientX = event.clientX;
-      const clientY = event.clientY;
-      const clientRect = canvas.getBoundingClientRect();
-      if (
-        clientRect.left <= clientX &&
-        clientX < clientRect.right &&
-        clientRect.top <= clientY &&
-        clientY < clientRect.bottom
-      ) {
-        draw({
-          dragging: true,
-          base: [
-            (100 * clientX) / canvas.height,
-            (100 * clientY) / canvas.height,
-          ],
-        });
-      }
-    },
-    [],
-  );
-
   useEffect(() => {
     const draw = drawRef.current;
     if (!draw) return;
@@ -438,27 +431,6 @@ const Demo63: FC<ComponentProps> = () => {
       picture: [image, 0],
     });
   }, [image]);
-
-  useFrameRequest(() => {
-    const draw = drawRef.current;
-    if (!draw) return;
-    draw(({ rotations, offset }) => {
-      const newRotations: typeof rotations = [
-        [Math.max(Math.min(rotations[0][0] + offset[1], 90), -90), 1, 0, 0],
-        [rotations[1][0] + offset[0], 0, 1, 0],
-      ];
-      if (
-        rotations[0][0] !== newRotations[0][0] ||
-        rotations[1][0] !== newRotations[1][0]
-      ) {
-        return {
-          rotations: newRotations,
-          offset: [0, 0],
-        };
-      }
-      return;
-    });
-  });
 
   return (
     <Canvas
