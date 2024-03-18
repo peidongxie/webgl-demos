@@ -1,4 +1,4 @@
-import { type FC, type MouseEventHandler, useCallback, useRef } from 'react';
+import { type FC, type PointerEventHandler, useCallback, useRef } from 'react';
 
 import Canvas from '../../component/canvas';
 import {
@@ -326,7 +326,7 @@ const Demo64: FC<ComponentProps> = () => {
     [],
   );
 
-  const handlePointerDown = useCallback<MouseEventHandler<HTMLCanvasElement>>(
+  const handlePointerDown = useCallback<PointerEventHandler<HTMLCanvasElement>>(
     (event) => {
       const canvas = event.target as HTMLCanvasElement;
       if (!canvas) return;
