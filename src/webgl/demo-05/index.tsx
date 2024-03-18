@@ -1,4 +1,4 @@
-import { type FC, type MouseEventHandler, useCallback, useRef } from 'react';
+import { type FC, type PointerEventHandler, useCallback, useRef } from 'react';
 
 import Canvas from '../../component/canvas';
 import {
@@ -63,8 +63,8 @@ const Demo05: FC<ComponentProps> = () => {
     [],
   );
 
-  const handleCanvasMouseDown = useCallback<
-    MouseEventHandler<HTMLCanvasElement>
+  const handleCanvasPointerDown = useCallback<
+    PointerEventHandler<HTMLCanvasElement>
   >((event) => {
     const canvas = event.target as HTMLCanvasElement;
     if (!canvas) return;
@@ -83,7 +83,7 @@ const Demo05: FC<ComponentProps> = () => {
 
   return (
     <Canvas
-      onMouseDown={handleCanvasMouseDown}
+      onPointerDown={handleCanvasPointerDown}
       onProgramInit={handleProgramInit}
       style={{ width: '100vw', height: '100vh', backgroundColor: '#000000' }}
     />
