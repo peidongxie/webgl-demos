@@ -10,8 +10,8 @@ import {
   useFrameRequest,
 } from '../../lib';
 import { type ComponentProps, type Tuple } from '../../type';
-import FSHADER_SOURCE from './fragment.glsl?raw';
-import VSHADER_SOURCE from './vertex.glsl?raw';
+import FSHADER from './fragment.glsl?raw';
+import VSHADER from './vertex.glsl?raw';
 
 type DemoState = StateWithRoot<{
   a_Position: GLint;
@@ -63,8 +63,8 @@ const Demo65: FC<ComponentProps> = () => {
     (canvas: HTMLCanvasElement, gl: WebGLRenderingContext) => {
       const draw = makeWebGLDraw<DemoState>(
         gl,
-        VSHADER_SOURCE,
-        FSHADER_SOURCE,
+        VSHADER,
+        FSHADER,
         (program) => ({
           // 着色器程序
           root: {

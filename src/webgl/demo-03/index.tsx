@@ -3,8 +3,8 @@ import { type FC, useCallback } from 'react';
 import Canvas from '../../component/canvas';
 import { makeWebGLDraw } from '../../lib';
 import { type ComponentProps } from '../../type';
-import FSHADER_SOURCE from './fragment.glsl?raw';
-import VSHADER_SOURCE from './vertex.glsl?raw';
+import FSHADER from './fragment.glsl?raw';
+import VSHADER from './vertex.glsl?raw';
 
 /**
  * 绘制点
@@ -12,7 +12,7 @@ import VSHADER_SOURCE from './vertex.glsl?raw';
 const Demo03: FC<ComponentProps> = () => {
   const handleProgramInit = useCallback(
     (_: HTMLCanvasElement, gl: WebGLRenderingContext) => {
-      const draw = makeWebGLDraw(gl, VSHADER_SOURCE, FSHADER_SOURCE, () => ({
+      const draw = makeWebGLDraw(gl, VSHADER, FSHADER, () => ({
         // 着色器程序
         root: {
           deps: [],
