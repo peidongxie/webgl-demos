@@ -33,10 +33,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@galacean/effects": "^1.2.2",
-    "@galacean/effects-plugin-model": "^1.2.2",
-    "@galacean/effects-plugin-orientation-transformer": "^1.2.2",
-    "@galacean/effects-plugin-spine": "^1.2.2",
+    "@galacean/effects": "^1.2.3",
+    "@galacean/effects-plugin-model": "^1.2.3",
+    "@galacean/effects-plugin-orientation-transformer": "^1.2.3",
+    "@galacean/effects-plugin-spine": "^1.2.3",
     "@galacean/engine": "1.1.0-beta.1",
     "@galacean/engine-toolkit-controls": "1.1.0-beta.1",
     "@galacean/mars-player": "^2.8.1",
@@ -48,10 +48,10 @@
   "devDependencies": {
     "@eslint/eslintrc": "^2.1.4",
     "@eslint/js": "^8.57.0",
-    "@tsconfig/strictest": "^2.0.3",
+    "@tsconfig/strictest": "^2.0.5",
     "@types/node": "^20.11.30",
-    "@types/react": "^18.2.67",
-    "@types/react-dom": "^18.2.22",
+    "@types/react": "^18.2.73",
+    "@types/react-dom": "^18.2.23",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "@vitejs/plugin-react-swc": "^3.6.0",
@@ -65,9 +65,9 @@
     "husky": "^8.0.3",
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
-    "sort-package-json": "^2.8.0",
+    "sort-package-json": "^2.9.0",
     "typescript": "^5.4.3",
-    "vite": "^4.5.2"
+    "vite": "^4.5.3"
   },
   "packageManager": "pnpm@8.14.1"
 }
