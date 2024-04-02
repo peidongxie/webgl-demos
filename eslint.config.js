@@ -1,52 +1,57 @@
-import { FlatCompat } from '@eslint/eslintrc';
-import js from '@eslint/js';
-import typescriptEslintParser from '@typescript-eslint/parser';
+import eslint from '@eslint/js';
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import reactRefreshPlugin from 'eslint-plugin-react-refresh';
 import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
 import globals from 'globals';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import typescriptEslint from 'typescript-eslint';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  resolvePluginsRelativeTo: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
+const eslintRecommended = eslint.configs.recommended;
+const typescriptEslintRecommended = typescriptEslint.configs.recommended;
 
-export default [
+export default typescriptEslint.config(
   {
     ignores: ['dist/*'],
   },
-  ...compat.extends(
-    'plugin:@typescript-eslint/recommended',
-    'plugin:react-hooks/recommended',
-    'plugin:prettier/recommended',
-  ),
+  eslintRecommended,
+  ...typescriptEslintRecommended,
   {
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        ...globals.es2020,
-      },
-      parser: typescriptEslintParser,
+    plugins: {
+      'react-hooks': reactHooksPlugin,
     },
-    linterOptions: {
-      reportUnusedDisableDirectives: true,
-    },
+    rules: reactHooksPlugin.configs.recommended.rules,
+  },
+  {
     plugins: {
       'react-refresh': reactRefreshPlugin,
-      'simple-import-sort': simpleImportSortPlugin,
     },
     rules: {
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
       ],
+    },
+  },
+  {
+    plugins: {
+      'simple-import-sort': simpleImportSortPlugin,
+    },
+    rules: {
       'simple-import-sort/exports': 'error',
       'simple-import-sort/imports': 'error',
     },
   },
-];
+  eslintPluginPrettierRecommended,
+  {
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.es2020,
+      },
+    },
+    linterOptions: {
+      noInlineConfig: true,
+      reportUnusedDisableDirectives: true,
+    },
+  },
+);
