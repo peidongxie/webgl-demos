@@ -216,50 +216,27 @@ const Demo38: FC<ComponentProps> = () => {
   useGui(
     [
       {
-        type: 'function',
-        name: '相机左移',
-        initialValue: () => {
+        type: 'number',
+        name: '相机位置',
+        initialValue: 0.2,
+        min: -1,
+        max: 1,
+        step: 0.01,
+        onChange: (value) => {
           const draw = drawRef.current;
           if (!draw) return;
           draw(({ camera }) => {
-            const [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ] =
-              camera;
             return {
               camera: [
-                eyeX - 0.01,
-                eyeY,
-                eyeZ,
-                centerX,
-                centerY,
-                centerZ,
-                upX,
-                upY,
-                upZ,
-              ],
-            };
-          });
-        },
-      },
-      {
-        type: 'function',
-        name: '相机右移',
-        initialValue: () => {
-          const draw = drawRef.current;
-          if (!draw) return;
-          draw(({ camera }) => {
-            const [eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ] =
-              camera;
-            return {
-              camera: [
-                eyeX + 0.01,
-                eyeY,
-                eyeZ,
-                centerX,
-                centerY,
-                centerZ,
-                upX,
-                upY,
-                upZ,
+                value,
+                camera[1],
+                camera[2],
+                camera[3],
+                camera[4],
+                camera[5],
+                camera[6],
+                camera[7],
+                camera[8],
               ],
             };
           });

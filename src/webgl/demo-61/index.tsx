@@ -521,17 +521,20 @@ const Demo61: FC<ComponentProps> = () => {
   useGui(
     [
       {
-        type: 'function',
-        name: '手臂逆时针旋转',
-        initialValue: () => {
+        type: 'number',
+        name: '手臂角度',
+        initialValue: 90,
+        min: -180,
+        max: 180,
+        step: 3,
+        onChange: (value) => {
           const draw = drawRef.current;
           if (!draw) return;
           draw(({ rotations }) => {
-            const [angle, rotationX, rotationY, rotationZ] = rotations[1];
             return {
               rotations: [
                 rotations[0],
-                [angle + 3, rotationX, rotationY, rotationZ],
+                [value, rotations[1][1], rotations[1][2], rotations[1][3]],
                 rotations[2],
                 rotations[3],
                 rotations[4],
@@ -542,18 +545,21 @@ const Demo61: FC<ComponentProps> = () => {
         },
       },
       {
-        type: 'function',
-        name: '手臂顺时针旋转',
-        initialValue: () => {
+        type: 'number',
+        name: '前臂角度',
+        initialValue: 45,
+        min: -135,
+        max: 135,
+        step: 3,
+        onChange: (value) => {
           const draw = drawRef.current;
           if (!draw) return;
           draw(({ rotations }) => {
-            const [angle, rotationX, rotationY, rotationZ] = rotations[1];
             return {
               rotations: [
                 rotations[0],
-                [angle - 3, rotationX, rotationY, rotationZ],
-                rotations[2],
+                rotations[1],
+                [value, rotations[2][1], rotations[2][2], rotations[2][3]],
                 rotations[3],
                 rotations[4],
                 rotations[5],
@@ -563,20 +569,22 @@ const Demo61: FC<ComponentProps> = () => {
         },
       },
       {
-        type: 'function',
-        name: '前臂逆时针旋转',
-        initialValue: () => {
+        type: 'number',
+        name: '手掌角度',
+        initialValue: 0,
+        min: -90,
+        max: 90,
+        step: 3,
+        onChange: (value) => {
           const draw = drawRef.current;
           if (!draw) return;
           draw(({ rotations }) => {
-            const [angle, rotationX, rotationY, rotationZ] = rotations[2];
-            if (angle >= 135) return { rotations };
             return {
               rotations: [
                 rotations[0],
                 rotations[1],
-                [angle + 3, rotationX, rotationY, rotationZ],
-                rotations[3],
+                rotations[2],
+                [value, rotations[3][1], rotations[3][2], rotations[3][3]],
                 rotations[4],
                 rotations[5],
               ],
@@ -585,108 +593,24 @@ const Demo61: FC<ComponentProps> = () => {
         },
       },
       {
-        type: 'function',
-        name: '前臂顺时针旋转',
-        initialValue: () => {
+        type: 'number',
+        name: '手指角度',
+        initialValue: 0,
+        min: -60,
+        max: 60,
+        step: 3,
+        onChange: (value) => {
           const draw = drawRef.current;
           if (!draw) return;
           draw(({ rotations }) => {
-            const [angle, rotationX, rotationY, rotationZ] = rotations[2];
-            if (angle <= -135) return { rotations };
-            return {
-              rotations: [
-                rotations[0],
-                rotations[1],
-                [angle - 3, rotationX, rotationY, rotationZ],
-                rotations[3],
-                rotations[4],
-                rotations[5],
-              ],
-            };
-          });
-        },
-      },
-      {
-        type: 'function',
-        name: '手掌逆时针旋转',
-        initialValue: () => {
-          const draw = drawRef.current;
-          if (!draw) return;
-          draw(({ rotations }) => {
-            const [angle, rotationX, rotationY, rotationZ] = rotations[3];
-            return {
-              rotations: [
-                rotations[0],
-                rotations[1],
-                rotations[2],
-                [angle + 3, rotationX, rotationY, rotationZ],
-                rotations[4],
-                rotations[5],
-              ],
-            };
-          });
-        },
-      },
-      {
-        type: 'function',
-        name: '手掌顺时针旋转',
-        initialValue: () => {
-          const draw = drawRef.current;
-          if (!draw) return;
-          draw(({ rotations }) => {
-            const [angle, rotationX, rotationY, rotationZ] = rotations[3];
-            return {
-              rotations: [
-                rotations[0],
-                rotations[1],
-                rotations[2],
-                [angle - 3, rotationX, rotationY, rotationZ],
-                rotations[4],
-                rotations[5],
-              ],
-            };
-          });
-        },
-      },
-      {
-        type: 'function',
-        name: '手指逆时针旋转',
-        initialValue: () => {
-          const draw = drawRef.current;
-          if (!draw) return;
-          draw(({ rotations }) => {
-            const [angle, rotationX, rotationY, rotationZ] = rotations[4];
-            if (angle >= 60) return { rotations };
             return {
               rotations: [
                 rotations[0],
                 rotations[1],
                 rotations[2],
                 rotations[3],
-                [angle + 3, rotationX, rotationY, rotationZ],
-                [-angle - 3, rotationX, rotationY, rotationZ],
-              ],
-            };
-          });
-        },
-      },
-      {
-        type: 'function',
-        name: '手指顺时针旋转',
-        initialValue: () => {
-          const draw = drawRef.current;
-          if (!draw) return;
-          draw(({ rotations }) => {
-            const [angle, rotationX, rotationY, rotationZ] = rotations[4];
-            if (angle <= -60) return { rotations };
-            return {
-              rotations: [
-                rotations[0],
-                rotations[1],
-                rotations[2],
-                rotations[3],
-                [angle - 3, rotationX, rotationY, rotationZ],
-                [-angle + 3, rotationX, rotationY, rotationZ],
+                [value, rotations[4][1], rotations[4][2], rotations[4][3]],
+                [-value, rotations[5][1], rotations[5][2], rotations[5][3]],
               ],
             };
           });

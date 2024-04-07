@@ -157,25 +157,20 @@ const Demo23: FC<ComponentProps> = () => {
   useGui(
     [
       {
-        type: 'function',
-        name: '逆时针转速增大',
-        initialValue: () => {
+        type: 'number',
+        name: '转速',
+        initialValue: 45,
+        min: 5,
+        max: 85,
+        step: 10,
+        onChange: (value) => {
           const draw = drawRef.current;
           if (!draw) return;
-          draw(({ velocity }) => ({
-            velocity: velocity + 10,
-          }));
-        },
-      },
-      {
-        type: 'function',
-        name: '顺时针转速增加',
-        initialValue: () => {
-          const draw = drawRef.current;
-          if (!draw) return;
-          draw(({ velocity }) => ({
-            velocity: velocity - 10,
-          }));
+          draw(() => {
+            return {
+              velocity: value,
+            };
+          });
         },
       },
     ],
