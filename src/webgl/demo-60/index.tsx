@@ -487,16 +487,19 @@ const Demo60: FC<ComponentProps> = () => {
   useGui(
     [
       {
-        type: 'function',
-        name: '手臂逆时针旋转',
-        initialValue: () => {
+        type: 'number',
+        name: '手臂角度',
+        initialValue: -90,
+        min: -180,
+        max: 180,
+        step: 3,
+        onChange: (value) => {
           const draw = drawRef.current;
           if (!draw) return;
           draw(({ rotations }) => {
-            const [angle, rotationX, rotationY, rotationZ] = rotations[0];
             return {
               rotations: [
-                [angle + 3, rotationX, rotationY, rotationZ],
+                [value, rotations[0][1], rotations[0][2], rotations[0][3]],
                 rotations[1],
               ],
             };
@@ -504,53 +507,20 @@ const Demo60: FC<ComponentProps> = () => {
         },
       },
       {
-        type: 'function',
-        name: '手臂顺时针旋转',
-        initialValue: () => {
+        type: 'number',
+        name: '前臂角度',
+        initialValue: 0,
+        min: -135,
+        max: 135,
+        step: 3,
+        onChange: (value) => {
           const draw = drawRef.current;
           if (!draw) return;
           draw(({ rotations }) => {
-            const [angle, rotationX, rotationY, rotationZ] = rotations[0];
-            return {
-              rotations: [
-                [angle - 3, rotationX, rotationY, rotationZ],
-                rotations[1],
-              ],
-            };
-          });
-        },
-      },
-      {
-        type: 'function',
-        name: '前臂逆时针旋转',
-        initialValue: () => {
-          const draw = drawRef.current;
-          if (!draw) return;
-          draw(({ rotations }) => {
-            const [angle, rotationX, rotationY, rotationZ] = rotations[1];
-            if (angle >= 135) return { rotations };
             return {
               rotations: [
                 rotations[0],
-                [angle + 3, rotationX, rotationY, rotationZ],
-              ],
-            };
-          });
-        },
-      },
-      {
-        type: 'function',
-        name: '前臂顺时针旋转',
-        initialValue: () => {
-          const draw = drawRef.current;
-          if (!draw) return;
-          draw(({ rotations }) => {
-            const [angle, rotationX, rotationY, rotationZ] = rotations[1];
-            if (angle <= -135) return { rotations };
-            return {
-              rotations: [
-                rotations[0],
-                [angle - 3, rotationX, rotationY, rotationZ],
+                [value, rotations[1][1], rotations[1][2], rotations[1][3]],
               ],
             };
           });
