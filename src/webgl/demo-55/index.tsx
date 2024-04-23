@@ -431,14 +431,14 @@ const Demo55: FC<ComponentProps> = () => {
           ],
         ],
         rotation: [90, 0, 1, 0],
-        velocity: 30,
-        time: Date.now(),
         camera: [3, 3, 7, 0, 0, 0, 0, 1, 0],
         perspective: [30, canvas.width / canvas.height, 1, 100],
         lights: [
           [1, 1, 1, 1.15, 2, 1.75],
           [0.2, 0.2, 0.2, 0, 0, 0],
         ],
+        velocity: 30,
+        time: Date.now(),
       });
       drawRef.current = draw;
     },
