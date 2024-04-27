@@ -322,11 +322,11 @@ const Demo66: FC<ComponentProps> = () => {
           [0, 0, 1, 0],
           [0, 0, 0, 1],
         ],
-        velocity: 20,
-        time: Date.now(),
         camera: [0, 0, 7, 0, 0, 0, 0, 1, 0],
         perspective: [30, canvas.width / canvas.height, 1, 100],
         clicked: false,
+        velocity: 20,
+        time: Date.now(),
       });
       glRef.current = gl;
       drawRef.current = draw;

@@ -8,6 +8,24 @@
   <img src="https://img.shields.io/github/package-json/v/peidongxie/webgl-demos" />
 </p>
 
+## Table of Contents
+
+- [Background](#background)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Related Efforts](#related-efforts)
+- [Maintainers](#maintainers)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Background
+
+## Installation
+
+## Usage
+
+## Related Efforts
+
 ## Maintainers
 
 [@peidongxie](https://github.com/peidongxie)
