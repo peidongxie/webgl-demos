@@ -84,6 +84,7 @@ const WebglDemo70 = lazy(() => import('./webgl/demo-70'));
 const WebglDemo71 = lazy(() => import('./webgl/demo-71'));
 const WebglDemo72 = lazy(() => import('./webgl/demo-72'));
 const WebglDemo73 = lazy(() => import('./webgl/demo-73'));
+const WebglDemo74 = lazy(() => import('./webgl/demo-74'));
 const GalaceanEffectsDemo01 = lazy(() => import('./galacean-effects/demo-01'));
 const GalaceanEngineDemo01 = lazy(() => import('./galacean-engine/demo-01'));
 const GalaceanEngineDemo02 = lazy(() => import('./galacean-engine/demo-02'));
@@ -675,6 +676,14 @@ const webglChildren: RouteObject[] = [
     element: <WebglDemo73 />,
     loader: (): MatchData => ({
       value: ['73 切换着色器', '/demo-73'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-74',
+    element: <WebglDemo74 />,
+    loader: (): MatchData => ({
+      value: ['74 绘制到纹理', '/demo-74'],
       children: [],
     }),
   },
