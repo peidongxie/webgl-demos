@@ -744,7 +744,11 @@ const appChildren: RouteObject[] = [
     loader: (args): MatchData => ({
       value: ['WebGL', '/webgl'],
       children: webglChildren
-        .map((child) => child.loader?.(args))
+        .map((child) =>
+          typeof child.loader === 'function'
+            ? child.loader(args)
+            : child.loader,
+        )
         .filter<MatchData>((childData): childData is MatchData => {
           if (!childData) return false;
           if (!Reflect.has(childData, 'value')) return false;
@@ -764,7 +768,11 @@ const appChildren: RouteObject[] = [
     loader: (args): MatchData => ({
       value: ['Galacean Effects', '/galacean-effects'],
       children: galaceanEffectsChildren
-        .map((child) => child.loader?.(args))
+        .map((child) =>
+          typeof child.loader === 'function'
+            ? child.loader(args)
+            : child.loader,
+        )
         .filter<MatchData>((childData): childData is MatchData => {
           if (!childData) return false;
           if (!Reflect.has(childData, 'value')) return false;
@@ -784,7 +792,11 @@ const appChildren: RouteObject[] = [
     loader: (args): MatchData => ({
       value: ['Galacean Engine', '/galacean-engine'],
       children: galaceanEngineChildren
-        .map((child) => child.loader?.(args))
+        .map((child) =>
+          typeof child.loader === 'function'
+            ? child.loader(args)
+            : child.loader,
+        )
         .filter<MatchData>((childData): childData is MatchData => {
           if (!childData) return false;
           if (!Reflect.has(childData, 'value')) return false;
@@ -812,7 +824,11 @@ const router = createBrowserRouter(
       loader: (args): MatchData => ({
         value: ['All', ''],
         children: appChildren
-          .map((child) => child.loader?.(args))
+          .map((child) =>
+            typeof child.loader === 'function'
+              ? child.loader(args)
+              : child.loader,
+          )
           .filter<MatchData>((childData): childData is MatchData => {
             if (!childData) return false;
             if (!Reflect.has(childData, 'value')) return false;

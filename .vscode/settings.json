@@ -12,5 +12,6 @@
     "mediump",
     "webglcontextcreationerror",
     "xform"
-  ]
+  ],
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
