@@ -21,8 +21,8 @@ type DemoState = StateWithRoot<{
   viewMatrix: Matrix4;
   modelMatrix: Matrix4;
   points: Tuple<Tuple<Tuple<number, 6>, 3>, 3>;
-  camera: Tuple<number, 9>;
   rotation: Tuple<number, 4>;
+  camera: Tuple<number, 9>;
 }>;
 
 /**
@@ -159,12 +159,12 @@ const Demo34: FC<ComponentProps> = () => {
           points: {
             deps: [],
           },
-          // 原子数据：相机
-          camera: {
-            deps: [],
-          },
           // 原子数据：旋转
           rotation: {
+            deps: [],
+          },
+          // 原子数据：相机
+          camera: {
             deps: [],
           },
         }),
@@ -187,8 +187,8 @@ const Demo34: FC<ComponentProps> = () => {
             [0.5, -0.5, 0, 1, 0.4, 0.4],
           ],
         ],
-        camera: [0.2, 0.25, 0.25, 0, 0, 0, 0, 1, 0],
         rotation: [-10, 0, 0, 1],
+        camera: [0.2, 0.25, 0.25, 0, 0, 0, 0, 1, 0],
       });
     },
     [],
