@@ -238,7 +238,7 @@ const Demo56: FC<ComponentProps> = () => {
           // 派生数据：顶点索引数组
           indexArray: {
             deps: ['surfaces'],
-            data: new Uint8Array(6 * DIVISION * DIVISION),
+            data: new Uint8Array(3 * 2 * DIVISION * DIVISION),
             onChange: ({ indexArray, surfaces }) => {
               indexArray.set(flatArray(surfaces));
             },

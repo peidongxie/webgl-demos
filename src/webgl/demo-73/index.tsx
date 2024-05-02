@@ -703,6 +703,16 @@ const Demo73: FC<ComponentProps> = () => {
           },
         }),
       );
+      const camera: Tuple<number, 9> = [0, 0, 15, 0, 0, 0, 0, 1, 0];
+      const perspective: Tuple<number, 4> = [
+        30,
+        canvas.width / canvas.height,
+        1,
+        100,
+      ];
+      const light: Tuple<number, 6> = [1, 1, 1, 0, 0, 1];
+      const velocity = 30;
+      const time = Date.now();
       draw1({
         points: [
           [
@@ -773,11 +783,11 @@ const Demo73: FC<ComponentProps> = () => {
           [20, 1, 0, 0],
           [0, 0, 1, 0],
         ],
-        velocity: 30,
-        time: Date.now(),
-        camera: [0, 0, 15, 0, 0, 0, 0, 1, 0],
-        perspective: [30, canvas.width / canvas.height, 1, 100],
-        light: [1, 1, 1, 0, 0, 1],
+        camera,
+        perspective,
+        light,
+        velocity,
+        time,
       });
       draw2({
         points: [
@@ -849,11 +859,11 @@ const Demo73: FC<ComponentProps> = () => {
           [20, 1, 0, 0],
           [0, 0, 1, 0],
         ],
-        velocity: 30,
-        time: Date.now(),
-        camera: [0, 0, 15, 0, 0, 0, 0, 1, 0],
-        perspective: [30, canvas.width / canvas.height, 1, 100],
-        light: [1, 1, 1, 0, 0, 1],
+        camera,
+        perspective,
+        light,
+        velocity,
+        time,
       });
       drawRef.current = [draw1, draw2];
     },
@@ -864,9 +874,9 @@ const Demo73: FC<ComponentProps> = () => {
     const draw = drawRef.current;
     if (!draw) return;
     const [draw1, draw2] = draw;
+    const timeEnd = Date.now();
     draw1(({ rotations, velocity, time }) => {
       const [angle, rotationX, rotationY, rotationZ] = rotations[1];
-      const timeEnd = Date.now();
       const timeStart = time;
       const timeSpan = timeEnd - timeStart;
       const angleStart = angle;
@@ -879,7 +889,6 @@ const Demo73: FC<ComponentProps> = () => {
     });
     draw2(({ rotations, velocity, time }) => {
       const [angle, rotationX, rotationY, rotationZ] = rotations[1];
-      const timeEnd = Date.now();
       const timeStart = time;
       const timeSpan = timeEnd - timeStart;
       const angleStart = angle;
