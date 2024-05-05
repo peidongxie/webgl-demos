@@ -86,6 +86,7 @@ const WebglDemo72 = lazy(() => import('./webgl/demo-72'));
 const WebglDemo73 = lazy(() => import('./webgl/demo-73'));
 const WebglDemo74 = lazy(() => import('./webgl/demo-74'));
 const WebglDemo75 = lazy(() => import('./webgl/demo-75'));
+const WebglDemo76 = lazy(() => import('./webgl/demo-76'));
 const GalaceanEffectsDemo01 = lazy(() => import('./galacean-effects/demo-01'));
 const GalaceanEngineDemo01 = lazy(() => import('./galacean-engine/demo-01'));
 const GalaceanEngineDemo02 = lazy(() => import('./galacean-engine/demo-02'));
@@ -693,6 +694,14 @@ const webglChildren: RouteObject[] = [
     element: <WebglDemo75 />,
     loader: (): MatchData => ({
       value: ['75 绘制阴影', '/demo-75'],
+      children: [],
+    }),
+  },
+  {
+    path: 'demo-76',
+    element: <WebglDemo76 />,
+    loader: (): MatchData => ({
+      value: ['76 绘制高精阴影', '/demo-76'],
       children: [],
     }),
   },
